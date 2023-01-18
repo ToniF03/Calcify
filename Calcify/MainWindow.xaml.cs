@@ -1527,7 +1527,7 @@ namespace Calcify
                 #endregion
 
                 #region Result
-                if (result == "" && calculatorRegex.IsMatch(currentLine) && !numberRegex.IsMatch(currentLine))
+                if (result == "" && calculatorRegex.IsMatch(currentLine) && !numberRegex.IsMatch(currentLine) && numberRegex.IsMatch(currentLine.Substring(currentLine.Length - 1)))
                 {
                     double val = Calculator.CalculateString(currentLine, givenRegex);
                     if (!double.IsNaN(val))

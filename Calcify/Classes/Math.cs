@@ -5369,7 +5369,7 @@ namespace Calcify.Math
             {
                 string geoSubTask = givenRegex["Geometrics"].Match(task).Value;
                 //string geoFirstPart = geoSubTask.Substring(0, 1) == "-" ? geoSubTask.Substring(1);
-                string[] geoParts = givenRegex["GeoOperators"].Split(task);
+                string[] geoParts = givenRegex["GeoOperators"].Split(geoSubTask);
                 double geoFirstPart = double.Parse(geoParts[0], CultureInfo.InvariantCulture);
                 double geoSecondPart = geoParts[2].StartsWith("(") ? double.Parse(geoParts[2].Substring(1, geoParts[2].Length - 2), CultureInfo.InvariantCulture) : double.Parse(geoParts[2], CultureInfo.InvariantCulture);
                 if (geoSecondPart == 0) return double.NaN;
