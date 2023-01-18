@@ -1,0 +1,264 @@
+﻿<Window x:Class="Calcify.About"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	    xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Calcify"
+        xmlns:properties="clr-namespace:Calcify.Properties"
+        x:Name="AboutWindow"
+        ResizeMode="NoResize"
+        mc:Ignorable="d" Style="{StaticResource modernWindow}"
+        Title="Calcify - About" Height="250" Width="500">
+
+    <Window.RenderTransform>
+        <ScaleTransform x:Name="WindowTrans" ScaleX="1" ScaleY="1" />
+    </Window.RenderTransform>
+        
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="30" />
+    </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <Style x:Key="lightLabel" TargetType="Label" >
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True" >
+                    <Setter Property="Foreground" Value="White" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="False" >
+                    <Setter Property="Foreground" Value="Black" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Storyboard x:Key="BackToAbout" >
+            <DoubleAnimation Storyboard.TargetName="GridTrans" Storyboard.TargetProperty="X" From="-500" To="0" Duration="0:0:0.15" />
+        </Storyboard>
+
+        <Storyboard x:Key="BackToLicenseOverview" >
+            <DoubleAnimation Storyboard.TargetName="GridTrans" Storyboard.TargetProperty="X" From="-1000" To="-500" Duration="0:0:0.15" />
+        </Storyboard>
+
+        <Storyboard x:Key="OpenLicenseOverview" >
+            <DoubleAnimation Storyboard.TargetName="GridTrans" Storyboard.TargetProperty="X" From="0" To="-500" Duration="0:0:0.15" />
+        </Storyboard>
+
+        <Storyboard x:Key="OpenLicenseScreen" >
+            <DoubleAnimation Storyboard.TargetName="GridTrans" Storyboard.TargetProperty="X" From="-500" To="-1000" Duration="0:0:0.15" />
+        </Storyboard>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid Style="{StaticResource modernHeaderFooter}" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="50" />
+            </Grid.ColumnDefinitions>
+
+
+            <Button Grid.Column="0" x:Name="BackButton" Click="BackButton_Click" Visibility="Hidden" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" >
+                <Button.Content>
+                    <Label FontSize="15" Content="&#xE830;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                </Button.Content>
+            </Button>
+
+            <Button Grid.Column="2" x:Name="closeButton" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeCloseButton}" >
+                <Button.Content>
+                    <Label FontSize="15" Content="&#xe947;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                </Button.Content>
+            </Button>
+        </Grid>
+        
+        <Grid x:Name="mainFrame" Grid.Row="1" Width="1500" Margin="0, 0, -1000, 0" >
+            <Grid.RenderTransform>
+                <TranslateTransform x:Name="GridTrans" X="0" Y="0" />
+            </Grid.RenderTransform>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="500" />
+                <ColumnDefinition Width="500" />
+                <ColumnDefinition Width="500" />
+            </Grid.ColumnDefinitions>
+
+
+            <Image Source="/Resources/Calcify.png" Margin="15" Width="{Binding RelativeSource={RelativeSource Self}, Path=Height}" Height="50" VerticalAlignment="Top" HorizontalAlignment="Left" />
+            <Label Content="Calcify" Margin="80, 15" Height="50" VerticalAlignment="Top" FontSize="40" FontFamily="Arial" Style="{StaticResource lightLabel}" />
+
+            <Grid Margin="15, 80, 15, 15" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.7*" />
+                    <ColumnDefinition Width="0.3*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel >
+                    <Label Content="Calcify" FontSize="14" Style="{StaticResource lightLabel}" />
+                    <Label Content="1.0.0" FontSize="14" Margin="0, -10, 0, 0" />
+                    <Label Content="Build date: 2023-01-17 23:56" FontSize="14" Margin="0, -2.5, 0, 0" />
+                    <Label Content="Coded with love by ToniF03" FontSize="14" Margin="0, -15, 0, 0" />
+                    <Label Content="Calcify is free software" FontSize="14" Margin="0, 0, 0, 0" />
+                    <Label Content="Licensed under the GNU General Public License" FontSize="14" Margin="0, -15, 0, 0" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" >
+                    <StackPanel Grid.Column="1" >
+                        <Button x:Name="ReleaseNotesButton" Click="ReleaseNotesButton_Click" Height="23" Style="{StaticResource ReactiveRoundedButton}" >
+                            <Grid>
+                                <Label Content="&#xE774;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0, 0, 0, 0" Style="{StaticResource lightLabel}" IsHitTestVisible="False" />
+                                <Label Content="Release Notes" FontSize="14" Margin="20, -4, 0, 0" Style="{StaticResource lightLabel}" IsHitTestVisible="False" />
+                            </Grid>
+                        </Button>
+                        <Button x:Name="LicenseButton" Click="LicenseButton_Click" Height="23" Margin="0, 1, 0, 0" Style="{StaticResource ReactiveRoundedButton}" >
+                            <Grid>
+                                <Label Content="&#xF000;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0, 0, 0, 0" Style="{StaticResource lightLabel}" />
+                                <Label Content="License" FontSize="14" Margin="20, -4, 0, 0" Style="{StaticResource lightLabel}" />
+                            </Grid>
+                        </Button>
+                        <Button x:Name="WebsiteButton" Click="WebsiteButton_Click" Height="23" Margin="0, 1, 0, 0" Style="{StaticResource ReactiveRoundedButton}" >
+                            <Grid>
+                                <Label Content="&#xE774;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0, 0, 0, 0" Style="{StaticResource lightLabel}" />
+                                <Label Content="Calcify Website" FontSize="14" Margin="20, -4, 0, 0" Style="{StaticResource lightLabel}" />
+                            </Grid>
+                        </Button>
+                        <Button x:Name="RepositoryButton" Click="RepositoryButton_Click" Height="23" Margin="0, 1, 0, 0" Style="{StaticResource ReactiveRoundedButton}" >
+                            <Grid>
+                                <Label Content="&#xE774;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0, 0, 0, 0" Style="{StaticResource lightLabel}" />
+                                <Label Content="Calcify Repository" FontSize="14" Margin="20, -4, 0, 0" Style="{StaticResource lightLabel}" />
+                            </Grid>
+                        </Button>
+                        <Button x:Name="BugsButton" Click="BugsButton_Click" Height="25" Margin="0, 1, 0, 0" Style="{StaticResource ReactiveRoundedButton}" >
+                            <Grid>
+                                <Label Content="&#xE774;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0, 0, 0, 0" Style="{StaticResource lightLabel}" />
+                                <Label Content="Bugs" FontSize="14" Margin="20, -4, 0, 0" Style="{StaticResource lightLabel}" />
+                            </Grid>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Column="1" >
+                <ScrollViewer Margin="15, 15, 0, 15">
+                    <StackPanel >
+                        <Button x:Name="CalcifyLicenseButton" Click="CalcifyLicenseButton_Click" Style="{StaticResource ItemButton}" >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="20" />
+                                </Grid.ColumnDefinitions>
+                                <Glyphs UnicodeString="&#xE76C;" FontRenderingEmSize="20" VerticalAlignment="Center" Grid.Column="1" />
+                                <StackPanel >
+                                    <StackPanel Orientation="Horizontal" >
+                                        <Label Content="Calcify - License" Style="{StaticResource lightLabel}" />
+                                        <Label Content="ToniF03" FontSize="10" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="10, 0">
+                                        <Glyphs UnicodeString="&#xF000;" FontRenderingEmSize="10" VerticalAlignment="Center" />
+                                        <Label Content="GNU General Public License v3.0" FontSize="10" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+                        <Button x:Name="JsonLicenseButton" Click="JsonLicenseButton_Click" Style="{StaticResource ItemButton}" Margin="0, 5, 0, 0" >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="20" />
+                                </Grid.ColumnDefinitions>
+                                <Glyphs UnicodeString="&#xE76C;" FontRenderingEmSize="20" VerticalAlignment="Center" Grid.Column="1" />
+                                <StackPanel >
+                                    <StackPanel Orientation="Horizontal" >
+                                        <Label Content="Newtonsoft.Json - License" Style="{StaticResource lightLabel}" />
+                                        <Label Content="James Newton-King" FontSize="10" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="10, 0">
+                                        <Glyphs UnicodeString="&#xF000;" FontRenderingEmSize="10" VerticalAlignment="Center" />
+                                        <Label Content="MIT License" FontSize="10" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+                        <Button x:Name="AvalonEditLicenseButton" Click="AvalonEditLicenseButton_Click" Style="{StaticResource ItemButton}" Margin="0, 5, 0, 0" >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="20" />
+                                </Grid.ColumnDefinitions>
+                                <Glyphs UnicodeString="&#xE76C;" FontRenderingEmSize="20" VerticalAlignment="Center" Grid.Column="1" />
+                                <StackPanel >
+                                    <StackPanel Orientation="Horizontal" >
+                                        <Label Content="ICSharpCode.AvalonEdit - License" Style="{StaticResource lightLabel}" />
+                                        <Label Content="AvalonEdit Contributors" FontSize="10" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="10, 0">
+                                        <Glyphs UnicodeString="&#xF000;" FontRenderingEmSize="10" VerticalAlignment="Center" />
+                                        <Label Content="MIT License" FontSize="10" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+                        <Button x:Name="RobotoFontLicenseButton" Click="RobotoFontLicenseButton_Click" Style="{StaticResource ItemButton}" Margin="0, 5, 0, 0" >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="20" />
+                                </Grid.ColumnDefinitions>
+                                <Glyphs UnicodeString="&#xE76C;" FontRenderingEmSize="20" VerticalAlignment="Center" Grid.Column="1" />
+                                <StackPanel >
+                                    <StackPanel Orientation="Horizontal" >
+                                        <Label Content="Roboto and RobotoMono font - License" Style="{StaticResource lightLabel}" />
+                                        <Label Content="Christian Robertson" FontSize="10" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="10, 0">
+                                        <Glyphs UnicodeString="&#xF000;" FontRenderingEmSize="10" VerticalAlignment="Center" />
+                                        <Label Content="Apache License, Version 2.0" FontSize="10" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+                        <Button x:Name="OctokitLicenseButton" Click="OctokitLicenseButton_Click" Style="{StaticResource ItemButton}" Margin="0, 5, 0, 0" >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="20" />
+                                </Grid.ColumnDefinitions>
+                                <Glyphs UnicodeString="&#xE76C;" FontRenderingEmSize="20" VerticalAlignment="Center" Grid.Column="1" />
+                                <StackPanel >
+                                    <StackPanel Orientation="Horizontal" >
+                                        <Label Content="Octokit - License" Style="{StaticResource lightLabel}" />
+                                        <Label Content="Github" FontSize="10" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="10, 0">
+                                        <Glyphs UnicodeString="&#xF000;" FontRenderingEmSize="10" VerticalAlignment="Center" />
+                                        <Label Content="MIT Licens" FontSize="10" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+
+            <Grid Grid.Column="2" >
+                <ScrollViewer x:Name="LicenseScroller" Margin="15, 15, 0, 40" PreviewMouseWheel="LicenseScroller_PreviewMouseWheel" >
+                    <avalonEdit:TextEditor 
+                                xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+                                ScrollViewer.VerticalScrollBarVisibility="Visible" 
+                                Background="Transparent" 
+                                Style="{StaticResource ReadOnlyAvalonEditor}"
+                                IsReadOnly="True"
+                                x:Name="LicenseDisplay" SyntaxHighlighting=""
+                                HorizontalContentAlignment="Right" 
+                                FontSize="13"
+                                HorizontalScrollBarVisibility="Disabled" 
+                                VerticalScrollBarVisibility="Disabled"/>
+                </ScrollViewer>
+                <Button x:Name="printButton" Click="printButton_Click" Style="{StaticResource ReactiveRoundedButton}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="15" >
+                    <Label Content="Print..." />
+                </Button>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
