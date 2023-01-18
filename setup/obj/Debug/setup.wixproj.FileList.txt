@@ -1,0 +1,10 @@
+A:\ToniFey\Documents\Projects\C#\uCalc\setup\bin\Debug\setup.msi
+A:\ToniFey\Documents\Projects\C#\uCalc\setup\bin\Debug\setup.wixpdb
+obj\Debug\Product.wixobj
+obj\Debug\setup.wixproj.BindContentsFileListnull.txt
+obj\Debug\setup.wixproj.BindOutputsFileListnull.txt
+obj\Debug\setup.wixproj.BindBuiltOutputsFileListnull.txt
+D:\Documents\Projects\C#\uCalc-nightly-build\setup\bin\Debug\setup.msi
+D:\Documents\Projects\C#\uCalc-nightly-build\setup\bin\Debug\setup.wixpdb
+D:\Documents\Projects\C#\Calcify-nightly-build\setup\bin\Debug\setup.msi
+D:\Documents\Projects\C#\Calcify-nightly-build\setup\bin\Debug\setup.wixpdb

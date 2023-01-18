@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+	<?define Calcify_TargetDir=$(var.Calcify.TargetDir)?>
+	<?define Update_TargetDir=$(var.Update.TargetDir)?>
+	<Product Id="*" Name="Calcify" Language="1033" Version="1.0.0.0" Manufacturer="ToniF03" UpgradeCode="46612da9-8b4f-4388-8eaa-616aae2d0e1e">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate EmbedCab="yes" />
+
+		<Feature Id="ProductFeature" Title="Calcify" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+			<ComponentRef Id="ApplicationShortCutStartUp" />
+			<ComponentRef Id="ApplicationShortcut" />
+			<ComponentRef Id="ApplicationDesktopShortcut" />
+			<ComponentRef Id="FileAssociations" />
+		</Feature>
+
+		<!-- NET Framework Prerequiste Check -->
+		<!--
+		<PropertyRef Id="WIXNETFX4RELEASEINSTALLED"/>
+		<Condition Message="This application requires .NET Framework 4.7.2 or later. Please install the .NET Framework then run this installer again.">
+			<![CDATA[Installed OR WIX_IS_NETFRAMEWORK_472_OR_LATER_INSTALLED]]>
+		</Condition>-->
+
+		<!-- Icon -->
+		<Icon Id="icon.ico" SourceFile="$(var.Calcify.TargetDir)\app.ico" />
+		<Property Id="ARPPRODUCTICON" Value="icon.ico" />
+
+		<!-- License -->
+		<WixVariable Id="WixUILicenseRtf" Value="CalcifyLicense.rtf" />
+
+		<!-- Banner and header -->
+		<!-- Banner should be 493 x 58, Header should be 493 x 312 -->
+		<WixVariable Id="WixUIDialogBmp" Value="Banner.png" />
+		<WixVariable Id="WixUIBannerBmp" Value="Header.png" />
+
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+		<UIRef Id="WixUI_InstallDir" />
+
+		<UIRef Id="WixUI_ErrorProgressText" />
+
+		<Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Thank you for installing Calcify." />
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="Calcify" />
+			</Directory>
+
+			
+			
+			<Directory Id="DesktopFolder" Name="Desktop" />
+			<Directory Id="ProgramMenuFolder" />
+			<Directory Id="StartupFolder" />
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<Component Id="Calcify.exe" Guid="e87fe2e7-9992-4b14-89bc-80d31174565c">
+				<File Id="Calcify.exe" Name="Calcify.exe" Source="$(var.Calcify_TargetDir)Calcify.exe" KeyPath="yes" />
+				<File Id="Update.exe" Name="Update.exe" Source="$(var.Update_TargetDir)Update.exe" />
+				<File Id="app.ico" Name="app.ico" Source="$(var.Calcify_TargetDir)\app.ico" />
+				<File Id="ICSharpCode.AvalonEdit.dll" Name="ICSharpCode.AvalonEdit.dll" Source="$(var.Calcify_TargetDir)\ICSharpCode.AvalonEdit.dll" />
+				<File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.Calcify_TargetDir)\Newtonsoft.Json.dll" />
+			</Component>
+			
+			<Component Id="FileAssociations" Guid="{9BC9F202-609E-4920-BDA2-BEB38F1C8C9D}" >
+				<RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\[ProductName].exe" Action="createAndRemoveOnUninstall" >
+					<RegistryValue Type="string" Value="[INSTALLFOLDER]Calcify.exe" />
+					<RegistryValue Type="string" Name="Path" Value="[INSTALLFOLDER]Calcify.exe" />
+				</RegistryKey>
+				<RegistryKey Root="HKCR" Key=".Calcify" Action="createAndRemoveOnUninstall" >
+					<RegistryValue Type="string" Value="Calcify.File.Calculation" />
+				</RegistryKey>
+				<RegistryKey Root="HKCR" Key="Calcify.File.Calculation\DefaultIcon" Action="createAndRemoveOnUninstall" >
+					<RegistryValue Type="string" Value="&quot;[INSTALLFOLDER]Calcify.exe&quot;,1" />
+				</RegistryKey>
+				<RegistryKey Root="HKCR" Key="Calcify.File.Calculation\shell\open\command" Action="createAndRemoveOnUninstall" >
+					<RegistryValue Type="string" Value="&quot;[INSTALLFOLDER]Calcify.exe&quot; %1" />
+				</RegistryKey>
+				<RegistryKey Root="HKCR" Key=".Calcify\shell\open\command" Action="createAndRemoveOnUninstall" >
+					<RegistryValue Type="string" Value="&quot;[INSTALLFOLDER]Calcify.exe&quot; %1" />
+				</RegistryKey>
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	<Fragment>
+		<DirectoryRef Id="ProgramMenuFolder" >
+			<Component Id="ApplicationShortcut" Guid="{D8412FE2-CE6F-476B-BFE2-AEA76380D226}" >
+				<Shortcut Id="ApplicationStartMenuShortcut"
+						  Name="!(bind.property.ProductName)"
+						  Description="Calcify"
+						  Target="[INSTALLFOLDER]Calcify.exe"
+						  WorkingDirectory="INSTALLFOLDER" />
+				<RemoveFolder Id="ProgramMenuFolder" On="uninstall" />
+				<RegistryValue Root="HKCU" Key="Software\ToniF03\[ProductName]" Name="programmenushortcutinstalled" Type="integer" Value="1" KeyPath="yes" />
+			</Component>
+		</DirectoryRef>
+		
+		<DirectoryRef Id="DesktopFolder" >
+			<Component Id="ApplicationDesktopShortcut" Guid="{C75F38CF-2ADE-4F5A-A818-2D177B2748D8}" >
+				<Shortcut Id="ApplicationDesktopShortcut"
+						  Name="!(bind.property.ProductName)"
+						  Description="Calcify"
+						  Target="[INSTALLFOLDER]Calcify.exe"
+						  WorkingDirectory="INSTALLFOLDER" />
+				<RemoveFolder Id="DesktopFolder" On="uninstall" />
+				<RegistryValue Root="HKCU" Key="Software\ToniF03\[ProductName]" Name="desktopshortcutinstalled" Type="integer" Value="1" KeyPath="yes" />
+			</Component>
+		</DirectoryRef>
+		<DirectoryRef Id="StartupFolder" >
+			<Component Id="ApplicationShortCutStartUp" Guid="{2A4540E3-9751-4DFA-AD86-E70467B971D2}" >
+				<Shortcut Id="ApplicationShortCutStartUp"
+						  Name="Update"
+						  Description="Calcify - Update"
+						  Target="[INSTALLFOLDER]Update.exe"
+						  WorkingDirectory="INSTALLFOLDER" />
+				<RemoveFolder Id="StartupFolder" On="uninstall" />
+				<RegistryValue Root="HKCU" Key="Software\ToniF03\[ProductName]" Name="startupshortcutinstalled" Type="integer" Value="1" KeyPath="yes" />
+			</Component>
+		</DirectoryRef>
+	</Fragment>
+</Wix>

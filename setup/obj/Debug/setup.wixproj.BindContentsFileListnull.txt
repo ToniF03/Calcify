@@ -1,0 +1,5 @@
+D:\Documents\Projects\C#\Calcify-nightly-build\Calcify\bin\Debug\\app.ico
+D:\Documents\Projects\C#\Calcify-nightly-build\Calcify\bin\Debug\Calcify.exe
+D:\Documents\Projects\C#\Calcify-nightly-build\Calcify\bin\Debug\\ICSharpCode.AvalonEdit.dll
+D:\Documents\Projects\C#\Calcify-nightly-build\Calcify\bin\Debug\\Newtonsoft.Json.dll
+D:\Documents\Projects\C#\Calcify-nightly-build\Calcify\bin\Debug\Update.exe

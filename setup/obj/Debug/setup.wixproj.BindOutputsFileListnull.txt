@@ -1,0 +1,2 @@
+D:\Documents\Projects\C#\Calcify-nightly-build\setup\bin\Debug\setup.msi
+D:\Documents\Projects\C#\Calcify-nightly-build\setup\bin\Debug\setup.wixpdb
