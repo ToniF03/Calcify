@@ -127,8 +127,8 @@ namespace Calcify
         SyntaxFile darkSyntax = new SyntaxFile(SyntaxFile.Theme.Dark);
 
         Dictionary<string, double> currencyDict = new Dictionary<string, double>();
-        // By http://exchangerateapi.io
-        string exchangeRateLink = "https://api.exchangerate.host/latest";
+        // By https://www.frankfurter.app/
+        string exchangeRateLink = "https://api.frankfurter.app/latest";
         #endregion
         #region UI
         #region Chrome
@@ -1527,7 +1527,7 @@ namespace Calcify
                 #endregion
 
                 #region Result
-                if (result == "" && calculatorRegex.IsMatch(currentLine) && !numberRegex.IsMatch(currentLine) && numberRegex.IsMatch(currentLine.Substring(currentLine.Length - 1)))
+                if (result == "" && calculatorRegex.IsMatch(currentLine) && !numberRegex.IsMatch(currentLine) && (currentLine.Length >= 1 ? (numberRegex.IsMatch(currentLine.Substring(currentLine.Length - 1)) || currentLine.EndsWith("|") || currentLine.EndsWith(")")) : false))
                 {
                     double val = Calculator.CalculateString(currentLine, givenRegex);
                     if (!double.IsNaN(val))
@@ -1563,7 +1563,7 @@ namespace Calcify
                 {
                     string[] splittedTask = currentLine.Split(' ');
                     splittedTask = new string[] { splittedTask[0], string.Join(" ", splittedTask.Skip(1)) };
-                    splittedTask[1] = frequencyExt[frequencyDict[splittedTask[1]]];
+                    splittedTask[1] = frequencyExt[frequencyDict[splittedTask[1].ToLower()]];
                     result = string.Join(" ", splittedTask);
                 }
                 else if (result == "" && directTimeRegex.IsMatch(currentLine))
@@ -1814,6 +1814,11 @@ namespace Calcify
             dataSizeDict.Add("B", DataSizeUnit.Byte);
             dataSizeDict.Add("byte", DataSizeUnit.Byte);
             dataSizeDict.Add("kb", DataSizeUnit.Kilobyte);
+            dataSizeDict.Add("mb", DataSizeUnit.Megabyte);
+            dataSizeDict.Add("gb", DataSizeUnit.Gigabyte);
+            dataSizeDict.Add("tb", DataSizeUnit.Terabyte);
+            dataSizeDict.Add("pb", DataSizeUnit.Petabyte);
+            dataSizeDict.Add("eb", DataSizeUnit.Exabyte);
             dataSizeDict.Add("kilobyte", DataSizeUnit.Kilobyte);
             dataSizeDict.Add("megabyte", DataSizeUnit.Megabyte);
             dataSizeDict.Add("gigabyte", DataSizeUnit.Gigabyte);

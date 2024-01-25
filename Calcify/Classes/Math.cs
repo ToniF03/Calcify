@@ -28,7 +28,7 @@ namespace Calcify.Math.Units
         public static readonly string TemperaturePattern = @"(\bK\b|°\b(?i)(C|F|Ra|Re|R)(?-i)\b)";
         public static readonly string DataSizePattern = @"\b((b|(K|M|G|T|P|E)?B)|(?i)(bit|(kilo|mega|giga|tera|peta|exa)?byte)(?-i))\b";
         public static readonly string TimePattern = @"(\b(c|yr|yrs|mth|wk|d|h|min|s|ms|μs|µs|ns)\b|\b(?i)(centur(y|ies)|decade(s)?|year(s)?|month(s)?|week(s)?|day(s)?|hour(s)?|minute(s)?|sec|(milli|micro|nano)?second(s)?)(?-i)\b)";
-        public static readonly string LengthPattern = @"(μm|µm|\b(nm|mm|cm|dm|km|dam|hm|mi|m|yd|ft|in)\b|\b(?i)(nanometer|micrometer|millimeter|centimeter|decimeter|kilometer|decameter|hectometer|meter|mile(s)?|yard|foot|feet|inch)(?-i)\b)";
+        public static readonly string LengthPattern = @"(\b(nm|mm|cm|dm|km|dam|hm|mi|m|yd|ft|in)\b|\b(?i)(nanometer|millimeter|centimeter|decimeter|kilometer|decameter|hectometer|meter|mile(s)?|yard|foot|feet|inch)(?-i)\b)";
         public static readonly string AnglePattern = @"(°|( |\b)(?i)(gon|grad|deg|mil|rad|arcmin|arcsec|gradian|degree|milliradian|radian|angular minute(s)?|angular second(s)?)(?-i)\b)";
         public static readonly string FrequencyPattern = @"((k|M|G)?Hz|(?i)((kilo|mega|giga)?hertz)(?-i))";
     }
@@ -5368,7 +5368,6 @@ namespace Calcify.Math
             while (givenRegex["Geometrics"].IsMatch(task))
             {
                 string geoSubTask = givenRegex["Geometrics"].Match(task).Value;
-                //string geoFirstPart = geoSubTask.Substring(0, 1) == "-" ? geoSubTask.Substring(1);
                 string[] geoParts = givenRegex["GeoOperators"].Split(geoSubTask);
                 double geoFirstPart = double.Parse(geoParts[0], CultureInfo.InvariantCulture);
                 double geoSecondPart = geoParts[2].StartsWith("(") ? double.Parse(geoParts[2].Substring(1, geoParts[2].Length - 2), CultureInfo.InvariantCulture) : double.Parse(geoParts[2], CultureInfo.InvariantCulture);

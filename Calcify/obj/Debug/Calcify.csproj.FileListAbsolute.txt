@@ -110,7 +110,6 @@ D:\Documents\Projects\C#\uCalc-nightly-build\uCalc\obj\Debug\uCalc.csproj.CopyCo
 D:\Documents\Projects\C#\uCalc-nightly-build\uCalc\obj\Debug\uCalc.exe
 D:\Documents\Projects\C#\uCalc-nightly-build\uCalc\obj\Debug\uCalc.pdb
 D:\Documents\Projects\C#\Calcify-nightly-build\Calcify\obj\Debug\Calcify.csproj.AssemblyReference.cache
-D:\Documents\Projects\C#\Calcify-nightly-build\Calcify\obj\Debug\Calcify.csproj.SuggestedBindingRedirects.cache
 D:\Documents\Projects\C#\Calcify-nightly-build\Calcify\obj\Debug\About.g.cs
 D:\Documents\Projects\C#\Calcify-nightly-build\Calcify\obj\Debug\DialogWindow.g.cs
 D:\Documents\Projects\C#\Calcify-nightly-build\Calcify\obj\Debug\MainWindow.g.cs
