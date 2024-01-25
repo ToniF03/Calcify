@@ -25,7 +25,7 @@ To install Calcify, just [download the latest release](https://github.com/ToniF0
 ## Contributing
 
 ### Contributing bugs, ideas and help
-1.  **Bugs** come in two flavours: non-critical and critical. Non-critical bugs are those that sometimes can mean a nuisance but that do not seriously affect working with the app. Critical bugs, however, make Zettlr barely or un-usable, and fixes need to be addressed urgently. Normally, the latter is taken on by the core-team.
+1.  **Bugs** come in two flavours: non-critical and critical. Non-critical bugs are those that sometimes can mean a nuisance but that do not seriously affect working with the app. Critical bugs, however, make Calcify barely or un-usable, and fixes need to be addressed urgently. Normally, the latter is taken on by the core-team.
 2.  **Enhancements** are some small additions that require adding some more functionality to a feature, but that should not evolve into an own distinct feature. Even if the issue description reads like a full feature to you, the "enhancement" label means there is already said functionality, which just needs to be amended. Please ask if you are unsure.
 3.  **Features** are bigger additions to the application that require a completely new feature. These can take some time, but could also prove to be a nice winter project.
 
