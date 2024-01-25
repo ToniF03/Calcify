@@ -4,7 +4,7 @@
 [Homepage](https://tonif03.github.io/prod/calcify) | [Discord](https://discord.gg/MfHHgYtWub) | [Documentations]() | [Support Me](https://www.buymeacoffee.com/tonif03) | [Support Me](https://buymeacoffee.com/tonif03)
 
 
-[Calcify](https://tonif03.github.io/prod/calcify) is a powerful calculator tool that goes beyond basic calculations, offering advanced features such as unit conversions, time and mathematical functions, and more. Thank to the developers of [this](https://exchangerate.host) great website is it possible to use always the current exchange rate. With Calcify, users can easily solve a wide range of mathematical problems, making it an ideal tool for students, professionals, and anyone in need of advanced calculation capabilities.
+[Calcify](https://tonif03.github.io/prod/calcify) is a powerful calculator tool that goes beyond basic calculations, offering advanced features such as unit conversions, time and mathematical functions, and more. Thank to the developers of [this](https://frankfurter.app) great website it is possible to use always the current exchange rate. With Calcify, users can easily solve a wide range of mathematical problems, making it an ideal tool for students, professionals, and anyone in need of advanced calculation capabilities.
 
 ![Currency calculation](resources/1.png)
 
