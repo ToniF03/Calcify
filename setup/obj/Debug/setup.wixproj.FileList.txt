@@ -8,3 +8,5 @@ D:\Documents\Projects\C#\uCalc-nightly-build\setup\bin\Debug\setup.msi
 D:\Documents\Projects\C#\uCalc-nightly-build\setup\bin\Debug\setup.wixpdb
 D:\Documents\Projects\C#\Calcify-nightly-build\setup\bin\Debug\setup.msi
 D:\Documents\Projects\C#\Calcify-nightly-build\setup\bin\Debug\setup.wixpdb
+C:\Users\ToniFey\Documents\Projects\Calcify\setup\bin\Debug\setup.msi
+C:\Users\ToniFey\Documents\Projects\Calcify\setup\bin\Debug\setup.wixpdb

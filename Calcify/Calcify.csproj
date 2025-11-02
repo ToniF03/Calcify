@@ -54,7 +54,7 @@
     </ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <Win32Resource>D:\Documents\Projects\C#\Calcify-nightly-build\Calcify\rc.res</Win32Resource>
+    <Win32Resource>.\rc.res</Win32Resource>
   </PropertyGroup>
   <PropertyGroup>
     <TargetZone>LocalIntranet</TargetZone>
