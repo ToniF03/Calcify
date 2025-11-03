@@ -46,6 +46,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30"/>
                 <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
                 <ColumnDefinition />
                 <ColumnDefinition Width="50"/>
                 <ColumnDefinition Width="50"/>
@@ -69,8 +70,17 @@
                 </Button.Content>
             </Button>
 
+            <!-- Theme button -->
+            <Button Grid.Column="1" Style="{StaticResource TransparentButton}" 
+                    WindowChrome.IsHitTestVisibleInChrome="True"
+                    x:Name="themeButton">
+                <Button.Content>
+                    <Label x:Name="themeButtonLabel" FontSize="18" Content="&#xE706;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" RenderTransformOrigin="0.5, 0.5"/>
+                </Button.Content>
+            </Button>
+
             <!-- Information button -->
-            <Button x:Name="Info" Grid.Column="1" WindowChrome.IsHitTestVisibleInChrome="True" IsEnabled="False" Opacity="0" ToolTipService.ShowDuration="120000" Height="{Binding RelativeSource={RelativeSource Self}, Path=Width}" >
+            <Button x:Name="Info" Grid.Column="2" WindowChrome.IsHitTestVisibleInChrome="True" IsEnabled="False" Opacity="0" ToolTipService.ShowDuration="120000" Height="{Binding RelativeSource={RelativeSource Self}, Path=Width}" >
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource TransparentButton}">
                         <Style.Triggers>
@@ -99,21 +109,21 @@
             </Button>
 
             <!-- Label with the title -->
-            <Label x:Name="titleLabel" Content="Calcify" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="2" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="90, 0, 0, 0" />
+            <Label x:Name="titleLabel" Content="Calcify" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="3" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="60, 0, 0, 0" />
             <!-- MinimizeButton -->
-            <Button Grid.Column="3" WindowChrome.IsHitTestVisibleInChrome="True" x:Name="MinimizeButton" Style="{StaticResource ChromeButton}" >
+            <Button Grid.Column="4" WindowChrome.IsHitTestVisibleInChrome="True" x:Name="MinimizeButton" Style="{StaticResource ChromeButton}" >
                 <Button.Content>
                     <Label FontSize="12" Content="&#xe949;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
                 </Button.Content>
             </Button>
             <!-- Maximize Button -->
-            <Button Grid.Column="4" WindowChrome.IsHitTestVisibleInChrome="True" x:Name="MaximizeButton" Style="{StaticResource ChromeButton}" >
+            <Button Grid.Column="5" WindowChrome.IsHitTestVisibleInChrome="True" x:Name="MaximizeButton" Style="{StaticResource ChromeButton}" >
                 <Button.Content>
                     <Label x:Name="MaximizeButtonText" FontSize="12" Content="&#xe922;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
                 </Button.Content>
             </Button>
             <!-- Close Button -->
-            <Button Grid.Column="5" x:Name="closeButton" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeCloseButton}" >
+            <Button Grid.Column="6" x:Name="closeButton" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeCloseButton}" >
                 <Button.Content>
                     <Label FontSize="14" Content="&#xe947;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                 </Button.Content>
@@ -191,7 +201,8 @@
 
             <Label x:Name="totalLabel" Grid.Column="1" Content="" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0, 0, 0, 0" />
 
-            <Button x:Name="settingsButton" Grid.Column="2" Style="{StaticResource TransparentButton}" >
+
+            <Button x:Name="settingsButton" Grid.Column="3" Style="{StaticResource TransparentButton}" >
                 <Button.Content>
                     <Label FontSize="18" Content="&#xE713;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" RenderTransformOrigin="0.5, 0.5">
                         <Label.RenderTransform>

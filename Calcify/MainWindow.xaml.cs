@@ -19,12 +19,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Xml;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Calcify
 {
@@ -167,6 +165,27 @@ namespace Calcify
             System.Diagnostics.Process.Start(System.Reflection.Assembly.GetEntryAssembly().Location);
         }
 
+
+
+        private void ThemeButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+            oldTotalValue = totalLabel.Content.ToString();
+            totalLabel.Content = "Toggle theme";
+        }
+
+        private void ThemeButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+            totalLabel.Content = oldTotalValue;
+            oldTotalValue = "";
+        }
+
+        private void ThemeButton_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.DarkMode = !Properties.Settings.Default.DarkMode;
+        }
+
+
+
         private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             ScrollViewer scrollViewer = (ScrollViewer)sender;
@@ -280,6 +299,9 @@ namespace Calcify
             StartNewButton.Click += StartNewButton_Click;
             StartNewButton.MouseEnter += StartNewButton_MouseEnter;
             StartNewButton.MouseLeave += StartNewButton_MouseLeave;
+            themeButton.Click += ThemeButton_Click;
+            themeButton.MouseEnter += ThemeButton_MouseEnter;
+            themeButton.MouseLeave += ThemeButton_MouseLeave;
             settingsButton.Click += SettingsButton_Click;
             settingsButton.MouseEnter += SettingsButton_MouseEnter;
             settingsButton.MouseLeave += StartNewButton_MouseLeave;
@@ -328,7 +350,6 @@ namespace Calcify
                 Fonts.GetFontFamilies(new Uri("pack://application:,,,/Fonts/RobotoMono-Regular.ttf")).CopyTo(f, 0);
                 mainEditor.FontFamily = f[0];
                 resultEditor.FontFamily = f[0];
-
             }
 
             byte[] byteArray = Encoding.UTF8.GetBytes(Properties.Settings.Default.DarkMode ? darkSyntax.Content : lightSyntax.Content);
@@ -341,6 +362,8 @@ namespace Calcify
                     mainEditor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
                 }
             }
+
+            themeButtonLabel.Content = Properties.Settings.Default.DarkMode ? "\uE708" : "\uE706";
         }
 
         private void Watcher_ValueChanged(object sender, EventArgs e)
@@ -353,6 +376,7 @@ namespace Calcify
             switch (e.SettingName) {
                 case "DarkMode":
                     DarkModeChanged((bool)e.NewValue);
+                    themeButtonLabel.Content = (bool)e.NewValue ? "\uE708" : "\uE706";
                     break;
                 case "SystemDefinedDarkMode":
                     if ((bool)e.NewValue == true)
@@ -408,7 +432,7 @@ namespace Calcify
             CaretOffset = mainEditor.CaretOffset;
         }
 
-        #region "Functions"
+        #region Functions
         #region "Exchange Rate"
         /// <summary>
         /// Downloads the current exchange rate of the day
@@ -2098,15 +2122,69 @@ namespace Calcify
 //
 //  - REFACTORING CODE
 //  - 'About' change date
+
 //  - Modulo operator (%)
 //  - now syntax highlighting
-//  - functions like floor(), ceil(), abs(), sin(), cos(), tan(), log(), ln()
+//  - functions like
+//    - floor()
+//    - ceil()
+//    - abs()
+//    - sin()
+//    - asin()
+//    - sinh()
+//    - asinh()
+//    - sinr() (sin to radians)...
+//    - cos()
+//    - acos()
+//    - cosh()
+//    - acosh()
+//    - tan()
+//    - atan()
+//    - tanh()
+//    - atanh()
+//    - log()
+//    - ln()
+//    - diff()
+//    - clamp()
+//    - pow()
+//    - exp()
+//    - cbrt()
+//    - root(float, int)
+//    - trunc()
+//    - sign()
+//    - min()
+//    - max()
+//    - fact()
+//    - perm() (permutation)
+//    - comb() (combination)
+//    - sum()
+//    - avg()
+//    - mean() (average)
+//    - median()
+//    - mode()
+//    - stdev() (standard deviation)
+//    - var() (variance)
+//    - randomint()
+//    - random()
+//  - chained operations
+//  - constants like 
+//    - tau
+//    - phi
+//    - c (speed of light) >> add to docs (math-functions.md)
+//    - h (Planck constant) >> add to docs (math-functions.md)
+//    - G (gravitational constant) >> add to docs (math-functions.md)
+//    - R (ideal gas constant) >> add to docs (math-functions.md)
+//    - Na (Avogadro constant) >> add to docs (math-functions.md)
+//    - k (Boltzmann constant) >> add to docs (math-functions.md)
+//    - μ0 (magnetic constant) >> add to docs (math-functions.md)
+//    - ε0 (electric constant) >> add to docs (math-functions.md)
+//    - σ (Stefan-Boltzmann constant) >> add to docs (math-functions.md)
+//    - g (standard gravity) >> add to docs (math-functions.md)
 //  - variables
 //  - ctrl + f find
 //  - ctrl + h replace
 //  - ctrl + , settings
 //  - F1 help
-//  - Toggle theme button toolbar
 //  - Recent Files List
 //  - toolbar
 //  - settings > font size
@@ -2117,13 +2195,13 @@ namespace Calcify
 //  - Auto Completion
 //  - Line Numbers
 //  - right click context menu
-//     -Undo - Undo last action
-//     -Redo - Redo last undone action
-//     -Cut - Cut selected text
-//     -Copy - Copy selected text
-//     -Paste - Paste from clipboard
-//     -Delete - Delete selected text
-//     -Select All - Select all content
+//    - Undo - Undo last action
+//    - Redo - Redo last undone action
+//    - Cut - Cut selected text
+//    - Copy - Copy selected text
+//    - Paste - Paste from clipboard
+//    - Delete - Delete selected text
+//    - Select All - Select all content
 //  - Status Bar Line and column
 //  - Rename settings scheme to theme
 //  - disable auto updates
@@ -2134,6 +2212,8 @@ namespace Calcify
 //  - settings > bracket matching
 //  - settings > highlight current line
 //  - settings > currency update interval
+//  - settings > thousands seperator
+//  - settings > Verify rates are current in Settings
 //  - editor > ctrl + D duplicate line
 //  - editor > ctrl + L delete line
 //  - editor > ctrl + / toggle comment line
@@ -2141,6 +2221,15 @@ namespace Calcify
 //  - editor > tab complete
 //  - editor > ctrl + / toggle comment
 //  - change file ending to .calc
+//  - accept inches, bytes, gallons, cups, speed (kmh, mh, ...), data speed (mbps, gbps, ...), tmrw, nmi (nautical miles) (1 nmi = 1852 m), carat (1 ct = 0.2 g), turn (turn, revolution) (1 turn = 360 degrees), THz, pressure, energy, Power, area, volumes (look supported-units.md) as keyword
+//  - basic calculation 1024 * x does not work
+//  - fix syntax color (days)
+//  - multiple conversions (100 cm to m to feet)
+//  - ask to save when drag and dropped
+//  - currency calculation
+//  - time parts (today.year, today.month, today.day, today.dayOfWeek, now.hour, now.minute, now.second)
+//  - time difference (today - tomorrow, now - 09:00)
+//  - maybe update architecture.md
 
 
 
@@ -2148,6 +2237,9 @@ namespace Calcify
 // Future TODO:
 //  - Plugin Support
 //  - Plugin Marketplace
-//  - volume units
-//  - pressure units
 //  - equations
+
+
+// Done:
+//  - Toggle theme button toolbar
+//  - Optimized data value conversion

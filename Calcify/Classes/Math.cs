@@ -1998,37 +1998,37 @@ namespace Calcify.Math.Conversion.DataSize
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            return val / 8000000000000000000;
+            return val / 9223372036854775808.0;
         }
         public static double ToPetabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            return val / 8000000000000000;
+            return val / 9007199254740992.0;
         }
         public static double ToTerabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            return val / 8000000000000;
+            return val / 8796093022208.0;
         }
         public static double ToGigabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            return val / 8000000000;
+            return val / 8589934592.0;
         }
         public static double ToMegabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            return val / 8000000;
+            return val / 8388608.0;
         }
         public static double ToKilobyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            return val / 8000;
+            return val / 8192.0;
         }
         public static double ToByte(double val)
         {
@@ -2043,42 +2043,42 @@ namespace Calcify.Math.Conversion.DataSize
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000000000000000000;
+            double result = val / 1152921504606846976.0;
             return result;
         }
         public static double ToPetabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000000000000000;
+            double result = val / 1125899906842624.0;
             return result;
         }
         public static double ToTerabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000000000000;
+            double result = val / 1099511627776.0;
             return result;
         }
         public static double ToGigabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000000000;
+            double result = val / 1073741824.0;
             return result;
         }
         public static double ToMegabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000000;
+            double result = val / 1048576.0;
             return result;
         }
         public static double ToKilobyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000;
+            double result = val / 1024.0;
             return result;
         }
         public static double ToBit(double val)
@@ -2095,49 +2095,49 @@ namespace Calcify.Math.Conversion.DataSize
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000000000000000;
+            double result = val / 1125899906842624.0;
             return result;
         }
         public static double ToPetabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000000000000;
+            double result = val / 1099511627776.0;
             return result;
         }
         public static double ToTerabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000000000;
+            double result = val / 1073741824.0;
             return result;
         }
         public static double ToGigabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000000;
+            double result = val / 1048576.0;
             return result;
         }
         public static double ToMegabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000;
+            double result = val / 1024.0;
             return result;
         }
         public static double ToByte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000;
+            double result = val * 1024;
             return result;
         }
         public static double ToBit(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 8000;
+            double result = val * 8192;
             return result;
         }
     }
@@ -2147,49 +2147,49 @@ namespace Calcify.Math.Conversion.DataSize
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000000000000;
+            double result = val / 1099511627776.0;
             return result;
         }
         public static double ToPetabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000000000;
+            double result = val / 1073741824.0;
             return result;
         }
         public static double ToTerabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000000;
+            double result = val / 1048576.0;
             return result;
         }
         public static double ToGigabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000;
+            double result = val / 1024.0;
             return result;
         }
         public static double ToKilobyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000;
+            double result = val * 1024;
             return result;
         }
         public static double ToByte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000000;
+            double result = val * 1048576;
             return result;
         }
         public static double ToBit(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 8000000;
+            double result = val * 8388608;
             return result;
         }
     }
@@ -2199,49 +2199,49 @@ namespace Calcify.Math.Conversion.DataSize
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000000000;
+            double result = val / 1073741824.0;
             return result;
         }
         public static double ToPetabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000000;
+            double result = val / 1048576.0;
             return result;
         }
         public static double ToTerabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000;
+            double result = val / 1024.0;
             return result;
         }
         public static double ToMegabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000;
+            double result = val * 1024;
             return result;
         }
         public static double ToKilobyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000000;
+            double result = val * 1048576;
             return result;
         }
         public static double ToByte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000000000;
+            double result = val * 1073741824;
             return result;
         }
         public static double ToBit(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 8000000000;
+            double result = val * 8589934592.0;
             return result;
         }
     }
@@ -2251,49 +2251,49 @@ namespace Calcify.Math.Conversion.DataSize
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000000;
+            double result = val / 1048576.0;
             return result;
         }
         public static double ToPetabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000;
+            double result = val / 1024.0;
             return result;
         }
         public static double ToGigabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000;
+            double result = val * 1024;
             return result;
         }
         public static double ToMegabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000000;
+            double result = val * 1048576;
             return result;
         }
         public static double ToKilobyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000000000;
+            double result = val * 1073741824;
             return result;
         }
         public static double ToByte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000000000000;
+            double result = val * 1099511627776.0;
             return result;
         }
         public static double ToBit(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 8000000000000;
+            double result = val * 8796093022208.0;
             return result;
         }
     }
@@ -2303,49 +2303,49 @@ namespace Calcify.Math.Conversion.DataSize
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val / 1000;
+            double result = val / 1024.0;
             return result;
         }
         public static double ToTerabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000;
+            double result = val * 1024;
             return result;
         }
         public static double ToGigabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000000;
+            double result = val * 1048576;
             return result;
         }
         public static double ToMegabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000000000;
+            double result = val * 1073741824;
             return result;
         }
         public static double ToKilobyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000000000000;
+            double result = val * 1099511627776.0;
             return result;
         }
         public static double ToByte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000000000000000;
+            double result = val * 1125899906842624.0;
             return result;
         }
         public static double ToBit(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 8000000000000000;
+            double result = val * 9007199254740992.0;
             return result;
         }
     }
@@ -2355,49 +2355,49 @@ namespace Calcify.Math.Conversion.DataSize
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000;
+            double result = val * 1024;
             return result;
         }
         public static double ToTerabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000000;
+            double result = val * 1048576;
             return result;
         }
         public static double ToGigabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000000000;
+            double result = val * 1073741824;
             return result;
         }
         public static double ToMegabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000000000000;
+            double result = val * 1099511627776.0;
             return result;
         }
         public static double ToKilobyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000000000000000;
+            double result = val * 1125899906842624.0;
             return result;
         }
         public static double ToByte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 1000000000000000000;
+            double result = val * 1152921504606846976.0;
             return result;
         }
         public static double ToBit(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
-            double result = val * 8000000000000000000;
+            double result = val * 9223372036854775808.0;
             return result;
         }
     }
