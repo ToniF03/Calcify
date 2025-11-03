@@ -1,4 +1,8 @@
-﻿using ICSharpCode.AvalonEdit.Document;
+﻿using Calcify.Math;
+using Calcify.Math.Conversion;
+using Calcify.Math.Conversion.Temperature;
+using Calcify.Tools;
+using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using Microsoft.Win32;
@@ -15,14 +19,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Xml;
-using Calcify.Math;
-using Calcify.Math.Conversion;
-using Calcify.Math.Conversion.Temperature;
-using Calcify.Tools;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Calcify
@@ -2095,8 +2096,53 @@ namespace Calcify
 
 // TODO:
 //
-//  - write docs
+//  - REFACTORING CODE
 //  - 'About' change date
+//  - Modulo operator (%)
+//  - now syntax highlighting
+//  - functions like floor(), ceil(), abs(), sin(), cos(), tan(), log(), ln()
+//  - variables
+//  - ctrl + f find
+//  - ctrl + h replace
+//  - ctrl + , settings
+//  - F1 help
+//  - Toggle theme button toolbar
+//  - Recent Files List
+//  - toolbar
+//  - settings > font size
+//  - zoom with ctrl + mouse wheel
+//  - zoom with ctrl + '+' / '-'
+//  - zoom reset with ctrl + '0'
+//  - settings > autosave > interval
+//  - Auto Completion
+//  - Line Numbers
+//  - right click context menu
+//     -Undo - Undo last action
+//     -Redo - Redo last undone action
+//     -Cut - Cut selected text
+//     -Copy - Copy selected text
+//     -Paste - Paste from clipboard
+//     -Delete - Delete selected text
+//     -Select All - Select all content
+//  - Status Bar Line and column
+//  - Rename settings scheme to theme
+//  - disable auto updates
+//  - settings > Word Wrap (?)
+//  - settings > Line Spacing
+//  - settings > tab size
+//  - settings > show whitespace characters
+//  - settings > bracket matching
+//  - settings > highlight current line
+//  - settings > currency update interval
+//  - editor > ctrl + D duplicate line
+//  - editor > ctrl + L delete line
+//  - editor > ctrl + / toggle comment line
+//  - editor > shift + tab decrease indent
+//  - editor > tab complete
+//  - editor > ctrl + / toggle comment
+//  - change file ending to .calc
+
+
 
 
 // Future TODO:
