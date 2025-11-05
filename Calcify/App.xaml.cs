@@ -33,7 +33,7 @@ namespace Calcify
                 {
 
                 }
-                else if (System.IO.File.Exists(e.Args[i]))
+                else if (File.Exists(e.Args[i]))
                 {
                     openFile = true;
                     filePath = e.Args[i];

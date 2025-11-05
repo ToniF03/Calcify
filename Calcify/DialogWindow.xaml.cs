@@ -34,6 +34,10 @@ namespace Calcify
             Enter.InputGestures.Add(new KeyGesture(Key.Enter));
             Space.InputGestures.Add(new KeyGesture(Key.Space));
             Esc.InputGestures.Add(new KeyGesture(Key.Escape));
+
+            CancelButton.Click += Cancel;
+            SaveButton.Click += Save;
+            NotSaveButton.Click += DoNotSave;
         }
 
         private void Esc_Executed(object sender, ExecutedRoutedEventArgs e)
