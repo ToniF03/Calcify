@@ -1,65 +1,93 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Printing;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Calcify
 {
     /// <summary>
-    /// Interaktionslogik für About.xaml
+    /// Interaction logic for About.xaml
+    /// This window displays application information and bundled component licenses.
     /// </summary>
     public partial class About : Window
     {
+        // Currently selected license (default: None)
         License selectedLicense = License.None;
+
+        // Reference to the main window so we can notify it when this window closes
         public MainWindow _mainWindow = null;
 
+        /// <summary>
+        /// Constructor: initializes components and wires event handlers.
+        /// </summary>
         public About()
         {
             InitializeComponent();
+
+            // Close button handler
             closeButton.Click += CloseButton_Click;
+
+            // Make AvalonEdit caret invisible to present the license text as a read-only view
             LicenseDisplay.TextArea.Caret.CaretBrush = System.Windows.Media.Brushes.Transparent;
+
+            // License overview buttons open the license overview animation
+            CalcifyLicenseButton.Click += LicenseButton_Click;
+            JsonLicenseButton.Click += LicenseButton_Click;
+            AvalonEditLicenseButton.Click += LicenseButton_Click;
+            RobotoFontLicenseButton.Click += LicenseButton_Click;
+            OctokitLicenseButton.Click += LicenseButton_Click;
+
+            // Back button handler for navigation
+            BackButton.Click += BackButton_Click;
+
+            // External links for release notes, website, repository and issue tracker
+            ReleaseNotesButton.Click += WebsiteButton_Click;
+            WebsiteButton.Click += WebsiteButton_Click;
+            RepositoryButton.Click += WebsiteButton_Click;
+            BugsButton.Click += WebsiteButton_Click;
+
+            // Handle mouse wheel for the license scroll viewer to enable smooth scrolling
+            LicenseScroller.PreviewMouseWheel += LicenseScroller_PreviewMouseWheel;
         }
 
+        /// <summary>
+        /// Closes the About window and clears the reference in the main window.
+        /// </summary>
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
             _mainWindow.aboutWindow = null;
         }
 
-        private void ReleaseNotesButton_Click(object sender, RoutedEventArgs e)
-        {
-            System.Diagnostics.Process.Start("https://tonif03.github.io/prod/Calcify#release-notes");
-        }
-
+        /// <summary>
+        /// Opens the appropriate website depending on which button was clicked.
+        /// </summary>
         private void WebsiteButton_Click(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start("https://tonif03.github.io/prod/Calcify/");
+            switch (((Button)sender).Name)
+            {
+                case "ReleaseNotesButton":
+                    System.Diagnostics.Process.Start("https://tonif03.github.io/projects/calcify/#release-notes");
+                    break;
+                case "WebsiteButton":
+                    System.Diagnostics.Process.Start("https://tonif03.github.io/projects/calcify/");
+                    break;
+                case "RepositoryButton":
+                    System.Diagnostics.Process.Start("https://github.com/ToniF03/Calcify");
+                    break;
+                case "BugsButton":
+                    System.Diagnostics.Process.Start("https://github.com/ToniF03/Calcify/issues");
+                    break;
+            }
         }
 
-        private void RepositoryButton_Click(object sender, RoutedEventArgs e)
-        {
-            System.Diagnostics.Process.Start("https://github.com/ToniF03/Calcify");
-        }
-
-        private void BugsButton_Click(object sender, RoutedEventArgs e)
-        {
-            System.Diagnostics.Process.Start("https://github.com/ToniF03/Calcify/issues");
-        }
-
+        /// <summary>
+        /// Opens the license overview animation and reveals the Back button.
+        /// </summary>
         private void LicenseButton_Click(object sender, RoutedEventArgs e)
         {
             Storyboard sb = (this.Resources["OpenLicenseOverview"] as Storyboard);
@@ -67,6 +95,10 @@ namespace Calcify
             BackButton.Visibility = Visibility.Visible;
         }
 
+        /// <summary>
+        /// Handles Back navigation depending on the current frame offset.
+        /// Uses storyboards to animate transitions.
+        /// </summary>
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             if (mainFrame.RenderTransform.Value.OffsetX == -500)
@@ -82,6 +114,10 @@ namespace Calcify
             }
         }
 
+        /// <summary>
+        /// Custom mouse wheel handling for the license ScrollViewer.
+        /// This ensures wheel delta scrolls the viewer even when inner controls have focus.
+        /// </summary>
         private void LicenseScroller_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             ScrollViewer scrollViewer = (ScrollViewer)sender;
@@ -89,104 +125,101 @@ namespace Calcify
             e.Handled = true;
         }
 
+        /// <summary>
+        /// Called when a specific license button is clicked.
+        /// Determines which license resource to load and opens the license screen.
+        /// </summary>
         private void CalcifyLicenseButton_Click(object sender, RoutedEventArgs e)
         {
-            selectedLicense = License.ToniF03_Calcify_LICENSE;
-            LoadLicense();
+            switch (((Button)sender).Name)
+            {
+                case "CalcifyLicenseButton":
+                    selectedLicense = License.ToniF03_Calcify_LICENSE;
+                    break;
+                case "JsonLicenseButton":
+                    selectedLicense = License.Newtonsoft_Json_LICENSE;
+                    break;
+                case "AvalonEditLicenseButton":
+                    selectedLicense = License.ICSharpCode_AvalonEdit_LICENSE;
+                    break;
+                case "RobotoFontLicenseButton":
+                    selectedLicense = License.ChristanRobertson_Roboto_LICENSE;
+                    break;
+                case "OctokitLicenseButton":
+                    selectedLicense = License.GITHUB_Octokit_LICENSE;
+                    break;
+                default:
+                    selectedLicense = License.None;
+                    break;
+            }
+
+            // Load the selected license text into the display and reset scroll position
+            LicenseDisplay.Text = LoadLicense();
+            LicenseScroller.ScrollToTop();
+
+            // Start the animation to show the license detail screen
             Storyboard sb = (this.Resources["OpenLicenseScreen"] as Storyboard);
             sb.Begin();
         }
 
-        private void JsonLicenseButton_Click(object sender, RoutedEventArgs e)
-        {
-            selectedLicense = License.Newtonsoft_Json_LICENSE;
-            LoadLicense();
-            Storyboard sb = (this.Resources["OpenLicenseScreen"] as Storyboard);
-            sb.Begin();
-        }
-
-        private void AvalonEditLicenseButton_Click(object sender, RoutedEventArgs e)
-        {
-            selectedLicense = License.ICSharpCode_AvalonEdit_LICENSE;
-            LoadLicense();
-            Storyboard sb = (this.Resources["OpenLicenseScreen"] as Storyboard);
-            sb.Begin();
-        }
-
-        private void RobotoFontLicenseButton_Click(object sender, RoutedEventArgs e)
-        {
-            selectedLicense = License.ChristanRobertson_Roboto_LICENSE;
-            LoadLicense();
-            Storyboard sb = (this.Resources["OpenLicenseScreen"] as Storyboard);
-            sb.Begin();
-        }
-
-        private void OctokitLicenseButton_Click(object sender, RoutedEventArgs e)
-        {
-            selectedLicense = License.GITHUB_Octokit_LICENSE;
-            LoadLicense();
-            Storyboard sb = (this.Resources["OpenLicenseScreen"] as Storyboard);
-            sb.Begin();
-        }
-
-        private void LoadLicense()
+        /// <summary>
+        /// Loads the selected license text from the assembly's embedded resources.
+        /// Note: resourceName must match the manifest resource name.
+        /// </summary>
+        private string LoadLicense()
         {
             var assembly = Assembly.GetExecutingAssembly();
             string result = "";
             string resourceName = "";
 
-            if (selectedLicense == License.Newtonsoft_Json_LICENSE)
-                resourceName = "Calcify.Licenses.Newtonsoft_Json_LICENSE.md";
-            else if (selectedLicense == License.ICSharpCode_AvalonEdit_LICENSE)
-                resourceName = "Calcify.Licenses.ICSharpCode_AvalonEdit_LICENSE.md";
-            else if (selectedLicense == License.ToniF03_Calcify_LICENSE)
-                resourceName = "Calcify.Licenses.ToniF03_Calcify_LICENSE.md";
-            else if (selectedLicense == License.ChristanRobertson_Roboto_LICENSE)
-                resourceName = "Calcify.Licenses.ChristanRobertson_Roboto_LICENSE.md";
-            else if (selectedLicense == License.GITHUB_Octokit_LICENSE)
-                resourceName = "Calcify.Licenses.GITHUB_Octokit_LICENSE.md";
+            // Map the selected license enum to a resource name
+            switch (selectedLicense)
+            {
+                case License.ToniF03_Calcify_LICENSE:
+                    resourceName = "Calcify License";
+                    break;
+                case License.Newtonsoft_Json_LICENSE:
+                    resourceName = "Newtonsoft.Json License";
+                    break;
+                case License.ICSharpCode_AvalonEdit_LICENSE:
+                    resourceName = "AvalonEdit License";
+                    break;
+                case License.ChristanRobertson_Roboto_LICENSE:
+                    resourceName = "Roboto Font License";
+                    break;
+                case License.GITHUB_Octokit_LICENSE:
+                    resourceName = "Octokit License";
+                    break;
+            }
 
+            // Read embedded resource stream. If resourceName is invalid this will throw.
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))
             using (StreamReader reader = new StreamReader(stream))
             {
                 result = reader.ReadToEnd();
             }
-            LicenseScroller.ScrollToTop();
-            LicenseDisplay.Text = result;
+            return result;
         }
 
+        /// <summary>
+        /// Prints the currently loaded license using a FlowDocument to handle pagination.
+        /// Each line from the license is added as a paragraph.
+        /// </summary>
         private void printButton_Click(object sender, RoutedEventArgs e)
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            string result = "";
-            string resourceName = "";
-
-            if (selectedLicense == License.Newtonsoft_Json_LICENSE)
-                resourceName = "Calcify.Licenses.Newtonsoft_Json_LICENSE.md";
-            else if (selectedLicense == License.ICSharpCode_AvalonEdit_LICENSE)
-                resourceName = "Calcify.Licenses.ICSharpCode_AvalonEdit_LICENSE.md";
-            else if (selectedLicense == License.ToniF03_Calcify_LICENSE)
-                resourceName = "Calcify.Licenses.ToniF03_Calcify_LICENSE.md";
-            else if (selectedLicense == License.ChristanRobertson_Roboto_LICENSE)
-                resourceName = "Calcify.Licenses.ChristanRobertson_Roboto_LICENSE.md";
-
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                result = reader.ReadToEnd();
-            }
-            //string path = System.IO.Path.GetTempPath() + "license.txt";
-            //File.WriteAllText(path, result);
+            string result = LoadLicense();
 
             PrintDialog printDialog = new PrintDialog();
             if (printDialog.ShowDialog() == true)
             {
+                // Build a FlowDocument to paginate the license text for printing
                 FlowDocument flowDocument = new FlowDocument();
                 flowDocument.PagePadding = new Thickness(94.5f);
+
+                // Add each line of the license as a separate paragraph
                 foreach (string line in result.Split('\n'))
                 {
                     Paragraph paragraph = new Paragraph();
-
                     paragraph.Margin = new Thickness(0, 0, 0, 0);
                     paragraph.Inlines.Add(new Run(line));
                     flowDocument.Blocks.Add(paragraph);
@@ -197,7 +230,10 @@ namespace Calcify
             }
         }
 
-        private enum License 
+        /// <summary>
+        /// Supported license identifiers used to select embedded resources.
+        /// </summary>
+        private enum License
         {
             None,
             ICSharpCode_AvalonEdit_LICENSE,

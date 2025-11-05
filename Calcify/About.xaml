@@ -61,7 +61,7 @@
             </Grid.ColumnDefinitions>
 
 
-            <Button Grid.Column="0" x:Name="BackButton" Click="BackButton_Click" Visibility="Hidden" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" >
+            <Button Grid.Column="0" x:Name="BackButton" Visibility="Hidden" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" >
                 <Button.Content>
                     <Label FontSize="15" Content="&#xE830;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                 </Button.Content>
@@ -105,31 +105,31 @@
 
                 <StackPanel Grid.Column="1" >
                     <StackPanel Grid.Column="1" >
-                        <Button x:Name="ReleaseNotesButton" Click="ReleaseNotesButton_Click" Height="23" Style="{StaticResource ReactiveRoundedButton}" >
+                        <Button x:Name="ReleaseNotesButton" Height="23" Style="{StaticResource ReactiveRoundedButton}" >
                             <Grid>
                                 <Label Content="&#xE774;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0, 0, 0, 0" Style="{StaticResource lightLabel}" IsHitTestVisible="False" />
                                 <Label Content="Release Notes" FontSize="14" Margin="20, -4, 0, 0" Style="{StaticResource lightLabel}" IsHitTestVisible="False" />
                             </Grid>
                         </Button>
-                        <Button x:Name="LicenseButton" Click="LicenseButton_Click" Height="23" Margin="0, 1, 0, 0" Style="{StaticResource ReactiveRoundedButton}" >
+                        <Button x:Name="LicenseButton" Height="23" Margin="0, 1, 0, 0" Style="{StaticResource ReactiveRoundedButton}" >
                             <Grid>
                                 <Label Content="&#xF000;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0, 0, 0, 0" Style="{StaticResource lightLabel}" />
                                 <Label Content="License" FontSize="14" Margin="20, -4, 0, 0" Style="{StaticResource lightLabel}" />
                             </Grid>
                         </Button>
-                        <Button x:Name="WebsiteButton" Click="WebsiteButton_Click" Height="23" Margin="0, 1, 0, 0" Style="{StaticResource ReactiveRoundedButton}" >
+                        <Button x:Name="WebsiteButton" Height="23" Margin="0, 1, 0, 0" Style="{StaticResource ReactiveRoundedButton}" >
                             <Grid>
                                 <Label Content="&#xE774;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0, 0, 0, 0" Style="{StaticResource lightLabel}" />
                                 <Label Content="Calcify Website" FontSize="14" Margin="20, -4, 0, 0" Style="{StaticResource lightLabel}" />
                             </Grid>
                         </Button>
-                        <Button x:Name="RepositoryButton" Click="RepositoryButton_Click" Height="23" Margin="0, 1, 0, 0" Style="{StaticResource ReactiveRoundedButton}" >
+                        <Button x:Name="RepositoryButton" Height="23" Margin="0, 1, 0, 0" Style="{StaticResource ReactiveRoundedButton}" >
                             <Grid>
                                 <Label Content="&#xE774;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0, 0, 0, 0" Style="{StaticResource lightLabel}" />
                                 <Label Content="Calcify Repository" FontSize="14" Margin="20, -4, 0, 0" Style="{StaticResource lightLabel}" />
                             </Grid>
                         </Button>
-                        <Button x:Name="BugsButton" Click="BugsButton_Click" Height="25" Margin="0, 1, 0, 0" Style="{StaticResource ReactiveRoundedButton}" >
+                        <Button x:Name="BugsButton" Height="25" Margin="0, 1, 0, 0" Style="{StaticResource ReactiveRoundedButton}" >
                             <Grid>
                                 <Label Content="&#xE774;" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0, 0, 0, 0" Style="{StaticResource lightLabel}" />
                                 <Label Content="Bugs" FontSize="14" Margin="20, -4, 0, 0" Style="{StaticResource lightLabel}" />
@@ -142,7 +142,7 @@
             <Grid Grid.Column="1" >
                 <ScrollViewer Margin="15, 15, 0, 15">
                     <StackPanel >
-                        <Button x:Name="CalcifyLicenseButton" Click="CalcifyLicenseButton_Click" Style="{StaticResource ItemButton}" >
+                        <Button x:Name="CalcifyLicenseButton" Style="{StaticResource ItemButton}" >
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition />
@@ -161,7 +161,7 @@
                                 </StackPanel>
                             </Grid>
                         </Button>
-                        <Button x:Name="JsonLicenseButton" Click="JsonLicenseButton_Click" Style="{StaticResource ItemButton}" Margin="0, 5, 0, 0" >
+                        <Button x:Name="JsonLicenseButton" Style="{StaticResource ItemButton}" Margin="0, 5, 0, 0" >
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition />
@@ -180,7 +180,7 @@
                                 </StackPanel>
                             </Grid>
                         </Button>
-                        <Button x:Name="AvalonEditLicenseButton" Click="AvalonEditLicenseButton_Click" Style="{StaticResource ItemButton}" Margin="0, 5, 0, 0" >
+                        <Button x:Name="AvalonEditLicenseButton" Style="{StaticResource ItemButton}" Margin="0, 5, 0, 0" >
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition />
@@ -199,7 +199,7 @@
                                 </StackPanel>
                             </Grid>
                         </Button>
-                        <Button x:Name="RobotoFontLicenseButton" Click="RobotoFontLicenseButton_Click" Style="{StaticResource ItemButton}" Margin="0, 5, 0, 0" >
+                        <Button x:Name="RobotoFontLicenseButton" Style="{StaticResource ItemButton}" Margin="0, 5, 0, 0" >
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition />
@@ -218,7 +218,7 @@
                                 </StackPanel>
                             </Grid>
                         </Button>
-                        <Button x:Name="OctokitLicenseButton" Click="OctokitLicenseButton_Click" Style="{StaticResource ItemButton}" Margin="0, 5, 0, 0" >
+                        <Button x:Name="OctokitLicenseButton" Style="{StaticResource ItemButton}" Margin="0, 5, 0, 0" >
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition />
@@ -242,7 +242,7 @@
             </Grid>
 
             <Grid Grid.Column="2" >
-                <ScrollViewer x:Name="LicenseScroller" Margin="15, 15, 0, 40" PreviewMouseWheel="LicenseScroller_PreviewMouseWheel" >
+                <ScrollViewer x:Name="LicenseScroller" Margin="15, 15, 0, 40" >
                     <avalonEdit:TextEditor 
                                 xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
                                 ScrollViewer.VerticalScrollBarVisibility="Visible" 
