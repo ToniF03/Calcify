@@ -53,11 +53,6 @@ namespace Calcify
         Regex timeRegex = new Regex(@"^(\d{1,2}:\d{1,2}(:\d{1,2})?)?|\d{1,2}:\d{1,2}(:\d{1,2})$");
         Regex dateTimeRegex = new Regex(@"^(\d{2}(\d{2})?\/\d{1,2}\/\d{1,2}( \d{1,2}:\d{1,2}(:\d{1,2})?)?|\d{1,2}:\d{1,2}(:\d{1,2})?)$");
         Regex dateTimeCalculationRegex = new Regex(@"^(\d{2}(\d{2})?\/\d{1,2}\/\d{1,2}( \d{1,2}:\d{1,2}(:\d{1,2})?)?|\d{1,2}:\d{1,2}(:\d{1,2})?)( (in|add|plus|\+|minus|remove|\-) \d+ (c|yr|mth|wk|d|h|min|s|(?i)(centur(y|ies)|decade(s)?|year(s)?|month(s)?|week(s)?|day(s)?|hour(s)?|minute(s)?|second(s)?)(?-i))|)*$");
-        Regex numeralSystemRegex = new Regex(@"^((bin|dec|oct|hex):)?(0x[a-fA-F0-9]+|[0-7]{4}( [0-7]{4})*) (in(to)?|to|as) (bin(ary)?|dec(imal)?|oct(al)?|hex(adecimal)?)$");
-        Regex decimalRegex = new Regex(@"^\d+");
-        Regex binaryRegex = new Regex(@"^[0-1]{1,4}(( [0-1]{4}|[0-1])+)");
-        Regex octalRegex = new Regex(@"^[0-7]{1,4}(( [0-7]{4}|[0-7])+)");
-        Regex hexadecimalRegex = new Regex(@"^0x[0-9a-fA-F]+");
         Regex PermutationRegex = new Regex(@"(?<n>\d+)C(?<r>\d+)");
         Regex calculatorRegex = new Regex(@"^((\d+(\.\d+)?)|\||(\+|\-|\*|\/|\^)(?!\+|\*|\/|\^|\!)|(|\(|\)|\!))*$");
         Regex numberRegex = new Regex(@"^\-?\d+(\.\d+)?$");
@@ -70,6 +65,7 @@ namespace Calcify
         Regex currencyRegex;
         Regex dataSizeRegex;
         Regex lengthRegex;
+        Regex temperatureRegex;
         Regex massRegex;
         Regex timeCalculationRegex;
         Regex directRegex;
@@ -80,7 +76,6 @@ namespace Calcify
         Regex directDataSizeRegex;
         Regex directFrequencyRegex;
         Regex directAngleRegex;
-        Dictionary<string, Regex> givenRegex;
         #endregion
         #region Document Informations
         public string documentPath = "";
@@ -342,6 +337,7 @@ namespace Calcify
             dataSizeRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + DataSizePattern + ") (in(to)?|to|as) (?<targetUnit>" + DataSizePattern + ")$");
             lengthRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + LengthPattern + ") (in(to)?|to|as) (?<targetUnit>" + LengthPattern + ")$");
             massRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + MassPattern + ") (in(to)?|to|as) (?<targetUnit>" + MassPattern + ")$");
+            temperatureRegex = new Regex(@"^\-?\d+(\.\d+)? " + TemperaturePattern + " (in(to)?|to|as) " + TemperaturePattern + "$");
             timeCalculationRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + TimePattern + ") (in(to)?|to|as) (?<targetUnit>" + TimePattern + ")$");
             directRegex = new Regex(@"^\-?\d+(\.\d+)? (" + CurrencyPattern + ")$");
             directTemperatureRegex = new Regex(@"^\-?\d+(\.\d+)? (" + TemperaturePattern + ")$");
@@ -358,7 +354,6 @@ namespace Calcify
             DropPanel.Visibility = Visibility.Visible;
             resultEditor.TextArea.Caret.CaretBrush = Brushes.Transparent;
             Info.ToolTip = new ToolTip();
-            givenRegex = Calculator.RegexDict();
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -788,7 +783,29 @@ namespace Calcify
                 foreach (Match match in sumAvgRegex.Matches(input))
                     input = input.Replace(match.Value, "{/" + match.Value + "/}");
 
+            // Execute Angle Conversion
             input = AngleCalculation(input);
+
+            // Execute Frequency Conversion
+            input = FrequencyCalculation(input);
+
+            // Execute Currency Conversion
+            input = CurrencyConversion(input);
+
+            // Execute DataSize Conversion
+            input = DataSizeConversion(input);
+
+            // Execute Length Conversion
+            input = LengthConversion(input);
+
+            // Execute Mass Conversion
+            input = MassConversion(input);
+
+            // Execute Temperature Conversion
+            input = TemperatureConversion(input);
+
+            // Execute Calculation
+            input = parseCalculation(input);
 
             return input;
         }
@@ -1169,8 +1186,19 @@ namespace Calcify
             return input;
         }
 
+        /// <summary>
+        /// Converts angle expressions within the input string from one unit to another and returns the result as a
+        /// formatted string.
+        /// </summary>
+        /// <remarks>The method supports conversion between supported angle units as defined in the
+        /// application's configuration. The result is rounded to the number of digits specified in application
+        /// settings.</remarks>
+        /// <param name="input">The input string containing an angle expression to be converted. Leading and trailing whitespace is ignored.</param>
+        /// <returns>A string representing the converted angle value in the target unit, formatted according to application
+        /// settings. If no convertible angle expression is found, returns the trimmed input string.</returns>
         private string AngleCalculation(string input)
         {
+            input = input.Trim();
             while (angleRegex.IsMatch(input))
             {
                 Match match = angleRegex.Match(input);
@@ -1186,934 +1214,202 @@ namespace Calcify
             return input;
         }
 
-        private string CalculateSum(int CurrentLineNumber, TextDocument newDoc, out int summedLineCount, string targetUnitString = "")
+        /// <summary>
+        /// Calculates and converts frequency values in the input string to the specified target unit, returning the
+        /// result as a formatted string.
+        /// </summary>
+        /// <remarks>The conversion uses application-specific formatting for numeric precision. Only the
+        /// first matching frequency pattern in the input is processed; additional patterns are ignored.</remarks>
+        /// <param name="input">The input string containing a frequency value and unit to be converted. The string should match the expected
+        /// frequency format; otherwise, it will be returned unchanged.</param>
+        /// <returns>A string representing the converted frequency value in the target unit, formatted according to application
+        /// settings. If the input does not match a frequency pattern, the original input string is returned.</returns>
+        private string FrequencyCalculation(string input)
         {
-            double value = 0;
-            string previousLine = "";
-            bool firstLineEncountered = false;
-            int lineCount = 0;
-
-            if (CurrentLineNumber != 1)
+            input.Trim();
+            while (frequencyRegex.IsMatch(input))
             {
-                while (newDoc.GetText(newDoc.GetLineByNumber(CurrentLineNumber - 1)) == "" && CurrentLineNumber - 1 != 1)
-                    CurrentLineNumber--;
-                for (int i = CurrentLineNumber - 1; i > 0; i--)
-                {
-                    previousLine = newDoc.GetText(newDoc.GetLineByNumber(i));
-                    if (previousLine == "" && firstLineEncountered)
-                        break;
-                    else if (new Regex(@"^-?\d+(\.\d+)?$").IsMatch(previousLine) && (targetUnitString == "" || targetUnitString == "digits"))
-                    {
-                        double exVal = double.Parse(new Regex(@"^-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
-                        firstLineEncountered = true;
-                        lineCount++;
-                        if (targetUnitString == "")
-                            targetUnitString = "digits";
-                        value += exVal;
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)? " + CurrencyPattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(CurrencyPattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        if (targetUnitString == "")
-                        {
-                            targetUnitString = new Regex(CurrencyPattern + "$").Match(previousLine).Value;
-                            string exVal = new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value;
-                            value = double.Parse(exVal, CultureInfo.InvariantCulture);
-                        }
-                        else
-                        {
-                            string currentUnit = new Regex(CurrencyPattern + @"$").Match(previousLine).Value;
-                            if (currentUnit == targetUnitString)
-                            {
-                                string exVal = new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value;
-                                value = value + double.Parse(exVal, CultureInfo.InvariantCulture);
-                            }
-                            else
-                            {
-                                string extractedString = new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value;
-                                double exVal = double.Parse(extractedString, CultureInfo.InvariantCulture);
-                                exVal = exVal / currencyDict[currentUnit];
-                                if (targetUnitString != "EUR")
-                                    exVal = exVal * currencyDict[targetUnitString];
-                                exVal = System.Math.Round(exVal, 2);
-                                value = value + exVal;
-                            }
-                        }
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)? " + MassPattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(MassPattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        string currentUnitString = new Regex(MassPattern + "$").Match(previousLine).Value.ToLower();
-                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value);
-                        MassUnit currentUnit = MassUnit.None;
-                        MassUnit targetUnit = MassUnit.None;
-                        if (targetUnitString == "")
-                        {
-                            targetUnitString = currentUnitString;
-                            value += exVal;
-                        }
-                        else
-                        {
-                            targetUnit = massDict[targetUnitString];
-                            targetUnitString = massExt[targetUnit];
-                            currentUnit = massDict[currentUnitString];
-                            if (currentUnit != targetUnit)
-                                exVal = Converter.MassConverter(exVal, currentUnit, targetUnit);
-                            if (targetUnit == MassUnit.Pounds)
-                                targetUnitString = exVal == 1 || exVal == -1 ? "lb" : "lbs";
-                            value += exVal;
+                Match match = frequencyRegex.Match(input);
+                double value = double.Parse(match.Groups["value"].Value);
+                FrequencyUnit targetUnit = frequencyDict[match.Groups["targetUnit"].Value.ToLower()];
+                FrequencyUnit srcUnit = frequencyDict[match.Groups["srcUnit"].Value.ToLower()];
+                if (targetUnit == srcUnit)
+                    return input.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + frequencyExt[targetUnit]);
+                value = Converter.FrequencyConverter(value, srcUnit, targetUnit);
+                return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + frequencyExt[targetUnit];
 
-                        }
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)? " + TemperaturePattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(TemperaturePattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        string currentUnitString = new Regex(TemperaturePattern + "$").Match(previousLine).Value;
-                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
-                        TemperatureUnit currentUnit = TemperatureUnit.None;
-                        TemperatureUnit targetUnit = TemperatureUnit.None;
-                        if (targetUnitString == "")
-                        {
-                            targetUnitString = currentUnitString;
-                            value = exVal;
-                        }
-                        else
-                        {
-                            currentUnit = temperatureDict[currentUnitString];
-                            targetUnit = temperatureDict[targetUnitString];
-                            targetUnitString = temperatureExt[targetUnit];
-                            if (currentUnit != targetUnit)
-                                exVal = Converter.TemperatureConverter(exVal, currentUnit, targetUnit);
-                            value += exVal;
-                        }
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)? " + DataSizePattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(DataSizePattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        string currentUnitString = new Regex(DataSizePattern + "$").Match(previousLine).Value;
-                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
-                        DataSizeUnit currentUnit = DataSizeUnit.None;
-                        DataSizeUnit targetUnit = DataSizeUnit.None;
-                        if (currentUnitString != "b" && currentUnitString != "B")
-                            currentUnitString = currentUnitString.ToLower();
-                        if (targetUnitString != "b" && targetUnitString != "B")
-                            targetUnitString = targetUnitString.ToLower();
-                        if (targetUnitString == "")
-                        {
-                            targetUnitString = currentUnitString;
-                            value += exVal;
-                            targetUnit = dataSizeDict[targetUnitString];
-                            targetUnitString = dataSizeExt[targetUnit];
-                        }
-                        else
-                        {
-                            targetUnit = dataSizeDict[targetUnitString];
-                            targetUnitString = dataSizeExt[targetUnit];
-                            currentUnit = dataSizeDict[currentUnitString];
-                            if (targetUnit != currentUnit)
-                                exVal = Converter.DataSizeConverter(exVal, currentUnit, targetUnit);
-                            value += exVal;
-                        }
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)? " + TimePattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(TimePattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        string currentUnitString = new Regex(TimePattern + "$").Match(previousLine).Value;
-                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
-                        TimeUnit currentUnit = TimeUnit.None;
-                        TimeUnit targetUnit = TimeUnit.None;
-                        if (targetUnitString == "")
-                        {
-                            targetUnitString = currentUnitString;
-                            value += exVal;
-                        }
-                        else
-                        {
-                            targetUnit = timeDict[targetUnitString];
-                            targetUnitString = timeExt[targetUnit];
-                            currentUnit = timeDict[currentUnitString];
-                            if (targetUnit != currentUnit)
-                                exVal = Converter.TimeConverter(exVal, currentUnit, targetUnit);
-                            value += exVal;
-                        }
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)? " + FrequencyPattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(FrequencyPattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
-                        string currentUnitString = new Regex(FrequencyPattern).Match(new Regex(@"^\-?\d+(\.\d+)? " + FrequencyPattern).Match(previousLine).Value).Value.ToLower().Trim();
-                        if (targetUnitString == "")
-                            targetUnitString = currentUnitString;
-                        FrequencyUnit targetUnit = FrequencyUnit.None;
-                        FrequencyUnit currentUnit = FrequencyUnit.None;
-                        targetUnitString = targetUnitString.ToLower();
-                        targetUnit = frequencyDict[targetUnitString];
-                        targetUnitString = frequencyExt[targetUnit];
-                        currentUnit = frequencyDict[currentUnitString];
-                        if (targetUnit != currentUnit)
-                            exVal = Converter.FrequencyConverter(exVal, currentUnit, targetUnit);
-                        value += exVal;
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)?" + AnglePattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(AnglePattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
-                        string currentUnitString = new Regex(AnglePattern).Match(previousLine).Value.ToLower().Trim();
-                        if (targetUnitString == "")
-                            targetUnitString = currentUnitString;
-                        AngleUnit targetUnit = AngleUnit.None;
-                        AngleUnit currentUnit = AngleUnit.None;
-                        targetUnit = angleDict[targetUnitString];
-                        targetUnitString = angleExt[targetUnit];
-                        currentUnit = angleDict[currentUnitString];
-                        if (currentUnit != targetUnit)
-                            exVal = Converter.AngleConverter(exVal, currentUnit, targetUnit);
-                        value += exVal;
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)? " + LengthPattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(LengthPattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        string currentUnitString = new Regex(LengthPattern + "$").Match(previousLine).Value;
-                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
-                        targetUnitString = targetUnitString == "" ? currentUnitString : targetUnitString;
-                        LengthUnit currentUnit = LengthUnit.None;
-                        LengthUnit targetUnit = LengthUnit.None;
-                        targetUnit = lengthDict[targetUnitString];
-                        targetUnitString = lengthExt[targetUnit];
-                        currentUnit = lengthDict[currentUnitString];
-                        if (targetUnit != currentUnit)
-                            exVal = Converter.LengthConverter(exVal, currentUnit, targetUnit);
-                        value += exVal;
-                    }
-                    else
-                        break;
-                }
-
-                summedLineCount = lineCount;
-                if (targetUnitString != "digits")
-                {
-                    if (System.Math.Round(value, Properties.Settings.Default.Digits) != 0)
-                        return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + targetUnitString;
-                    else
-                        return ToNumberString(value) + " " + targetUnitString;
-                }
-                else
-                {
-                    if (System.Math.Round(value, Properties.Settings.Default.Digits) != 0)
-                        return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits));
-                    else
-                        return ToNumberString(value);
-                }
             }
-            else
-                summedLineCount = 0;
-            return "";
+            return input;
         }
 
-        private string Calculate(DocumentLine input, TextDocument newDoc)
+        /// <summary>
+        /// Converts currency values found in the input string from one unit to another using predefined exchange rates.
+        /// </summary>
+        /// <remarks>Currency conversion is performed using exchange rates defined in the internal
+        /// currency dictionary. Only recognized currency units and patterns will be converted; unrecognized formats
+        /// remain unchanged. The conversion rounds results to two decimal places.</remarks>
+        /// <param name="input">The input string containing currency values to be converted. Currency values should be formatted according
+        /// to the expected pattern for recognition.</param>
+        /// <returns>A string with all recognized currency values converted to their target units. If no convertible currency
+        /// values are found, returns the original input string.</returns>
+        private string CurrencyConversion(string input)
         {
-            // ##############################################################
-            string result = "";
-
-            string currentLine = mainEditor.Document.GetText(input.Offset, input.Length);
-            // ##############################################################
-            string uneditedCurrentLine = currentLine;
-            windowTitle = "Calcify";
-            // ##############################################################
-            if (input.LineNumber == 1)
+            while (currencyRegex.IsMatch(input))
             {
-                // ##############################################################
-                if (currentLine.StartsWith("# "))
+                Match match = currencyRegex.Match(input);
+                double value = double.Parse(match.Groups["value"].Value, CultureInfo.InvariantCulture);
+                string currentUnit = match.Groups["srcUnit"].Value.ToUpper();
+                string targetUnit = match.Groups["targetUnit"].Value.ToUpper();
+                if (currentUnit == targetUnit)
+                    return ToNumberString(System.Math.Round(value, 2)) + " " + targetUnit;
+                if (currentUnit == "EUR")
                 {
-                    string text = mainEditor.Document.GetText(input.Offset, input.Length).Substring(2).Trim();
-                    if (text != "" && text.Replace(" ", "") != "")
-                    {
-                        windowTitle = windowTitle + " - " + text;
-                        this.Title = windowTitle + (documentText == mainEditor.Text ? "" : "  ●");
-                        titleLabel.Content = windowTitle + (documentText == mainEditor.Text ? "" : "  ●");
-                    }
-                    else
-                    {
-                        this.Title = windowTitle + (documentText == mainEditor.Text ? "" : "  ●");
-                        titleLabel.Content = windowTitle + (documentText == mainEditor.Text ? "" : "  ●");
-                    }
+                    value = System.Math.Round(value * currencyDict[targetUnit], 2);
+                }
+                else if (targetUnit == "EUR")
+                {
+                    value = System.Math.Round(value / currencyDict[currentUnit], 2);
                 }
                 else
                 {
-                    this.Title = windowTitle + (documentText == mainEditor.Text ? "" : "  ●");
-                    titleLabel.Content = windowTitle + (documentText == mainEditor.Text ? "" : "  ●");
+                    value = System.Math.Round(value / currencyDict[currentUnit] * currencyDict[targetUnit], 2);
                 }
+                input = input.Replace(match.Value, ToNumberString(value) + " " + targetUnit);
             }
+            return input;
+        }
 
-            // ##############################################################
-            if (!currentLine.StartsWith("#"))
+        /// <summary>
+        /// Converts a data size expression within the input string from one unit to another and returns the result as a
+        /// formatted string.
+        /// </summary>
+        /// <remarks>The method supports conversion between recognized data size units as defined in the
+        /// application's configuration. The number of decimal digits in the result is determined by the current
+        /// settings. If the source and target units are the same, the value is rounded and formatted without
+        /// conversion.</remarks>
+        /// <param name="input">The input string containing a data size expression to convert. The expression should specify both the source
+        /// and target units (e.g., "10 MB to KB").</param>
+        /// <returns>A string with the converted data size value and unit. If no valid data size expression is found, returns the
+        /// original input string unchanged.</returns>
+        private string DataSizeConversion(string input)
+        {
+            input.Trim();
+            while (dataSizeRegex.IsMatch(input))
             {
-                if (currentLine.Contains("#"))
-                    currentLine = currentLine.Split('#')[0];
-
-                // ##############################################################
-                while (currentLine.Contains("  "))
-                    currentLine = currentLine.Replace("  ", " ");
-                currentLine = currentLine.Trim();
-
-                // ##############################################################
-                if (prevRegex.IsMatch(currentLine))
-                {
-                    if (input.LineNumber != 1)
-                    {
-                        string previousLine = "";
-                        for (int i = 1; input.LineNumber - i != 0; i++)
-                        {
-                            previousLine = newDoc.GetText(newDoc.GetLineByNumber(input.LineNumber - i));
-                            if (previousLine != "")
-                                break;
-                        }
-
-                        currentLine = prevRegex.Replace(currentLine, previousLine);
-                    }
-                }
-
-                // ##############################################################
-                #region Permutation
-                //if (PermutationRegex.IsMatch(currentLine))
-                //{
-                foreach (Match match in PermutationRegex.Matches(currentLine))
-                {
-                    int n = 0;
-                    int r = 0;
-                    string[] m = match.Value.Split('C');
-                    n = int.Parse(m[0]);
-                    r = int.Parse(m[1]);
-                    if (n >= r)
-                    {
-                        currentLine = currentLine.Replace(match.Value, Functions.nCr(n, r).ToString());
-                    }
-                }
-                //}
-                #endregion
-                // ##############################################################
-                #region Constants
-                if (constantsRegex.IsMatch(currentLine))
-                {
-                    foreach (Match match in constantsRegex.Matches(currentLine))
-                    {
-                        if (match.Value == "pi" || match.Value == "π")
-                            currentLine = constantsRegex.Replace(currentLine, ToNumberString(System.Math.Round(System.Math.PI, Properties.Settings.Default.Digits)), 1);
-                        else if (match.Value == "e")
-                            currentLine = constantsRegex.Replace(currentLine, ToNumberString(System.Math.Round(System.Math.E, Properties.Settings.Default.Digits)), 1);
-                    }
-                }
-                #endregion
-                #region Functions
-                if (randRegex.IsMatch(currentLine))
-                {
-                    MatchCollection matches = randRegex.Matches(currentLine);
-                    foreach (Match match in matches)
-                    {
-                        string text = match.Value;
-                        string[] numbersString = text.Split(',');
-                        double minNumber = double.Parse(numbersString[0].Split('(')[1], CultureInfo.InvariantCulture);
-                        double maxNumber = double.Parse(numbersString[1].Split(')')[0], CultureInfo.InvariantCulture);
-                        if (minNumber < maxNumber)
-                        {
-                            if (text.StartsWith("rand("))
-                            {
-                                double generatedNumber = GetRandomDouble(minNumber, maxNumber);
-                                generatedNumber = System.Math.Round(generatedNumber, Properties.Settings.Default.Digits);
-                                currentLine = currentLine.Replace(text, ToNumberString(System.Math.Round(generatedNumber, Properties.Settings.Default.Digits)) + " ");
-                            }
-                            else if (text.StartsWith("randint("))
-                            {
-                                int generatedNumber = new Random().Next((int)minNumber, (int)maxNumber);
-                                currentLine = currentLine.Replace(text, ToNumberString(generatedNumber) + " ");
-                            }
-                        }
-                    }
-                }
-
-                // ##############################################################
-                if (diffRegex.IsMatch(currentLine))
-                {
-                    foreach (Match match in diffRegex.Matches(currentLine))
-                    {
-                        string text = match.Value;
-                        string[] numbersString = text.Split(',');
-                        double minNumber = double.Parse(numbersString[0].Split('(')[1], CultureInfo.InvariantCulture);
-                        double maxNumber = double.Parse(numbersString[1].Split(')')[0], CultureInfo.InvariantCulture);
-                        double diff = System.Math.Abs(maxNumber - minNumber);
-                        currentLine = currentLine.Replace(text, ToNumberString(System.Math.Round(diff, Properties.Settings.Default.Digits)) + " ");
-                    }
-                }
-
-                // ##############################################################
-                if (roundRegex.IsMatch(currentLine))
-                {
-                    MatchCollection matches = roundRegex.Matches(currentLine);
-                    foreach (Match match in matches)
-                    {
-                        string text = match.Value;
-                        string[] numbersString = text.Split(',');
-                        double minNumber = double.Parse(numbersString[0].Split('(')[1], CultureInfo.InvariantCulture);
-                        int digits = int.Parse(numbersString[1].Split(')')[0]);
-                        if (0 <= digits)
-                        {
-                            double roundedNumber = System.Math.Round(minNumber, digits);
-                            currentLine = currentLine.Replace(text, ToNumberString(roundedNumber));
-                        }
-                    }
-                }
-
-                // ##############################################################
-                if (sqrtRegex.IsMatch(currentLine))
-                {
-                    MatchCollection matches = sqrtRegex.Matches(currentLine);
-                    foreach (Match match in matches)
-                    {
-                        double extractedNumber = double.Parse(match.Value.Split('(')[1].Split(')')[0], CultureInfo.InvariantCulture);
-                        if (extractedNumber > 0)
-                        {
-                            double value = System.Math.Sqrt(extractedNumber);
-                            if (System.Math.Round(value, Properties.Settings.Default.Digits) != 0)
-                                currentLine = currentLine.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)));
-                            else
-                                currentLine = currentLine.Replace(match.Value, ToNumberString(value));
-                        }
-                    }
-                }
-                // ##############################################################
-                #region Sum
-                // ##############################################################
-                if (sumAvgRegex.IsMatch(currentLine))
-                {
-                    MatchCollection matches = sumAvgRegex.Matches(currentLine);
-                    string targetUnitString = "";
-                    foreach (Match match in matches)
-                    {
-                        targetUnitString = "";
-                        string text = match.Value.ToLower();
-                        if (text.Contains(" "))
-                            targetUnitString = string.Join(" ", targetUnitString.Split(' ').Skip(2));
-                        int summedLines;
-                        string s = CalculateSum(input.LineNumber, newDoc, out summedLines, targetUnitString) + " ";
-                        if (text == "avg")
-                        {
-                            string[] splittedResult = s.Split(' ');
-                            splittedResult = new string[] { splittedResult[0], String.Join(" ", splittedResult.Skip(1)) };
-                            double value = double.Parse(splittedResult[0], CultureInfo.InvariantCulture);
-                            value /= summedLines;
-                            s = ToNumberString(value) + " " + splittedResult[1];
-                        }
-                        currentLine = Regex.Replace(currentLine, @"\b" + match.Value + @"( |$)", s);
-                        currentLine = currentLine.Replace("  ", " ").Trim();
-                    }
-
-                }
-                #endregion
-                #endregion
-
-                // ##############################################################
-                if (dateTimeKeyWordsRegex.IsMatch(currentLine))
-                {
-                    DateTime dateTime = DateTime.Now;
-                    string timeString = "";
-                    MatchCollection matches = dateTimeKeyWordsRegex.Matches(currentLine);
-                    foreach (Match match in matches)
-                    {
-                        if (match.Value.ToLower() == "now" || match.Value.ToLower() == "time")
-                            timeString = dateTime.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
-                        else if (match.Value.ToLower() == "today" || match.Value.ToLower() == "date")
-                            timeString = dateTime.ToString("yyyy/MM/dd", CultureInfo.InvariantCulture);
-                        else if (match.Value.ToLower() == "yesterday")
-                            timeString = dateTime.AddDays(-1).ToString("yyyy/MM/dd", CultureInfo.InvariantCulture);
-                        else if (match.Value.ToLower() == "tomorrow")
-                            timeString = dateTime.AddDays(1).ToString("yyyy/MM/dd", CultureInfo.InvariantCulture);
-                        currentLine = Regex.Replace(currentLine, @"\b(?i)" + match.Value.ToLower() + @"(?-i)\b", timeString);
-                    }
-                }
-
-                // Date
-                // ##############################################################
-                #region Date
-                // ##############################################################
-                if (dateTimeCalculationRegex.IsMatch(currentLine))
-                {
-                    bool dateGiven = currentLine.Contains('/');
-                    bool timeGiven = currentLine.Contains(':');
-                    DateTime originalDate;
-                    int year = 0;
-                    int month = 0;
-                    int day = 0;
-                    int hour = 0;
-                    int minute = 0;
-                    int second = 0;
-                    string[] splittedTask = null;
-
-                    if (dateGiven)
-                    {
-                        year = int.Parse(currentLine.Split(' ')[0].Split('/')[0]);
-                        month = int.Parse(currentLine.Split(' ')[0].Split('/')[1]);
-                        day = int.Parse(currentLine.Split(' ')[0].Split('/')[2]);
-                    }
-                    else
-                    {
-                        year = DateTime.Now.Year;
-                        month = DateTime.Now.Month;
-                        day = DateTime.Now.Day;
-                    }
-                    if (timeGiven)
-                    {
-                        if (dateGiven)
-                        {
-                            splittedTask = currentLine.Split(' ');
-                            splittedTask = splittedTask[1].Split(':');
-                        }
-                        else if (!dateGiven)
-                        {
-                            splittedTask = currentLine.Split(' ');
-                            splittedTask = splittedTask[0].Split(':');
-                        }
-                        hour = int.Parse(splittedTask[0]);
-                        minute = int.Parse(splittedTask[1]);
-                        if (splittedTask.Length == 3)
-                            second = int.Parse(splittedTask[2]);
-                    }
-                    if (((dateGiven && !(year < 1 || month < 1 || month > 12)) || !dateGiven) && ((timeGiven && !(hour < 0 || minute < 0 || second < 0 || hour > 23 || minute > 59 || second > 59)) || !timeGiven))
-                    {
-                        if (day > -1 && day <= DateTime.DaysInMonth(year, month))
-                        {
-                            originalDate = new DateTime(year, month, day);
-                            DateTime date = new DateTime(year, month, day, hour, minute, second);
-                            if (Regex.IsMatch(currentLine, @"^(\d{4}|\d{2})\/\d{1,2}\/\d{1,2} \d{1,2}\:\d{1,2}(:\d{1,2})?$"))
-                            {
-                                if (second != 0)
-                                    result = date.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
-                                else
-                                    result = date.ToString("yyyy/MM/dd HH:mm", CultureInfo.InvariantCulture);
-                            }
-                            else if (Regex.IsMatch(currentLine, @"^\d\d?\:\d\d?(:\d\d?)?$"))
-                            {
-                                if (second != 0)
-                                    result = date.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
-                                else
-                                    result = date.ToString("HH:mm", CultureInfo.InvariantCulture);
-                            }
-                            else if (Regex.IsMatch(currentLine, @"^(\d{4}|\d{2})\/(\d{2}|\d)\/(\d{2}|\d)$"))
-                                result = date.ToString("yyyy/MM/dd", CultureInfo.InvariantCulture);
-                            else
-                            {
-                                int exVal = 0;
-                                MatchCollection matches = Regex.Matches(currentLine, @" (in|add|plus|\+|minus|remove|\-) \d+ (c|yr|mth|wk|d|h|min|s|(?i)(centur(y|ies)|decade(s)?|year(s)?|month(s)?|week(s)?|day(s)?|hour(s)?|minute(s)?|second(s)?)(?-i))");
-
-                                foreach (Match m in matches)
-                                {
-                                    splittedTask = m.Value.Substring(1).Split(' ');
-                                    splittedTask[0] = splittedTask[0].ToLower();
-                                    exVal = int.Parse(splittedTask[1]);
-                                    if (splittedTask[0] == "minus" || splittedTask[0] == "remove" || splittedTask[0] == "-")
-                                        exVal *= -1;
-                                    string exUnit = splittedTask[2].ToLower();
-                                    switch (exUnit)
-                                    {
-                                        case "century":
-                                        case "centuries":
-                                        case "c":
-                                            date = date.AddYears(exVal * 100);
-                                            break;
-                                        case "decade":
-                                        case "decades":
-                                            date = date.AddYears(exVal * 10);
-                                            break;
-                                        case "year":
-                                        case "years":
-                                        case "yr":
-                                            date = date.AddYears(exVal);
-                                            break;
-                                        case "months":
-                                        case "month":
-                                        case "mth":
-                                            date = date.AddMonths(exVal);
-                                            break;
-                                        case "weeks":
-                                        case "week":
-                                        case "wk":
-                                            date = date.AddDays(exVal * 7);
-                                            break;
-                                        case "days":
-                                        case "day":
-                                        case "d":
-                                            date = date.AddDays(exVal);
-                                            break;
-                                    }
-                                    if (timeGiven)
-                                    {
-                                        switch (exUnit)
-                                        {
-                                            case "hours":
-                                            case "hour":
-                                            case "h":
-                                                date = date.AddHours(exVal);
-                                                break;
-                                            case "minutes":
-                                            case "minute":
-                                            case "min":
-                                                date = date.AddMinutes(exVal);
-                                                break;
-                                            case "seconds":
-                                            case "second":
-                                            case "s":
-                                                date = date.AddSeconds(exVal);
-                                                break;
-                                        }
-                                    }
-                                }
-
-                                if (originalDate.Date == date.Date || dateGiven && timeGiven)
-                                    result = date.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
-                                else if (timeGiven && !dateGiven)
-                                    result = date.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
-                                else if (dateGiven && !timeGiven)
-                                    result = date.ToString("yyyy/MM/dd", CultureInfo.InvariantCulture);
-                            }
-                        }
-                    }
-                }
-                #endregion
-                // Angle
-                #region Angle Units
-                else if (angleRegex.IsMatch(currentLine))
-                {
-                    double extractedValue = double.Parse(currentLine.Split(' ')[0], CultureInfo.InvariantCulture);
-                    string[] splittedTask = currentLine.Split(' ');
-                    string currentUnitString = (splittedTask[1].ToLower() == "angular" ? splittedTask[1] + " " + splittedTask[2] : splittedTask[1]).ToLower();
-                    string targetUnitString = splittedTask[splittedTask.Length - 1];
-                    AngleUnit targetUnit = AngleUnit.None;
-                    AngleUnit currentUnit = AngleUnit.None;
-                    targetUnit = angleDict[targetUnitString.ToLower()];
-                    targetUnitString = angleExt[targetUnit];
-                    currentUnit = angleDict[currentUnitString];
-                    if (targetUnit != currentUnit)
-                        extractedValue = Converter.AngleConverter(extractedValue, currentUnit, targetUnit);
-                    if (System.Math.Round(extractedValue, Properties.Settings.Default.Digits) != 0)
-                        result = ToNumberString(System.Math.Round(extractedValue, Properties.Settings.Default.Digits)) + " " + targetUnitString;
-                    else
-                        result = ToNumberString(extractedValue) + " " + targetUnitString;
-                }
-                #endregion
-                // Frequency
-                #region Frequency
-                else if (frequencyRegex.IsMatch(currentLine))
-                {
-                    double extractedValue = double.Parse(currentLine.Split(' ')[0], CultureInfo.InvariantCulture);
-                    string currentUnitString = currentLine.Split(' ')[1].ToLower().Trim();
-                    string targetUnitString = currentLine.Split(' ')[3].ToLower().Trim();
-                    FrequencyUnit targetUnit = FrequencyUnit.None;
-                    FrequencyUnit currentUnit = FrequencyUnit.None;
-                    targetUnit = frequencyDict[targetUnitString];
-                    targetUnitString = frequencyExt[targetUnit];
-                    currentUnit = frequencyDict[currentUnitString];
-                    if (targetUnit != currentUnit)
-                        extractedValue = Converter.FrequencyConverter(extractedValue, currentUnit, targetUnit);
-                    if (System.Math.Round(extractedValue, Properties.Settings.Default.Digits) != 0)
-                        result = ToNumberString(System.Math.Round(extractedValue, Properties.Settings.Default.Digits)) + " " + targetUnitString;
-                    else
-                        result = ToNumberString(extractedValue) + " " + targetUnitString;
-                }
-                #endregion
-                // Currency
-                #region Currency Units
-                else if (currencyRegex.IsMatch(currentLine))
-                {
-                    string valueString = currentLine.Split(' ')[0];
-                    double value = double.Parse(valueString, CultureInfo.InvariantCulture);
-                    string currentUnit = currentLine.Substring(valueString.Length + 1, 3).ToUpper();
-                    string targetUnit = currentLine.Substring(currentLine.Length - 3).ToUpper();
-                    if (currentUnit != targetUnit)
-                    {
-                        if (currentUnit == "EUR")
-                        {
-                            value = System.Math.Round(value * currencyDict[targetUnit], 2);
-                            result = value.ToString(CultureInfo.InvariantCulture).Replace(',', '.') + " " + targetUnit;
-                        }
-                        else if (targetUnit == "EUR")
-                        {
-                            value = System.Math.Round(value / currencyDict[currentUnit], 2);
-                            result = value.ToString(CultureInfo.InvariantCulture).Replace(',', '.') + " " + targetUnit;
-                        }
-                        else
-                        {
-                            value = System.Math.Round(value / currencyDict[currentUnit] * currencyDict[targetUnit], 2);
-                            result = value.ToString(CultureInfo.InvariantCulture).Replace(',', '.') + " " + targetUnit;
-                        }
-                    }
-                }
-                #endregion
-                // Data size
-                #region Data Size Units
-                else if (dataSizeRegex.IsMatch(currentLine))
-                {
-                    string[] splittedTask = currentLine.Split(' ');
-                    double extractedValue = double.Parse(splittedTask[0], CultureInfo.InvariantCulture);
-                    string currentUnitString = splittedTask[1];
-                    string targetUnitString = splittedTask[3];
-                    DataSizeUnit targetUnit = DataSizeUnit.None;
-                    DataSizeUnit currentUnit = DataSizeUnit.None;
-                    targetUnitString = targetUnitString != "b" && targetUnitString != "B" ? targetUnitString.ToLower() : targetUnitString;
-                    currentUnitString = currentUnitString != "b" && currentUnitString != "B" ? currentUnitString.ToLower() : currentUnitString;
-                    targetUnit = dataSizeDict[targetUnitString];
-                    targetUnitString = dataSizeExt[targetUnit];
-                    currentUnit = dataSizeDict[currentUnitString];
-                    if (currentUnit != targetUnit)
-                    {
-                        double res = Converter.DataSizeConverter(extractedValue, currentUnit, targetUnit);
-                        string valString = ToNumberString(res);
-                        result = valString + " " + targetUnitString;
-                    }
-                }
-                #endregion
-                // Length
-                #region Length Units
-                else if (lengthRegex.IsMatch(currentLine))
-                {
-                    string[] splittedTask = currentLine.Split(' ');
-                    double extractedValue = double.Parse(splittedTask[0], CultureInfo.InvariantCulture);
-                    string currentUnitString = splittedTask[1];
-                    string targetUnitString = splittedTask[3];
-                    LengthUnit targetUnit = LengthUnit.None;
-                    LengthUnit currentUnit = LengthUnit.None;
-                    targetUnit = lengthDict[targetUnitString];
-                    targetUnitString = lengthExt[targetUnit];
-                    currentUnit = lengthDict[currentUnitString];
-                    if (currentUnit != targetUnit)
-                        extractedValue = Converter.LengthConverter(extractedValue, currentUnit, targetUnit);
-                    if (System.Math.Round(extractedValue, Properties.Settings.Default.Digits) != 0)
-                        result = ToNumberString(System.Math.Round(extractedValue, Properties.Settings.Default.Digits)) + " " + targetUnitString;
-                    else
-                        result = ToNumberString(extractedValue) + " " + targetUnitString;
-                }
-                #endregion
-                // Mass
-                #region Mass Units
-                else if (massRegex.IsMatch(currentLine))
-                {
-                    string[] splittedTask = currentLine.Split(' ');
-                    double exVal = double.Parse(splittedTask[0], CultureInfo.InvariantCulture);
-                    string currentUnitString = splittedTask[1].ToLower() == "long" || splittedTask[1].ToLower() == "short" ? splittedTask[1] + " " + splittedTask[2] : splittedTask[1];
-                    string targetUnitString = splittedTask[splittedTask.Length - 2] == "long" || splittedTask[splittedTask.Length - 2] == "short" ? splittedTask[splittedTask.Length - 2] + " " + splittedTask[splittedTask.Length - 1] : splittedTask[splittedTask.Length - 1];
-                    MassUnit currentUnit = MassUnit.None;
-                    MassUnit targetUnit = MassUnit.None;
-                    targetUnit = massDict[targetUnitString];
-                    targetUnitString = massExt[targetUnit];
-                    currentUnit = massDict[currentUnitString];
-                    if (currentUnit != targetUnit)
-                    {
-                        double res = Converter.MassConverter(exVal, currentUnit, targetUnit);
-                        if (targetUnit == MassUnit.Pounds)
-                            targetUnitString = res == 1 || res == -1 ? "lb" : "lbs";
-                        if (System.Math.Round(exVal, Properties.Settings.Default.Digits) != 0)
-                            result = ToNumberString(System.Math.Round(res, Properties.Settings.Default.Digits)) + " " + targetUnitString;
-                        else
-                            result = ToNumberString(res) + " " + targetUnitString;
-                    }
-                }
-                #endregion
-                // Numeral systems
-                #region NumeralSystems
-                else if (numeralSystemRegex.IsMatch(currentLine))
-                {
-                    string exVal = "";
-                    NumeralSystemUnit currentUnit = NumeralSystemUnit.None;
-                    NumeralSystemUnit targetUnit = NumeralSystemUnit.None;
-                    currentLine = currentLine.Replace(" into ", " in ");
-                    currentLine = currentLine.Replace(" to ", " in ");
-                    string[] splittedTask = currentLine.Split(new string[] { " in " }, 2, StringSplitOptions.None);
-                    if (currentLine.StartsWith("bin:") || binaryRegex.IsMatch(splittedTask[0]))
-                        currentUnit = NumeralSystemUnit.Binary;
-                    else if (currentLine.StartsWith("oct:") || octalRegex.IsMatch(splittedTask[0]))
-                        currentUnit = NumeralSystemUnit.Octal;
-                    else if (currentLine.StartsWith("hex:") || hexadecimalRegex.IsMatch(splittedTask[0]))
-                        currentUnit = NumeralSystemUnit.Hexadecimal;
-                    else if (currentLine.StartsWith("dec:") || decimalRegex.IsMatch(splittedTask[0]))
-                        currentUnit = NumeralSystemUnit.Decimal;
-                    if (currentLine.EndsWith("bin") || currentLine.EndsWith("binary"))
-                        targetUnit = NumeralSystemUnit.Binary;
-                    else if (currentLine.EndsWith("hex") || currentLine.EndsWith("hexadecimal"))
-                        targetUnit = NumeralSystemUnit.Hexadecimal;
-                    else if (currentLine.EndsWith("oct") || currentLine.EndsWith("octal"))
-                        targetUnit = NumeralSystemUnit.Octal;
-                    else if (currentLine.EndsWith("dec") || currentLine.EndsWith("decimal"))
-                        targetUnit = NumeralSystemUnit.Decimal;
-                    if (currentLine.StartsWith("bin:") || currentLine.StartsWith("hex:") || currentLine.StartsWith("oct:") || currentLine.StartsWith("dec:"))
-                        currentLine = currentLine.Substring(4);
-                    exVal = Regex.Match(currentLine, "^(0x)?([0-9a-fA-F]+| )").Value;
-                    result = Converter.NumeralSystemConverter(exVal, currentUnit, targetUnit);
-                }
-                #endregion
-                // Temperature
-                #region Temperature Units
-                else if (Regex.IsMatch(currentLine, @"^\-?\d+(\.\d+)? " + TemperaturePattern + " (in(to)?|to|as) " + TemperaturePattern + "$"))
-                {
-                    string[] splittedTask = currentLine.Split(' ');
-                    double extractedValue = double.Parse(splittedTask[0], CultureInfo.InvariantCulture);
-                    string targetUnitString = splittedTask[3];
-                    string currentUnitString = splittedTask[1];
-                    TemperatureUnit currentUnit = TemperatureUnit.None;
-                    TemperatureUnit targetUnit = TemperatureUnit.None;
-                    targetUnit = temperatureDict[targetUnitString.ToUpper()];
-                    targetUnitString = temperatureExt[targetUnit];
-                    currentUnit = temperatureDict[currentUnitString.ToUpper()];
-                    if (currentUnit != targetUnit)
-                    {
-                        double res = Converter.TemperatureConverter(extractedValue, currentUnit, targetUnit);
-                        if (System.Math.Round(res, Properties.Settings.Default.Digits) != 0)
-                            result = ToNumberString(System.Math.Round(res, Properties.Settings.Default.Digits)) + " " + targetUnitString;
-                        else
-                            result = ToNumberString(res) + " " + targetUnitString;
-                    }
-                }
-                #endregion
-                // Time
-                #region Time Units
-                else if (timeCalculationRegex.IsMatch(currentLine))
-                {
-                    string[] splittedTask = currentLine.Split(' ');
-                    double extractedValue = double.Parse(splittedTask[0], CultureInfo.InvariantCulture);
-                    string currentUnitString = splittedTask[1];
-                    string targetUnitString = splittedTask[splittedTask.Length - 1];
-                    TimeUnit currentUnit = TimeUnit.None;
-                    TimeUnit targetUnit = TimeUnit.None;
-                    targetUnit = timeDict[targetUnitString];
-                    targetUnitString = timeExt[targetUnit];
-                    currentUnit = timeDict[currentUnitString];
-                    if (currentUnit != targetUnit)
-                    {
-                        double res = Converter.TimeConverter(extractedValue, currentUnit, targetUnit);
-                        if (res != 1 && res != -1)
-                        {
-                            switch (targetUnitString)
-                            {
-                                case "century":
-                                    targetUnitString = "centuries";
-                                    break;
-                                case "decade":
-                                case "year":
-                                case "month":
-                                case "week":
-                                case "day":
-                                    targetUnitString = targetUnitString + "s";
-                                    break;
-                            }
-                        }
-                        if (System.Math.Round(res, Properties.Settings.Default.Digits) != 0)
-                            result = ToNumberString(System.Math.Round(res, Properties.Settings.Default.Digits)) + " " + targetUnitString;
-                        else
-                            result = ToNumberString(res) + " " + targetUnitString;
-                    }
-                }
-                #endregion
-
-                #region Result
-                if (result == "" && calculatorRegex.IsMatch(currentLine) && !numberRegex.IsMatch(currentLine) && (currentLine.Length >= 1 ? (numberRegex.IsMatch(currentLine.Substring(currentLine.Length - 1)) || currentLine.EndsWith("|") || currentLine.EndsWith(")")) : false))
-                {
-                    double val = Calculator.CalculateString(currentLine, givenRegex);
-                    if (!double.IsNaN(val))
-                        result = ToNumberString(val);
-                }
-                else if (Regex.IsMatch(currentLine, @"^(hex:)?(0x[0-9a-fA-F]+)$"))
-                    if (currentLine.StartsWith("hex:"))
-                        result = "0x" + currentLine.Substring(6).ToUpper();
-                    else
-                        result = "0x" + currentLine.Substring(2).ToUpper();
-                else if (result == "" && numeralFormatRegex.IsMatch(currentLine))
-                    result = currentLine;
-                else if (result == "" && directRegex.IsMatch(currentLine))
-                    result = currentLine;
-                else if (result == "" && directTemperatureRegex.IsMatch(currentLine))
-                {
-                    string[] splittedTask = currentLine.Split(' ');
-                    splittedTask[1] = temperatureExt[temperatureDict[splittedTask[1].ToUpper()]];
-                    result = string.Join(" ", splittedTask);
-                }
-                else if (result == "" && directMassRegex.IsMatch(currentLine))
-                {
-                    string[] splittedTask = currentLine.Split(' ');
-                    splittedTask = new string[] { splittedTask[0], String.Join(" ", splittedTask.Skip(1)) };
-                    string exUnit = splittedTask[1];
-                    double exVal = double.Parse(currentLine.Split(' ')[0], CultureInfo.InvariantCulture);
-                    exUnit = massExt[massDict[exUnit]];
-                    if (exUnit == "lb")
-                        exUnit = exVal == 1 || exVal == -1 ? "lb" : "lbs";
-                    result = ToNumberString(exVal) + " " + exUnit;
-                }
-                else if (result == "" && directFrequencyRegex.IsMatch(currentLine))
-                {
-                    string[] splittedTask = currentLine.Split(' ');
-                    splittedTask = new string[] { splittedTask[0], string.Join(" ", splittedTask.Skip(1)) };
-                    splittedTask[1] = frequencyExt[frequencyDict[splittedTask[1].ToLower()]];
-                    result = string.Join(" ", splittedTask);
-                }
-                else if (result == "" && directTimeRegex.IsMatch(currentLine))
-                {
-                    double exVal = double.Parse(currentLine.Split(' ')[0]);
-                    string exUnit = currentLine.Split(' ')[1];
-                    exUnit = timeExt[timeDict[exUnit]];
-                    result = ToNumberString(exVal) + " " + exUnit;
-                }
-                else if (result == "" && directLengthRegex.IsMatch(currentLine))
-                {
-                    string[] splittedTask = currentLine.Split(' ');
-                    splittedTask = new string[] { splittedTask[0], string.Join(" ", splittedTask.Skip(1)) };
-                    string exUnit = splittedTask[1];
-                    double exVal = double.Parse(splittedTask[0], CultureInfo.InvariantCulture);
-                    exUnit = lengthExt[lengthDict[exUnit]];
-                    result = ToNumberString(exVal) + " " + exUnit;
-
-                }
-                else if (result == "" && directDataSizeRegex.IsMatch(currentLine))
-                {
-                    string[] splittedTask = currentLine.Split(' ');
-                    splittedTask = new string[] { splittedTask[0], string.Join(" ", splittedTask.Skip(1)) };
-                    string exUnit = splittedTask[1];
-                    double exVal = double.Parse(splittedTask[0], CultureInfo.InvariantCulture);
-                    if (exUnit != "b" && exUnit != "B")
-                        exUnit = exUnit.ToLower();
-                    exUnit = dataSizeExt[dataSizeDict[exUnit]];
-                    result = ToNumberString(exVal) + " " + exUnit;
-                }
-                else if (result == "" && numberRegex.IsMatch(currentLine.Trim()))
-                {
-                    result = currentLine;
-                }
-                else if (result == "" && directBinOctRegex.IsMatch(currentLine))
-                {
-                    if (!(currentLine.StartsWith("bin:") && Regex.IsMatch(currentLine, @"[2-7]")))
-                    {
-                        result = currentLine.Substring((currentLine.StartsWith("oct:") || currentLine.StartsWith("bin:")) ? 4 : 0);
-                        result = result.Replace(" ", "");
-                        if (result.Length % 4 != 0)
-                            result = result.PadLeft(result.Length + (4 - (result.Length % 4)), '0');
-                        result = string.Join(" ", result.Split(4));
-                    }
-                }
-                else if (result == "" && directAngleRegex.IsMatch(currentLine))
-                {
-                    string[] splittedTask = currentLine.Split(' ');
-                    splittedTask = new string[] { splittedTask[0], String.Join(" ", splittedTask.Skip(1)) };
-                    double exVal = double.Parse(splittedTask[0], CultureInfo.InvariantCulture);
-                    string currentUnitString = splittedTask[1].ToLower().Trim();
-                    currentUnitString = angleExt[angleDict[currentUnitString]];
-                    result = ToNumberString(exVal) + " " + currentUnitString;
-                }
-                #endregion
+                Match match = dataSizeRegex.Match(input);
+                double value = double.Parse(match.Groups["value"].Value, CultureInfo.InvariantCulture);
+                DataSizeUnit targetUnit = dataSizeDict[match.Groups["targetUnit"].Value.ToLower()];
+                DataSizeUnit srcUnit = dataSizeDict[match.Groups["srcUnit"].Value.ToLower()];
+                if (targetUnit == srcUnit)
+                    return input.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + dataSizeExt[targetUnit]);
+                value = Converter.DataSizeConverter(value, srcUnit, targetUnit);
+                return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + dataSizeExt[targetUnit];
             }
-            return result;
+            return input;
+        }
+
+        /// <summary>
+        /// Converts a length value in the input string from one unit to another, replacing the matched value with its
+        /// converted equivalent.
+        /// </summary>
+        /// <remarks>If the source and target units are the same, the value is rounded and formatted
+        /// without conversion. The conversion uses the number of digits specified in application settings for rounding.
+        /// If no valid length conversion pattern is detected, the input is returned unchanged.</remarks>
+        /// <param name="input">The input string containing a length value and units to be converted. The string must include both source
+        /// and target units in a recognizable format.</param>
+        /// <returns>A string with the length value converted to the target unit if a valid conversion pattern is found;
+        /// otherwise, returns the original input string.</returns>
+        private string LengthConversion(string input)
+        {
+            input.Trim();
+            while (lengthRegex.IsMatch(input))
+            {
+                Match match = lengthRegex.Match(input);
+                double value = double.Parse(match.Groups["value"].Value, CultureInfo.InvariantCulture);
+                LengthUnit targetUnit = lengthDict[match.Groups["targetUnit"].Value.ToLower()];
+                LengthUnit srcUnit = lengthDict[match.Groups["srcUnit"].Value.ToLower()];
+                if (targetUnit == srcUnit)
+                    return input.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + lengthExt[targetUnit]);
+                value = Converter.LengthConverter(value, srcUnit, targetUnit);
+                return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + lengthExt[targetUnit];
+            }
+            return input;
+        }
+
+        /// <summary>
+        /// Converts mass values in the specified input string from one unit to another, replacing recognized mass
+        /// expressions with their converted equivalents.
+        /// </summary>
+        /// <remarks>Only mass expressions matching the expected pattern are converted. If the source and
+        /// target units are the same, the value is rounded and formatted without conversion. The method does not modify
+        /// the input string if no valid mass expressions are detected.</remarks>
+        /// <param name="input">The input string containing mass values and units to be converted. The string should include mass
+        /// expressions in a supported format.</param>
+        /// <returns>A string with mass values converted to the target units. If no mass expressions are found, returns the
+        /// original input string.</returns>
+        private string MassConversion(string input)
+        {
+            input.Trim();
+            while (massRegex.IsMatch(input))
+            {
+                Match match = massRegex.Match(input);
+                double value = double.Parse(match.Groups["value"].Value, CultureInfo.InvariantCulture);
+                MassUnit targetUnit = massDict[match.Groups["targetUnit"].Value.ToLower()];
+                MassUnit srcUnit = massDict[match.Groups["srcUnit"].Value.ToLower()];
+                if (targetUnit == srcUnit)
+                    return input.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + massExt[targetUnit]);
+                value = Converter.MassConverter(value, srcUnit, targetUnit);
+                return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + massExt[targetUnit];
+            }
+            return input;
+        }
+
+        /// <summary>
+        /// Converts a temperature value in the input string from one unit to another, if a valid temperature conversion
+        /// pattern is detected.
+        /// </summary>
+        /// <remarks>If the input string does not match a recognized temperature conversion pattern, the
+        /// method returns the input unchanged. The conversion uses the number of digits specified in application
+        /// settings for rounding. Supported units and formats depend on the application's configuration.</remarks>
+        /// <param name="input">The input string containing a temperature value and units to convert. The string should match the expected
+        /// temperature conversion format.</param>
+        /// <returns>A string with the converted temperature value and target unit if a valid conversion pattern is found;
+        /// otherwise, returns the original input string.</returns>
+        private string TemperatureConversion(string input)
+        {
+            input.Trim();
+            while (temperatureRegex.IsMatch(input))
+            {
+                Match match = temperatureRegex.Match(input);
+                double value = double.Parse(match.Groups["value"].Value, CultureInfo.InvariantCulture);
+                TemperatureUnit targetUnit = temperatureDict[match.Groups["targetUnit"].Value.ToLower()];
+                TemperatureUnit srcUnit = temperatureDict[match.Groups["srcUnit"].Value.ToLower()];
+                if (targetUnit == srcUnit)
+                    return input.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + temperatureExt[targetUnit]);
+                value = Converter.TemperatureConverter(value, srcUnit, targetUnit);
+                return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + temperatureExt[targetUnit];
+            }
+            return input;
+        }
+
+        /// <summary>
+        /// Parses a calculation expression from the specified input string and returns the computed result as a
+        /// formatted string.
+        /// </summary>
+        /// <remarks>The result is rounded according to the application's digit settings. If the input
+        /// cannot be parsed or evaluated, the method returns an empty string instead of throwing an
+        /// exception.</remarks>
+        /// <param name="input">The calculation expression to evaluate. Must be a valid mathematical expression; otherwise, an empty string
+        /// is returned.</param>
+        /// <returns>A string containing the formatted result of the calculation, rounded to the configured number of digits.
+        /// Returns an empty string if the input is invalid or cannot be evaluated.</returns>
+        private string parseCalculation(string input)
+        {
+            double value = Calculator.CalculateString(input);
+            if (!double.IsNaN(value))
+                return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits));
+            else
+                return "";
         }
 
         /// <summary>
@@ -2123,7 +1419,7 @@ namespace Calcify
         /// <returns></returns>
         private string ToNumberString(double val)
         {
-            string valString = val.ToString("N10", CultureInfo.InvariantCulture).Replace(",", "");
+            string valString = val.ToString("N10", CultureInfo.InvariantCulture);
             if (valString.Contains("."))
                 while (valString.EndsWith("0"))
                     valString = valString.Substring(0, valString.Length - 1);

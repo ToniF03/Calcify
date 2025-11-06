@@ -5271,8 +5271,10 @@ namespace Calcify.Math
         /// </summary>
         /// <param name="task">The task string to be calculated</param>
         /// <returns></returns>
-        public static double CalculateString(string task, Dictionary<string, Regex> givenRegex)
+        public static double CalculateString(string task)
         {
+            Dictionary<string, Regex> givenRegex = RegexDict();
+
             // Check if it is just a number and save some steps
             if (givenRegex["Numbers"].IsMatch(task)) return double.Parse(task, CultureInfo.InvariantCulture);
 
@@ -5346,7 +5348,7 @@ namespace Calcify.Math
                 string match = givenRegex["Abs"].Match(task).Value;
                 if (match != "")
                 {
-                    double bracketResult = System.Math.Abs(CalculateString(match.Substring(1, match.Length - 2), givenRegex));
+                    double bracketResult = System.Math.Abs(CalculateString(match.Substring(1, match.Length - 2)));
                     task = task.Replace(match, bracketResult.ToString("N10", CultureInfo.InvariantCulture));
                 }
             }
@@ -5366,7 +5368,7 @@ namespace Calcify.Math
                 match = givenRegex["Brackets"].Match(task).Value;
                 if (match != "")
                 {
-                    double bracketResult = CalculateString(match.Substring(1, match.Length - 2), givenRegex);
+                    double bracketResult = CalculateString(match.Substring(1, match.Length - 2));
                     task = task.Replace(match, bracketResult < 0 ? "(" + bracketResult.ToString("N10", CultureInfo.InvariantCulture) + ")" : bracketResult.ToString("N10", CultureInfo.InvariantCulture));
                 }
             }
