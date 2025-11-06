@@ -5196,6 +5196,13 @@ namespace Calcify.Math
 
         }
 
+        /// <summary>
+        /// Calculates the number of combinations that can be made by selecting a subset of size r from a set of size n.
+        /// </summary>
+        /// <param name="n">The total number of items in the set. Must be greater than or equal to <paramref name="r"/>.</param>
+        /// <param name="r">The number of items to select from the set. Must be less than or equal to <paramref name="n"/>.</param>
+        /// <returns>The number of possible combinations as a double-precision floating-point value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="n"/> is less than <paramref name="r"/>.</exception>
         public static double nCr(int n, int r)
         {
             if (n < r)

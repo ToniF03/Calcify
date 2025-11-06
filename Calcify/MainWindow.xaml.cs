@@ -1,6 +1,5 @@
 ﻿using Calcify.Math;
 using Calcify.Math.Conversion;
-using Calcify.Math.Conversion.Temperature;
 using Calcify.Tools;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Highlighting;
@@ -41,20 +40,25 @@ namespace Calcify
         string ConstantsPattern = @"(π|\b(pi|e)\b)";
         #endregion
         #region Regex
-        Regex prevRegex = new Regex(@"(?i)\b(previous|prev|answer|ans)\b(?-i)");
+        Regex prevRegex = new Regex(@"\b(previous|prev|answer|ans)\b");
+
         Regex randRegex = new Regex(@"(\brand\(\d+(\.\d+)?, \d+(\.\d+)?\)( |$)|\brandint\(\d+, \d+\)( |$))");
         Regex diffRegex = new Regex(@"\bdiff\(-?\d+(\.\d+)?, -?\d+(\.\d+)?\)( |$)");
         Regex roundRegex = new Regex(@"\bround\(\d+(\.\d+)?, \d+\)( |$)");
-        Regex sqrtRegex = new Regex(@"\bsqrt\((-)?\d+(\.\d+)?\)(( )?|$)");
+
+        Regex sqrtRegex = new Regex(@"\b(?<func>sqrt)\((?<variable1>(-)?\d+(\.\d+)?)\)(( )?|$)");
+
         Regex dateTimeKeyWordsRegex = new Regex(@"\b(?i)(now|time|yesterday|date|today|tomorrow)(?-i)\b");
-        Regex dateTimeRegex = new Regex(@"^(\d{2}(\d{2})?\/\d{1,2}\/\d{1,2}( \d{1,2}:\d{1,2}(:\d{1,2})?)?|\d{1,2}:\d{1,2}(:\d{1,2})?)( (in|add|plus|\+|minus|remove|\-) \d+ (c|yr|mth|wk|d|h|min|s|(?i)(centur(y|ies)|decade(s)?|year(s)?|month(s)?|week(s)?|day(s)?|hour(s)?|minute(s)?|second(s)?)(?-i))|)*$");
+        Regex dateRegex = new Regex(@"^(\d{4}|\d{2})\/(\d{2}|\d)\/(\d{2}|\d)$");
+        Regex timeRegex = new Regex(@"^(\d{1,2}:\d{1,2}(:\d{1,2})?)?|\d{1,2}:\d{1,2}(:\d{1,2})$");
+        Regex dateTimeRegex = new Regex(@"^(\d{2}(\d{2})?\/\d{1,2}\/\d{1,2}( \d{1,2}:\d{1,2}(:\d{1,2})?)?|\d{1,2}:\d{1,2}(:\d{1,2})?)$");
+        Regex dateTimeCalculationRegex = new Regex(@"^(\d{2}(\d{2})?\/\d{1,2}\/\d{1,2}( \d{1,2}:\d{1,2}(:\d{1,2})?)?|\d{1,2}:\d{1,2}(:\d{1,2})?)( (in|add|plus|\+|minus|remove|\-) \d+ (c|yr|mth|wk|d|h|min|s|(?i)(centur(y|ies)|decade(s)?|year(s)?|month(s)?|week(s)?|day(s)?|hour(s)?|minute(s)?|second(s)?)(?-i))|)*$");
         Regex numeralSystemRegex = new Regex(@"^((bin|dec|oct|hex):)?(0x[a-fA-F0-9]+|[0-7]{4}( [0-7]{4})*) (in(to)?|to|as) (bin(ary)?|dec(imal)?|oct(al)?|hex(adecimal)?)$");
         Regex decimalRegex = new Regex(@"^\d+");
         Regex binaryRegex = new Regex(@"^[0-1]{1,4}(( [0-1]{4}|[0-1])+)");
         Regex octalRegex = new Regex(@"^[0-7]{1,4}(( [0-7]{4}|[0-7])+)");
         Regex hexadecimalRegex = new Regex(@"^0x[0-9a-fA-F]+");
-        // Regex calculatorRegex = new Regex(@"^(\d+(\.\d+)?|\+|\-|\*|\/|\^|\(|\)|\!)*$");
-        Regex PermutationRegex = new Regex(@"\d+C\d+");
+        Regex PermutationRegex = new Regex(@"(?<n>\d+)C(?<r>\d+)");
         Regex calculatorRegex = new Regex(@"^((\d+(\.\d+)?)|\||(\+|\-|\*|\/|\^)(?!\+|\*|\/|\^|\!)|(|\(|\)|\!))*$");
         Regex numberRegex = new Regex(@"^\-?\d+(\.\d+)?$");
         Regex numeralFormatRegex = new Regex(@"^(0x[0-9a-fA-F]+|\-?\d+(\.\d+)?)$");
@@ -67,7 +71,7 @@ namespace Calcify
         Regex dataSizeRegex;
         Regex lengthRegex;
         Regex massRegex;
-        Regex timeRegex;
+        Regex timeCalculationRegex;
         Regex directRegex;
         Regex directMassRegex;
         Regex directTemperatureRegex;
@@ -100,7 +104,6 @@ namespace Calcify
         Dictionary<string, FrequencyUnit> frequencyDict = new Dictionary<string, FrequencyUnit>();
         Dictionary<string, LengthUnit> lengthDict = new Dictionary<string, LengthUnit>();
         Dictionary<string, MassUnit> massDict = new Dictionary<string, MassUnit>();
-        Dictionary<string, NumeralSystemUnit> numeralSystemDict = new Dictionary<string, NumeralSystemUnit>();
         Dictionary<string, TemperatureUnit> temperatureDict = new Dictionary<string, TemperatureUnit>();
         Dictionary<string, TimeUnit> timeDict = new Dictionary<string, TimeUnit>();
         Dictionary<AngleUnit, string> angleExt = new Dictionary<AngleUnit, string>();
@@ -112,22 +115,21 @@ namespace Calcify
         Dictionary<TemperatureUnit, string> temperatureExt = new Dictionary<TemperatureUnit, string>();
         Dictionary<TimeUnit, string> timeExt = new Dictionary<TimeUnit, string>();
         #endregion
-        string oldTotalValue = "";
-        string windowTitle = "";
+        private string oldTotalValue = "";
+        private string windowTitle = "";
+        private bool unsavedChanges = false;
+        // By https://www.frankfurter.app/
+        private string exchangeRateLink = "https://api.frankfurter.app/latest";
+        private Dictionary<string, double> currencyDict = new Dictionary<string, double>();
+        private RegistryWatcher watcher = null;
+        private SyntaxFile lightSyntax = new SyntaxFile(SyntaxFile.Theme.Light);
+        private SyntaxFile darkSyntax = new SyntaxFile(SyntaxFile.Theme.Dark);
+
         public int returnState = -1;
-        bool unsavedChanges = false;
-        int CaretOffset = 0;
         public About aboutWindow = null;
         public DialogWindow dialogWindow = null;
         public Settings settingsWindow = null;
-        RegistryWatcher watcher = null;
 
-        SyntaxFile lightSyntax = new SyntaxFile(SyntaxFile.Theme.Light);
-        SyntaxFile darkSyntax = new SyntaxFile(SyntaxFile.Theme.Dark);
-
-        Dictionary<string, double> currencyDict = new Dictionary<string, double>();
-        // By https://www.frankfurter.app/
-        string exchangeRateLink = "https://api.frankfurter.app/latest";
         #endregion
         #region UI
         #region Chrome
@@ -154,7 +156,7 @@ namespace Calcify
             totalLabel.Content = "Start new instance";
         }
 
-        private void StartNewButton_MouseLeave(object sender, MouseEventArgs e)
+        private void StartNewButton_MouseLeave(object sender, RoutedEventArgs e)
         {
             totalLabel.Content = oldTotalValue;
             oldTotalValue = "";
@@ -195,7 +197,7 @@ namespace Calcify
 
         private void Menu_Click(object sender, RoutedEventArgs e)
         {
-            ((ContextMenu)Menu.ContextMenu).IsOpen = true;
+            ((ContextMenu)MenuButton.ContextMenu).IsOpen = true;
         }
         #endregion
         private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -291,20 +293,38 @@ namespace Calcify
             Properties.Settings.Default.SettingChanging += Settings_SettingChanging;
             this.Loaded += MainWindow_Loaded;
             this.SizeChanged += MainWindow_SizeChanged;
+            this.DragEnter += Window_DragEvent;
+            this.DragLeave += Window_DragEvent;
+            this.Drop += Window_DragEvent;
+
             mainEditor.TextChanged += mainEditor_TextChanged;
-            mainEditor.TextArea.Caret.PositionChanged += Caret_PositionChanged; ;
+            mainEditor.TextArea.Caret.PositionChanged += Caret_PositionChanged;
+
             MinimizeButton.Click += MinimizeButton_Click;
             MaximizeButton.Click += MaximizeButton_Click;
             closeButton.Click += CloseButton_Click;
+
             StartNewButton.Click += StartNewButton_Click;
             StartNewButton.MouseEnter += StartNewButton_MouseEnter;
             StartNewButton.MouseLeave += StartNewButton_MouseLeave;
+
             themeButton.Click += ThemeButton_Click;
             themeButton.MouseEnter += ThemeButton_MouseEnter;
             themeButton.MouseLeave += ThemeButton_MouseLeave;
+
             settingsButton.Click += SettingsButton_Click;
             settingsButton.MouseEnter += SettingsButton_MouseEnter;
             settingsButton.MouseLeave += StartNewButton_MouseLeave;
+
+            MenuButton.Click += Menu_Click;
+
+            contextNewFileButton.Click += contextNewFileButton_Click;
+            contextOpenButton.Click += contextOpenButton_Click;
+            contextSaveButton.Click += contextSaveButton_Click;
+            contextSaveAsButton.Click += contextSaveButton_Click;
+            contextAboutButton.Click += contextAboutButton_Click;
+            contextSettingsButton.Click += SettingsButton_Click;
+            contextExitButton.Click += CloseButton_Click;
             #endregion
             #region Input Bindings
             CtrlS.InputGestures.Add(new KeyGesture(Key.S, ModifierKeys.Control));
@@ -315,14 +335,14 @@ namespace Calcify
             #endregion
             #region RegexSettings 
             constantsRegex = new Regex(ConstantsPattern);
-            sumAvgRegex = new Regex(@"\b(avg\b|sum(\b| (in(to)?|to|as) (" + TemperaturePattern + "|" + LengthPattern + "|" + AnglePattern + "|" + MassPattern + "|" + FrequencyPattern + "|" + CurrencyPattern + "|" + DataSizePattern + "|" + TimePattern + @"))?)");
-            angleRegex = new Regex(@"^\-?\d+(\.\d+)?" + AnglePattern + " (in(to)?|to|as) " + AnglePattern + "$");
-            frequencyRegex = new Regex(@"^\-?\d+(\.\d+)? " + FrequencyPattern + " (in(to)?|to|as) " + FrequencyPattern + "$");
-            currencyRegex = new Regex(@"^\-?\d+(\.\d+)? " + CurrencyPattern + " (in(to)?|to|as) " + CurrencyPattern + "$");
-            dataSizeRegex = new Regex(@"^\-?\d+(\.\d+)? " + DataSizePattern + " (in(to)?|to|as) " + DataSizePattern + "$");
-            lengthRegex = new Regex(@"^\-?\d+(\.\d+)? " + LengthPattern + " (in(to)?|to|as) " + LengthPattern + "$");
-            massRegex = new Regex(@"^\-?\d+(\.\d+)? " + MassPattern + " (in(to)?|to|as) " + MassPattern + "$");
-            timeRegex = new Regex(@"^\-?\d+(\.\d+)? " + TimePattern + @" (in(to)?|to|as) " + TimePattern + @"$");
+            sumAvgRegex = new Regex(@"\b(avg|sum)\b");
+            angleRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + AnglePattern + ") (in(to)?|to|as) (?<targetUnit>" + AnglePattern + ")$");
+            frequencyRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + FrequencyPattern + ") (in(to)?|to|as) (?<targetUnit>" + FrequencyPattern + ")$");
+            currencyRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + CurrencyPattern + ") (in(to)?|to|as) (?<targetUnit>" + CurrencyPattern + ")$");
+            dataSizeRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + DataSizePattern + ") (in(to)?|to|as) (?<targetUnit>" + DataSizePattern + ")$");
+            lengthRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + LengthPattern + ") (in(to)?|to|as) (?<targetUnit>" + LengthPattern + ")$");
+            massRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + MassPattern + ") (in(to)?|to|as) (?<targetUnit>" + MassPattern + ")$");
+            timeCalculationRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + TimePattern + ") (in(to)?|to|as) (?<targetUnit>" + TimePattern + ")$");
             directRegex = new Regex(@"^\-?\d+(\.\d+)? (" + CurrencyPattern + ")$");
             directTemperatureRegex = new Regex(@"^\-?\d+(\.\d+)? (" + TemperaturePattern + ")$");
             directMassRegex = new Regex(@"^\-?\d+(\.\d+)? " + MassPattern + "$");
@@ -338,7 +358,7 @@ namespace Calcify
             DropPanel.Visibility = Visibility.Visible;
             resultEditor.TextArea.Caret.CaretBrush = Brushes.Transparent;
             Info.ToolTip = new ToolTip();
-            givenRegex = Calcify.Math.Calculator.RegexDict();
+            givenRegex = Calculator.RegexDict();
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -373,7 +393,8 @@ namespace Calcify
 
         private void Settings_SettingChanging(object sender, System.Configuration.SettingChangingEventArgs e)
         {
-            switch (e.SettingName) {
+            switch (e.SettingName)
+            {
                 case "DarkMode":
                     DarkModeChanged((bool)e.NewValue);
                     themeButtonLabel.Content = (bool)e.NewValue ? "\uE708" : "\uE706";
@@ -381,8 +402,6 @@ namespace Calcify
                 case "SystemDefinedDarkMode":
                     if ((bool)e.NewValue == true)
                     {
-                        //watcher = new RegistryWatcher("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "AppsUseLightTheme");
-                        //watcher.ValueChanged += Watcher_ValueChanged;
                         watcher.Start();
                         Properties.Settings.Default.DarkMode = int.Parse(watcher.Value) != 1;
                     }
@@ -395,8 +414,6 @@ namespace Calcify
 
         private void mainEditor_TextChanged(object sender, EventArgs e)
         {
-            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
             TextDocument newDocument = new TextDocument();
             unsavedChanges = documentText != mainEditor.Text;
 
@@ -405,16 +422,15 @@ namespace Calcify
                 string result = "";
                 DocumentLine line = mainEditor.Document.GetLineByNumber(i);
                 result = Calculate(line, newDocument);
+                Console.WriteLine(Calc(mainEditor.Document.GetText(line.Offset, line.Length)));
                 newDocument.Text = newDocument.Text + result + '\n';
             }
             resultEditor.Document = newDocument;
-            sw.Stop();
-            Console.WriteLine("Elapsed time for calculation: " + sw.Elapsed);
         }
 
         private void Caret_PositionChanged(object sender, EventArgs e)
         {
-            #region Offset calculation
+            // Keep the caret line in the viewport
             double actualLineNumber = mainEditor.Document.GetLineByOffset(mainEditor.CaretOffset).LineNumber - 1;
             double defaultLineHeight = mainEditor.TextArea.TextView.DefaultLineHeight;
             double ScrollViewerHeight = EditorContainer.ViewportHeight;
@@ -427,13 +443,11 @@ namespace Calcify
                 EditorContainer.ScrollToVerticalOffset(VerticalOffset + secOffset);
             else if (CalculatedOffset > 0)
                 EditorContainer.ScrollToVerticalOffset(VerticalOffset + CalculatedOffset);
-            #endregion
             CalculateTotal();
-            CaretOffset = mainEditor.CaretOffset;
         }
 
         #region Functions
-        #region "Exchange Rate"
+        #region Exchange Rate
         /// <summary>
         /// Downloads the current exchange rate of the day
         /// </summary>
@@ -478,12 +492,14 @@ namespace Calcify
                 }
                 currencyDict = newCurrencyDict;
                 CurrencyPattern = "(EUR|" + string.Join("|", currencyDict.Keys) + ")";
+
+                // Re-create currency regex with updated pattern
                 currencyRegex = new Regex(@"^\-?\d+(\.\d+)? " + CurrencyPattern + " (in(to)?|to|as) " + CurrencyPattern + "$");
                 UpdateSyntaxHighlighting();
             }
         }
         #endregion
-        #region "Open & Save File"
+        #region Open & Save File
         /// <summary>
         /// Open a file
         /// </summary>
@@ -701,7 +717,7 @@ namespace Calcify
             ((ToolTip)Info.ToolTip).Foreground = new SolidColorBrush { Color = (newValue ? Color.FromRgb(180, 180, 180) : Color.FromRgb(0, 0, 0)) };
             byte[] byteArray = Encoding.UTF8.GetBytes(newValue ? darkSyntax.Content : lightSyntax.Content);
             MemoryStream stream = new MemoryStream(byteArray);
-            
+
             using (Stream s = stream)
             {
                 using (XmlTextReader reader = new XmlTextReader(s))
@@ -733,6 +749,441 @@ namespace Calcify
             else
                 totalLabel.Content = "";
 
+        }
+
+        private string Calc(string input, bool acceptPrevious = true)
+        {
+            string originalInput = input;
+
+            // Comment line
+            if (input.StartsWith("#"))
+                return "";
+
+            // Remove comments at the end of the line
+            if (input.Contains("#"))
+                input = input.Substring(0, input.IndexOf("#")).Trim();
+
+            // Remove double spaces
+            while (input.Contains("  "))
+                input = input.Replace("  ", " ");
+
+            // Find and replace 'prev', 'previous', 'ans', 'answer', 'last' with the parser keyword for the last result
+            if (acceptPrevious)
+                input = prevRegex.Replace(input, "{/last/}");
+
+            // Replace all permutation expressions in the input
+            input = ReplacePermutations(input);
+
+            // Replace constants
+            input = ReplaceConstants(input);
+
+            // Replace Functions
+            input = ReplaceTwoVariableFunctions(input);
+            input = ReplaceOneVariableFunctions(input);
+
+            // Replace DateTime variables
+            input = DateTimeCalculation(input);
+
+            if (acceptPrevious)
+                foreach (Match match in sumAvgRegex.Matches(input))
+                    input = input.Replace(match.Value, "{/" + match.Value + "/}");
+
+            input = AngleCalculation(input);
+
+            return input;
+        }
+
+        /// <summary>
+        /// Replaces all permutation expressions in the specified text with their calculated values.
+        /// </summary>
+        /// <remarks>Permutation expressions are expected to be in the form 'nCr', where n and r are
+        /// integers and n is greater than or equal to r. Only valid expressions are replaced; invalid or malformed
+        /// expressions are ignored.</remarks>
+        /// <param name="text">The input string containing permutation expressions in the format 'nCr', where n and r are integers.</param>
+        /// <returns>A string in which all valid permutation expressions have been replaced with their computed results. If no
+        /// valid expressions are found, the original text is returned unchanged.</returns>
+        private string ReplacePermutations(string text)
+        {
+            // Materialize matches first to avoid modifying the input while iterating.
+            var matches = PermutationRegex.Matches(text).Cast<Match>().ToArray();
+            foreach (var match in matches)
+            {
+                if (!int.TryParse(match.Groups["n"].Value, out int n)) continue;
+                if (!int.TryParse(match.Groups["r"].Value, out int r)) continue;
+
+                if (n >= r)
+                    text = text.Replace(match.Value, Functions.nCr(n, r).ToString());
+            }
+            return text;
+        }
+
+        /// <summary>
+        /// Replaces recognized mathematical constant names in the specified text with their numeric values, rounded to
+        /// the configured number of digits.
+        /// </summary>
+        /// <remarks>The numeric values for constants are rounded according to the application's digit
+        /// settings. Only the first occurrence of each constant is replaced per iteration.</remarks>
+        /// <param name="text">The input string containing mathematical constant names to be replaced. Supported constants are "pi", "π",
+        /// and "e".</param>
+        /// <returns>A string in which all supported constant names have been replaced with their corresponding numeric values.</returns>
+        private string ReplaceConstants(string text)
+        {
+            foreach (Match match in constantsRegex.Matches(text))
+            {
+                if (match.Value == "pi" || match.Value == "π")
+                    text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(System.Math.PI, Properties.Settings.Default.Digits)), 1);
+                else if (match.Value == "e")
+                    text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(System.Math.E, Properties.Settings.Default.Digits)), 1);
+            }
+            return text;
+        }
+
+        /// <summary>
+        /// Replaces all recognized single-variable mathematical function expressions in the input string with their
+        /// computed numeric results.
+        /// </summary>
+        /// <remarks>Currently supports replacement of square root expressions in the form 'sqrt(number)'.
+        /// Only positive numbers are evaluated; other values are ignored. The numeric result is rounded according to
+        /// the application's digit settings before replacement.</remarks>
+        /// <param name="input">The input string containing mathematical function expressions to be evaluated and replaced.</param>
+        /// <returns>A string in which each recognized single-variable function expression has been replaced by its calculated
+        /// value. If no such expressions are found, the original input string is returned unchanged.</returns>
+        private string ReplaceOneVariableFunctions(string input)
+        {
+            MatchCollection matches = sqrtRegex.Matches(input);
+            foreach (Match match in matches)
+            {
+                double extractedNumber;
+                string function = match.Groups["func"].Value;
+                switch (function)
+                {
+                    case "sqrt":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        if (extractedNumber > 0)
+                        {
+                            double value = System.Math.Sqrt(extractedNumber);
+                            input = input.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)));
+                        }
+                        break;
+                }
+            }
+            return input;
+        }
+
+        /// <summary>
+        /// Replaces supported two-variable function expressions in the input string with their computed results.
+        /// </summary>
+        /// <remarks>Supported functions include diff(min, max), rand(min, max), randint(min, max), and
+        /// round(value, digits). Each function must follow the format 'functionName(number1, number2)'. If min is
+        /// greater than max for diff, rand, or randint, the values are swapped automatically (except for round). The
+        /// number of decimal digits in results is determined by application settings.</remarks>
+        /// <param name="input">The input string containing function expressions such as diff, rand, randint, or round, each with two
+        /// numeric arguments.</param>
+        /// <returns>A string in which all recognized two-variable function expressions have been replaced by their evaluated
+        /// numeric results.</returns>
+        private string ReplaceTwoVariableFunctions(string input)
+        {
+            MatchCollection matches;
+
+            Regex functionsRegex = new Regex(@"\b(?<func>(diff|rand|randint|round))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)");
+            // Replace and execute functions
+            matches = functionsRegex.Matches(input);
+            foreach (Match match in matches)
+            {
+                string function = match.Groups["func"].Value;
+                double minNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                double maxNumber = double.Parse(match.Groups["variable2"].Value, CultureInfo.InvariantCulture);
+
+                // Swap if min is greater than max
+                if (minNumber > maxNumber && function != "round")
+                {
+                    double temp = minNumber;
+                    minNumber = maxNumber;
+                    maxNumber = temp;
+                }
+
+
+                double generatedNumber = 0;
+                switch (function)
+                {
+                    // Calculate difference
+                    case "diff":
+                        generatedNumber = maxNumber - minNumber;
+                        generatedNumber = System.Math.Round(generatedNumber, Properties.Settings.Default.Digits);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(generatedNumber, Properties.Settings.Default.Digits)) + " ");
+                        break;
+                    // Generate random double
+                    case "rand":
+                        generatedNumber = GetRandomDouble(minNumber, maxNumber);
+                        generatedNumber = System.Math.Round(generatedNumber, Properties.Settings.Default.Digits);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(generatedNumber, Properties.Settings.Default.Digits)) + " ");
+                        break;
+                    // Generate random integer
+                    case "randint":
+                        generatedNumber = new Random().Next((int)minNumber, (int)maxNumber);
+                        input = input.Replace(match.Value, ToNumberString(generatedNumber) + " ").Trim();
+                        break;
+                    // Round number
+                    case "round":
+                        generatedNumber = System.Math.Round(minNumber, (int)maxNumber);
+                        input = input.Replace(match.Value, ToNumberString(generatedNumber) + " ").Trim();
+                        break;
+                }
+            }
+
+
+
+            return input;
+        }
+
+        /// <summary>
+        /// Replaces recognized date and time keywords in the specified input string with their corresponding formatted
+        /// date or time values.
+        /// </summary>
+        /// <remarks>The formatting of the replacement values depends on application settings. For
+        /// example, if the "showDateTime" setting is enabled, both date and time are included for certain keywords.
+        /// Only keywords explicitly recognized by the method are replaced.</remarks>
+        /// <param name="input">The input string to process. May contain keywords such as "now", "today", "yesterday", or "tomorrow" that
+        /// will be replaced with formatted date or time values.</param>
+        /// <returns>A string with all recognized date and time keywords replaced by their corresponding formatted values. If no
+        /// keywords are found, returns an empty string.</returns>
+        private string DateTimeCalculation(string input)
+        {
+            // Replace keywords first (now, today, yesterday, tomorrow, etc.)
+            DateTime dateTime = DateTime.Now;
+            string timeString = "";
+            MatchCollection matches = dateTimeKeyWordsRegex.Matches(input);
+            foreach (Match match in matches.Cast<Match>().ToArray())
+            {
+                switch (match.Value.ToLower())
+                {
+                    case "now":
+                    case "time":
+                        if (Properties.Settings.Default.showDateTime)
+                            timeString = dateTime.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
+                        else
+                            timeString = dateTime.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+                        break;
+
+                    case "now.hour":
+                    case "time.hour":
+                        timeString = dateTime.ToString("HH", CultureInfo.InvariantCulture);
+                        break;
+                    case "now.minute":
+                    case "time.minute":
+                        timeString = dateTime.ToString("mm", CultureInfo.InvariantCulture);
+                        break;
+                    case "now.second":
+                    case "time.second":
+                        timeString = dateTime.ToString("ss", CultureInfo.InvariantCulture);
+                        break;
+
+                    case "today":
+                    case "date":
+                        timeString = dateTime.ToString("yyyy/MM/dd", CultureInfo.InvariantCulture);
+                        break;
+
+                    case "today.day":
+                    case "date.day":
+                        timeString = dateTime.ToString("dd", CultureInfo.InvariantCulture);
+                        break;
+                    case "today.month":
+                    case "date.month":
+                        timeString = dateTime.ToString("MM", CultureInfo.InvariantCulture);
+                        break;
+                    case "today.year":
+                    case "date.year":
+                        timeString = dateTime.ToString("yyyy", CultureInfo.InvariantCulture);
+                        break;
+                    case "today.weekday":
+                    case "date.weekday":
+                        timeString = dateTime.ToString("dddd", CultureInfo.InvariantCulture);
+                        break;
+                    case "today.dayofyear":
+                    case "date.dayofyear":
+                        timeString = dateTime.DayOfYear.ToString("D3", CultureInfo.InvariantCulture);
+                        break;
+                    case "today.weekofyear":
+                    case "date.weekofyear":
+                        timeString = dateTime.Month.ToString("00", CultureInfo.InvariantCulture);
+                        break;
+
+                    case "yesterday":
+                    case "tomorrow":
+                        timeString = dateTime
+                            .AddDays(match.Value.ToLower() == "yesterday" ? -1 : 1)
+                            .ToString("yyyy/MM/dd", CultureInfo.InvariantCulture);
+                        break;
+
+                    case "yesterday.day":
+                    case "tomorrow.day":
+                        timeString = dateTime
+                            .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
+                            .ToString("dd", CultureInfo.InvariantCulture);
+                        break;
+                    case "yesterday.month":
+                    case "tomorrow.month":
+                        timeString = dateTime
+                            .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
+                            .ToString("MM", CultureInfo.InvariantCulture);
+                        break;
+                    case "yesterday.year":
+                    case "tomorrow.year":
+                        timeString = dateTime
+                            .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
+                            .ToString("yyyy", CultureInfo.InvariantCulture);
+                        break;
+                    case "yesterday.weekday":
+                    case "tomorrow.weekday":
+                        timeString = dateTime
+                            .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
+                            .ToString("dddd", CultureInfo.InvariantCulture);
+                        break;
+                    case "yesterday.dayofyear":
+                    case "tomorrow.dayofyear":
+                        timeString = dateTime
+                            .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
+                            .DayOfYear
+                            .ToString("D3", CultureInfo.InvariantCulture);
+                        break;
+                    case "yesterday.weekofyear":
+                    case "tomorrow.weekofyear":
+                        timeString = dateTime
+                            .AddDays(match.Value.ToLower()
+                            .StartsWith("yesterday") ? -1 : 1)
+                            .Month
+                            .ToString("00", CultureInfo.InvariantCulture);
+                        break;
+                }
+
+                input = Regex.Replace(input, @"\b(?i)" + Regex.Escape(match.Value.ToLower()) + @"(?-i)\b", timeString);
+            }
+
+            // Support simple time arithmetic:
+            // - "HH:mm(:ss)? (+|add|plus) HH:mm(:ss)?"
+            // - "HH:mm(:ss)? (-|minus) HH:mm(:ss)?" (difference -> duration)
+            // - "datetime (+|-) duration" (duration can be "HH:mm", or "N h/min/s")
+            // - "(now|today|date|... ) (+|-) duration"
+            var timeOpRegex = new Regex(@"(?<left>(?:\d{1,2}:\d{2}(?::\d{2})?|\d{4}\/\d{1,2}\/\d{1,2}(?: \d{1,2}:\d{2}(?::\d{2})?)?))\s*(?<op>\+|\-|add|plus|minus)\s*(?<right>(?:\d{1,2}:\d{2}(?::\d{2})?|\d+\s*(?:h(r|our(s)?)?|min(ute(s)?)?|s(ec(ond(s)?)?)?)))");
+
+            while (timeOpRegex.IsMatch(input))
+            {
+                Match m = timeOpRegex.Match(input);
+                string leftRaw = m.Groups["left"].Value;
+                string opRaw = m.Groups["op"].Value.ToLower();
+                string rightRaw = m.Groups["right"].Value;
+
+                bool opIsAdd = opRaw == "+" || opRaw == "add" || opRaw == "plus";
+                bool opIsSub = opRaw == "-" || opRaw == "minus";
+
+                // Try parse left as DateTime (date or time-only)
+                bool leftIsDateTime = DateTime.TryParse(leftRaw, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime leftDt);
+                // Try parse right as time-of-day (HH:mm[:ss])
+                TimeSpan rightSpan = TimeSpan.Zero;
+                bool rightIsTimeOfDay = TimeSpan.TryParse(rightRaw, CultureInfo.InvariantCulture, out rightSpan);
+                if (!rightIsTimeOfDay)
+                {
+                    // Try parse as "N h/min/s"
+                    var unitMatch = Regex.Match(rightRaw.Trim(), @"(?<num>\d+)\s*(?<unit>h|hr|hour|hours|m|min|minute|minutes|s|sec|second|seconds)", RegexOptions.IgnoreCase);
+                    if (unitMatch.Success)
+                    {
+                        int num = int.Parse(unitMatch.Groups["num"].Value);
+                        string unit = unitMatch.Groups["unit"].Value.ToLower();
+                        switch (unit)
+                        {
+                            case "h":
+                            case "hr":
+                            case "hour":
+                            case "hours":
+                                rightSpan = TimeSpan.FromHours(num);
+                                rightRaw = rightSpan.ToString(@"hh\:mm\:ss");
+                                break;
+                            case "m":
+                            case "min":
+                            case "minute":
+                            case "minutes":
+                                rightSpan = TimeSpan.FromMinutes(num);
+                                rightRaw = rightSpan.ToString(@"hh\:mm\:ss");
+                                break;
+                            default:
+                                rightSpan = TimeSpan.FromSeconds(num);
+                                rightRaw = rightSpan.ToString(@"hh\:mm\:ss");
+                                break;
+                        }
+                    }
+                }
+
+                string replacement = null;
+
+                if (leftIsDateTime)
+                {
+                    // If right is a time-of-day and left is date/time, interpret right as TimeSpan
+                    if (!rightIsTimeOfDay && rightRaw.Contains(":"))
+                    {
+                        rightIsTimeOfDay = TimeSpan.TryParse(rightRaw, CultureInfo.InvariantCulture, out rightSpan);
+                    }
+
+                    if (rightIsTimeOfDay)
+                    {
+                        DateTime resultDt = opIsAdd ? leftDt.Add(rightSpan) : leftDt.Subtract(rightSpan);
+                        // Preserve format: if left included date and time -> full datetime, if only date -> date, if only time -> time
+                        if (leftRaw.Contains("/") && leftRaw.Contains(":"))
+                            replacement = resultDt.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
+                        else if (leftRaw.Contains("/"))
+                            replacement = resultDt.ToString("yyyy/MM/dd", CultureInfo.InvariantCulture);
+                        else
+                        {
+                            replacement = resultDt.ToString(rightSpan.Seconds != 0 ? "HH:mm:ss" : "HH:mm", CultureInfo.InvariantCulture);
+                        }
+                    }
+                }
+                else
+                {
+                    // left is time-only or couldn't be parsed as DateTime, attempt TimeSpan parsing
+                    bool leftIsTimeSpan = TimeSpan.TryParse(leftRaw, CultureInfo.InvariantCulture, out TimeSpan leftSpan);
+                    if (leftIsTimeSpan && (rightSpan != TimeSpan.Zero || rightIsTimeOfDay))
+                    {
+                        if (opIsSub && rightIsTimeOfDay && !rightRaw.Contains("h") && !rightRaw.Contains("m") && !rightRaw.Contains("s"))
+                        {
+                            // Interpret both as time-of-day and return difference (duration)
+                            TimeSpan diff = leftSpan - rightSpan;
+                            if (diff < TimeSpan.Zero) diff = diff.Negate();
+                            replacement = diff.ToString(diff.Seconds != 0 ? @"hh\:mm\:ss" : @"hh\:mm");
+                        }
+                        else
+                        {
+                            TimeSpan resultSpan = opIsAdd ? leftSpan.Add(rightSpan) : leftSpan.Subtract(rightSpan);
+                            // normalize to 24h for time-of-day addition
+                            if (opIsAdd) resultSpan = TimeSpan.FromHours((resultSpan.TotalHours) % 24);
+                            replacement = resultSpan.ToString(resultSpan.Seconds != 0 ? @"hh\:mm\:ss" : @"hh\:mm");
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(replacement))
+                {
+                    input = input.Replace(m.Value, replacement);
+                }
+            }
+
+            return input;
+        }
+
+        private string AngleCalculation(string input)
+        {
+            while (angleRegex.IsMatch(input))
+            {
+                Match match = angleRegex.Match(input);
+                double value = double.Parse(match.Groups["value"].Value);
+                AngleUnit targetUnit = angleDict[match.Groups["targetUnit"].Value];
+                AngleUnit srcUnit = angleDict[match.Groups["srcUnit"].Value];
+                if (targetUnit == srcUnit)
+                    return input.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + angleExt[targetUnit]);
+                value = Converter.AngleConverter(value, srcUnit, targetUnit);
+                return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + angleExt[targetUnit];
+
+            }
+            return input;
         }
 
         private string CalculateSum(int CurrentLineNumber, TextDocument newDoc, out int summedLineCount, string targetUnitString = "")
@@ -969,13 +1420,17 @@ namespace Calcify
 
         private string Calculate(DocumentLine input, TextDocument newDoc)
         {
+            // ##############################################################
             string result = "";
 
             string currentLine = mainEditor.Document.GetText(input.Offset, input.Length);
+            // ##############################################################
             string uneditedCurrentLine = currentLine;
             windowTitle = "Calcify";
+            // ##############################################################
             if (input.LineNumber == 1)
             {
+                // ##############################################################
                 if (currentLine.StartsWith("# "))
                 {
                     string text = mainEditor.Document.GetText(input.Offset, input.Length).Substring(2).Trim();
@@ -998,15 +1453,18 @@ namespace Calcify
                 }
             }
 
+            // ##############################################################
             if (!currentLine.StartsWith("#"))
             {
                 if (currentLine.Contains("#"))
                     currentLine = currentLine.Split('#')[0];
 
+                // ##############################################################
                 while (currentLine.Contains("  "))
                     currentLine = currentLine.Replace("  ", " ");
                 currentLine = currentLine.Trim();
 
+                // ##############################################################
                 if (prevRegex.IsMatch(currentLine))
                 {
                     if (input.LineNumber != 1)
@@ -1023,23 +1481,25 @@ namespace Calcify
                     }
                 }
 
+                // ##############################################################
                 #region Permutation
-                if (PermutationRegex.IsMatch(currentLine))
+                //if (PermutationRegex.IsMatch(currentLine))
+                //{
+                foreach (Match match in PermutationRegex.Matches(currentLine))
                 {
-                    foreach (Match match in PermutationRegex.Matches(currentLine))
+                    int n = 0;
+                    int r = 0;
+                    string[] m = match.Value.Split('C');
+                    n = int.Parse(m[0]);
+                    r = int.Parse(m[1]);
+                    if (n >= r)
                     {
-                        int n = 0;
-                        int r = 0;
-                        string[] m = match.Value.Split('C');
-                        n = int.Parse(m[0]);
-                        r = int.Parse(m[1]);
-                        if (n >= r)
-                        {
-                            currentLine = currentLine.Replace(match.Value, Functions.nCr(n, r).ToString());
-                        }
+                        currentLine = currentLine.Replace(match.Value, Functions.nCr(n, r).ToString());
                     }
                 }
+                //}
                 #endregion
+                // ##############################################################
                 #region Constants
                 if (constantsRegex.IsMatch(currentLine))
                 {
@@ -1079,6 +1539,7 @@ namespace Calcify
                     }
                 }
 
+                // ##############################################################
                 if (diffRegex.IsMatch(currentLine))
                 {
                     foreach (Match match in diffRegex.Matches(currentLine))
@@ -1092,6 +1553,7 @@ namespace Calcify
                     }
                 }
 
+                // ##############################################################
                 if (roundRegex.IsMatch(currentLine))
                 {
                     MatchCollection matches = roundRegex.Matches(currentLine);
@@ -1109,6 +1571,7 @@ namespace Calcify
                     }
                 }
 
+                // ##############################################################
                 if (sqrtRegex.IsMatch(currentLine))
                 {
                     MatchCollection matches = sqrtRegex.Matches(currentLine);
@@ -1125,7 +1588,9 @@ namespace Calcify
                         }
                     }
                 }
+                // ##############################################################
                 #region Sum
+                // ##############################################################
                 if (sumAvgRegex.IsMatch(currentLine))
                 {
                     MatchCollection matches = sumAvgRegex.Matches(currentLine);
@@ -1154,6 +1619,7 @@ namespace Calcify
                 #endregion
                 #endregion
 
+                // ##############################################################
                 if (dateTimeKeyWordsRegex.IsMatch(currentLine))
                 {
                     DateTime dateTime = DateTime.Now;
@@ -1174,8 +1640,10 @@ namespace Calcify
                 }
 
                 // Date
+                // ##############################################################
                 #region Date
-                if (dateTimeRegex.IsMatch(currentLine))
+                // ##############################################################
+                if (dateTimeCalculationRegex.IsMatch(currentLine))
                 {
                     bool dateGiven = currentLine.Contains('/');
                     bool timeGiven = currentLine.Contains(':');
@@ -1328,7 +1796,7 @@ namespace Calcify
                     string targetUnitString = splittedTask[splittedTask.Length - 1];
                     AngleUnit targetUnit = AngleUnit.None;
                     AngleUnit currentUnit = AngleUnit.None;
-                    targetUnit = angleDict[targetUnitString];
+                    targetUnit = angleDict[targetUnitString.ToLower()];
                     targetUnitString = angleExt[targetUnit];
                     currentUnit = angleDict[currentUnitString];
                     if (targetUnit != currentUnit)
@@ -1513,7 +1981,7 @@ namespace Calcify
                 #endregion
                 // Time
                 #region Time Units
-                else if (timeRegex.IsMatch(currentLine))
+                else if (timeCalculationRegex.IsMatch(currentLine))
                 {
                     string[] splittedTask = currentLine.Split(' ');
                     double extractedValue = double.Parse(splittedTask[0], CultureInfo.InvariantCulture);
@@ -1637,7 +2105,7 @@ namespace Calcify
                 else if (result == "" && directAngleRegex.IsMatch(currentLine))
                 {
                     string[] splittedTask = currentLine.Split(' ');
-                    splittedTask = new string[] { splittedTask[0], string.Join(" ", splittedTask.Skip(1)) };
+                    splittedTask = new string[] { splittedTask[0], String.Join(" ", splittedTask.Skip(1)) };
                     double exVal = double.Parse(splittedTask[0], CultureInfo.InvariantCulture);
                     string currentUnitString = splittedTask[1].ToLower().Trim();
                     currentUnitString = angleExt[angleDict[currentUnitString]];
@@ -1959,28 +2427,21 @@ namespace Calcify
 
         private void contextOpenButton_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog { Filter = "Calcify File (*.Calcify)|*.Calcify|All Files (*.*)|*.*", FileName = "" };
+            OpenFileDialog openFileDialog = new OpenFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
             if (openFileDialog.ShowDialog() == true)
                 openFile(openFileDialog.FileName);
         }
 
         private void contextSaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (documentPath == "")
+            if (documentPath == "" || ((Button)sender).Name == "contextSaveAsButton")
             {
-                SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.Calcify)|*.Calcify|All Files (*.*)|*.*", FileName = "" };
+                SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.Calcify|All Files (*.*)|*.*", FileName = "" };
                 if (saveFileDialog.ShowDialog() == true)
                     saveFile(saveFileDialog.FileName);
             }
             else
                 saveFile(documentPath);
-        }
-
-        private void contextSaveAsButton_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.Calcify)|*.Calcify|All Files (*.*)|*.*", FileName = documentPath != "" ? Path.GetFileNameWithoutExtension(documentPath) : "" };
-            if (saveFileDialog.ShowDialog() == true)
-                saveFile(saveFileDialog.FileName);
         }
 
         private void contextAboutButton_Click(object sender, RoutedEventArgs e)
@@ -2000,35 +2461,24 @@ namespace Calcify
             }
             else aboutWindow.Focus();
         }
-
-        private void contextExitButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
         #endregion
         #region Drag & Drop
-        private void Window_Drop(object sender, DragEventArgs e)
+        private void Window_DragEvent(object sender, DragEventArgs e)
         {
-            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            if (files[0].ToLower().EndsWith(".Calcify"))
-                openFile(files[0]);
-            DropPanel.IsEnabled = false;
-            DropPanel.IsHitTestVisible = false;
-            EditorContainer.Effect = new BlurEffect { Radius = 0 };
-        }
-
-        private void Window_DragEnter(object sender, DragEventArgs e)
-        {
-            DropPanel.IsEnabled = true;
-            DropPanel.IsHitTestVisible = true;
-            EditorContainer.Effect = new BlurEffect { Radius = 10 };
-        }
-
-        private void Window_DragLeave(object sender, DragEventArgs e)
-        {
-            DropPanel.IsEnabled = false;
-            DropPanel.IsHitTestVisible = false;
-            EditorContainer.Effect = new BlurEffect { Radius = 0 };
+            if (e.RoutedEvent == UIElement.DropEvent)
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                if (files[0].ToLower().EndsWith(".calcify"))
+                    openFile(files[0]);
+                DropPanel.IsEnabled = false;
+                DropPanel.IsHitTestVisible = false;
+                EditorContainer.Effect = new BlurEffect { Radius = 0 };
+                return;
+            }
+            bool dragEnter = e.RoutedEvent.Name == "DragEnter";
+            DropPanel.IsEnabled = dragEnter;
+            DropPanel.IsHitTestVisible = dragEnter;
+            EditorContainer.Effect = new BlurEffect { Radius = (dragEnter ? 10 : 0) };
         }
         #endregion
         #region Hotkeys
@@ -2123,9 +2573,9 @@ namespace Calcify
 //  - REFACTORING CODE
 //  - 'About' change date
 
-//  - Modulo operator (%)
 //  - now syntax highlighting
 //  - functions like
+//    - Modulo operator (%)
 //    - floor()
 //    - ceil()
 //    - abs()
@@ -2144,7 +2594,6 @@ namespace Calcify
 //    - atanh()
 //    - log()
 //    - ln()
-//    - diff()
 //    - clamp()
 //    - pow()
 //    - exp()
@@ -2180,20 +2629,16 @@ namespace Calcify
 //    - ε0 (electric constant) >> add to docs (math-functions.md)
 //    - σ (Stefan-Boltzmann constant) >> add to docs (math-functions.md)
 //    - g (standard gravity) >> add to docs (math-functions.md)
-//  - variables
-//  - ctrl + f find
-//  - ctrl + h replace
-//  - ctrl + , settings
-//  - F1 help
+//  - implement variables
+
 //  - Recent Files List
 //  - toolbar
-//  - settings > font size
 //  - zoom with ctrl + mouse wheel
 //  - zoom with ctrl + '+' / '-'
 //  - zoom reset with ctrl + '0'
-//  - settings > autosave > interval
 //  - Auto Completion
 //  - Line Numbers
+
 //  - right click context menu
 //    - Undo - Undo last action
 //    - Redo - Redo last undone action
@@ -2205,6 +2650,9 @@ namespace Calcify
 //  - Status Bar Line and column
 //  - Rename settings scheme to theme
 //  - disable auto updates
+
+//  - settings > font size
+//  - settings > autosave > interval
 //  - settings > Word Wrap (?)
 //  - settings > Line Spacing
 //  - settings > tab size
@@ -2214,12 +2662,18 @@ namespace Calcify
 //  - settings > currency update interval
 //  - settings > thousands seperator
 //  - settings > Verify rates are current in Settings
+
 //  - editor > ctrl + D duplicate line
 //  - editor > ctrl + L delete line
 //  - editor > ctrl + / toggle comment line
 //  - editor > shift + tab decrease indent
 //  - editor > tab complete
 //  - editor > ctrl + / toggle comment
+//  - editor > ctrl + f find
+//  - editor > ctrl + h replace
+//  - editor > ctrl + , settings
+//  - editor > F1 help
+
 //  - change file ending to .calc
 //  - accept inches, bytes, gallons, cups, speed (kmh, mh, ...), data speed (mbps, gbps, ...), tmrw, nmi (nautical miles) (1 nmi = 1852 m), carat (1 ct = 0.2 g), turn (turn, revolution) (1 turn = 360 degrees), THz, pressure, energy, Power, area, volumes (look supported-units.md) as keyword
 //  - basic calculation 1024 * x does not work
@@ -2230,7 +2684,7 @@ namespace Calcify
 //  - time parts (today.year, today.month, today.day, today.dayOfWeek, now.hour, now.minute, now.second)
 //  - time difference (today - tomorrow, now - 09:00)
 //  - maybe update architecture.md
-
+//  - Time Formats (now.format("HH:mm:ss"), today.format("yyyy-MM-dd"))
 
 
 
@@ -2243,3 +2697,4 @@ namespace Calcify
 // Done:
 //  - Toggle theme button toolbar
 //  - Optimized data value conversion
+//  - Added Permutations and Combinations functions

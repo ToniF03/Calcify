@@ -7,10 +7,7 @@
         xmlns:local="clr-namespace:Calcify"
         xmlns:properties="clr-namespace:Calcify.Properties"
         mc:Ignorable="d"
-        AllowDrop="True"
-        Drop="Window_Drop"
-        DragEnter="Window_DragEnter"
-        DragLeave="Window_DragLeave"
+        AllowDrop="True"        
         WindowStyle="None"
         MinHeight="120" MinWidth="300"
         Title="Calcify" Height="500" Width="600" Style="{StaticResource modernWindow}" >
@@ -54,15 +51,16 @@
             </Grid.ColumnDefinitions>
 
             <!-- Function button -->
-            <Button x:Name="Menu" Grid.Column="0" WindowChrome.IsHitTestVisibleInChrome="True" Click="Menu_Click" Style="{StaticResource ChromeButton}" >
+            <Button x:Name="MenuButton" Grid.Column="0" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" >
                 <Button.ContextMenu>
                     <ContextMenu >
-                        <MenuItem Header="New File" x:Name="contextNewFileButton" Click="contextNewFileButton_Click" />
-                        <MenuItem Header="Open" x:Name="contextOpenButton" Click="contextOpenButton_Click" />
-                        <MenuItem Header="Save" x:Name="contextSaveButton" Click="contextSaveButton_Click" />
-                        <MenuItem Header="Save as..." x:Name="contextSaveAsButton" Click="contextSaveAsButton_Click" />
-                        <MenuItem Header="About" x:Name="contextAboutButton" Click="contextAboutButton_Click" />
-                        <MenuItem Header="Exit" x:Name="contextExitButton" Click="contextExitButton_Click" />
+                        <MenuItem x:Name="contextNewFileButton" Header="New File"/>
+                        <MenuItem x:Name="contextOpenButton" Header="Open"/>
+                        <MenuItem x:Name="contextSaveButton" Header="Save"/>
+                        <MenuItem x:Name="contextSaveAsButton" Header="Save as..."/>
+                        <MenuItem x:Name="contextAboutButton" Header="About"/>
+                        <MenuItem x:Name="contextSettingsButton" Header="Settings"/>
+                        <MenuItem x:Name="contextExitButton" Header="Exit"/>
                     </ContextMenu>
                 </Button.ContextMenu>
                 <Button.Content>
@@ -71,9 +69,8 @@
             </Button>
 
             <!-- Theme button -->
-            <Button Grid.Column="1" Style="{StaticResource TransparentButton}" 
-                    WindowChrome.IsHitTestVisibleInChrome="True"
-                    x:Name="themeButton">
+            <Button x:Name="themeButton" Grid.Column="1" Style="{StaticResource TransparentButton}" 
+                    WindowChrome.IsHitTestVisibleInChrome="True">
                 <Button.Content>
                     <Label x:Name="themeButtonLabel" FontSize="18" Content="&#xE706;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" RenderTransformOrigin="0.5, 0.5"/>
                 </Button.Content>
@@ -111,19 +108,19 @@
             <!-- Label with the title -->
             <Label x:Name="titleLabel" Content="Calcify" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="3" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="60, 0, 0, 0" />
             <!-- MinimizeButton -->
-            <Button Grid.Column="4" WindowChrome.IsHitTestVisibleInChrome="True" x:Name="MinimizeButton" Style="{StaticResource ChromeButton}" >
+            <Button x:Name="MinimizeButton" Grid.Column="4" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" >
                 <Button.Content>
                     <Label FontSize="12" Content="&#xe949;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
                 </Button.Content>
             </Button>
             <!-- Maximize Button -->
-            <Button Grid.Column="5" WindowChrome.IsHitTestVisibleInChrome="True" x:Name="MaximizeButton" Style="{StaticResource ChromeButton}" >
+            <Button x:Name="MaximizeButton" Grid.Column="5" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" >
                 <Button.Content>
                     <Label x:Name="MaximizeButtonText" FontSize="12" Content="&#xe922;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
                 </Button.Content>
             </Button>
             <!-- Close Button -->
-            <Button Grid.Column="6" x:Name="closeButton" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeCloseButton}" >
+            <Button x:Name="closeButton" Grid.Column="6" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeCloseButton}" >
                 <Button.Content>
                     <Label FontSize="14" Content="&#xe947;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                 </Button.Content>
@@ -131,7 +128,7 @@
         </Grid>
 
         <!-- Container with the two text boxes inside -->
-        <ScrollViewer Grid.Row="1" x:Name="EditorContainer" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel" Margin="0, 7, 0, 0">
+        <ScrollViewer x:Name="EditorContainer" Grid.Row="1" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel" Margin="0, 7, 0, 0">
             <Grid Grid.Row="1" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="6*" />
@@ -142,8 +139,8 @@
 
                 <!-- Main editor, where the magic happens -->
                 <avalonEdit:TextEditor x:Name="mainEditor"
-                                       Background="Transparent"
                                        Grid.Column="0" 
+                                       Background="Transparent"
                                        Margin="7, 0, 2.5, 7"
                                        FontSize="13"
                                        WordWrap="False"
@@ -153,11 +150,11 @@
 
                 <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
-                <!-- The pane where the results are displayed -->
+                <!-- The pane where the results are being displayed -->
                 <avalonEdit:TextEditor 
-                                xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
-                                Name="resultEditor" 
+                                x:Name="resultEditor" 
                                 Grid.Column="2" Margin="2.5,0,7,7"
+                                xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
                                 ScrollViewer.VerticalScrollBarVisibility="Visible" 
                                 Background="Transparent" 
                                 Foreground="#7EA32B"
