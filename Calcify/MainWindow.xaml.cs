@@ -353,7 +353,6 @@ namespace Calcify
             this.MaxWidth = SystemParameters.MaximizedPrimaryScreenWidth;
             DropPanel.Visibility = Visibility.Visible;
             resultEditor.TextArea.Caret.CaretBrush = Brushes.Transparent;
-            Info.ToolTip = new ToolTip();
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -416,8 +415,7 @@ namespace Calcify
             {
                 string result = "";
                 DocumentLine line = mainEditor.Document.GetLineByNumber(i);
-                result = Calculate(line, newDocument);
-                Console.WriteLine(Calc(mainEditor.Document.GetText(line.Offset, line.Length)));
+                result = Calculate(mainEditor.Document.GetText(line.Offset, line.Length));
                 newDocument.Text = newDocument.Text + result + '\n';
             }
             resultEditor.Document = newDocument;
@@ -630,20 +628,20 @@ namespace Calcify
         public void DocumentChanged()
         {
             if (documentPath == "")
-                Info.IsEnabled = false;
+                titleLabel.ToolTip = null;
             else
             {
-                Info.IsEnabled = true;
-                ((ToolTip)Info.ToolTip).Content = "Author: " + documentAuthor + "\nLast edited by: " + documentEditedBy + "\nCreated: " + Calculator.UnixTimeStampToDateTime(documentCreated).ToString() + "\nModified: " + Calculator.UnixTimeStampToDateTime(documentModified).ToString() + "\nPath: " + Path.GetDirectoryName(documentPath);
+                titleLabel.ToolTip = new ToolTip();
+                ((ToolTip)titleLabel.ToolTip).Content = "Author: " + documentAuthor + "\nLast edited by: " + documentEditedBy + "\nCreated: " + Calculator.UnixTimeStampToDateTime(documentCreated).ToString() + "\nModified: " + Calculator.UnixTimeStampToDateTime(documentModified).ToString() + "\nPath: " + Path.GetDirectoryName(documentPath);
                 if (Properties.Settings.Default.DarkMode)
                 {
-                    ((ToolTip)Info.ToolTip).Background = new SolidColorBrush { Color = Color.FromRgb(37, 38, 43) };
-                    ((ToolTip)Info.ToolTip).Foreground = new SolidColorBrush { Color = Color.FromRgb(180, 180, 180) };
+                    ((ToolTip)titleLabel.ToolTip).Background = new SolidColorBrush { Color = Color.FromRgb(37, 38, 43) };
+                    ((ToolTip)titleLabel.ToolTip).Foreground = new SolidColorBrush { Color = Color.FromRgb(180, 180, 180) };
                 }
                 else
                 {
-                    ((ToolTip)Info.ToolTip).Background = new SolidColorBrush { Color = Color.FromRgb(241, 242, 247) };
-                    ((ToolTip)Info.ToolTip).Foreground = new SolidColorBrush { Color = Color.FromRgb(0, 0, 0) };
+                    ((ToolTip)titleLabel.ToolTip).Background = new SolidColorBrush { Color = Color.FromRgb(241, 242, 247) };
+                    ((ToolTip)titleLabel.ToolTip).Foreground = new SolidColorBrush { Color = Color.FromRgb(0, 0, 0) };
                 }
             }
 
@@ -708,8 +706,6 @@ namespace Calcify
         /// <param name="newValue"></param>
         private void DarkModeChanged(bool newValue)
         {
-            ((ToolTip)Info.ToolTip).Background = new SolidColorBrush { Color = (newValue ? Color.FromRgb(37, 38, 43) : Color.FromRgb(241, 242, 247)) };
-            ((ToolTip)Info.ToolTip).Foreground = new SolidColorBrush { Color = (newValue ? Color.FromRgb(180, 180, 180) : Color.FromRgb(0, 0, 0)) };
             byte[] byteArray = Encoding.UTF8.GetBytes(newValue ? darkSyntax.Content : lightSyntax.Content);
             MemoryStream stream = new MemoryStream(byteArray);
 
@@ -746,7 +742,7 @@ namespace Calcify
 
         }
 
-        private string Calc(string input, bool acceptPrevious = true)
+        private string Calculate(string input, bool acceptPrevious = true)
         {
             string originalInput = input;
 
@@ -1410,6 +1406,238 @@ namespace Calcify
                 return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits));
             else
                 return "";
+        }
+
+        private string CalculateSum(int CurrentLineNumber, TextDocument newDoc, out int summedLineCount, string targetUnitString = "")
+        {
+            double value = 0;
+            string previousLine = "";
+            bool firstLineEncountered = false;
+            int lineCount = 0;
+
+            if (CurrentLineNumber != 1)
+            {
+                while (newDoc.GetText(newDoc.GetLineByNumber(CurrentLineNumber - 1)) == "" && CurrentLineNumber - 1 != 1)
+                    CurrentLineNumber--;
+                for (int i = CurrentLineNumber - 1; i > 0; i--)
+                {
+                    previousLine = newDoc.GetText(newDoc.GetLineByNumber(i));
+                    if (previousLine == "" && firstLineEncountered)
+                        break;
+                    else if (new Regex(@"^-?\d+(\.\d+)?$").IsMatch(previousLine) && (targetUnitString == "" || targetUnitString == "digits"))
+                    {
+                        double exVal = double.Parse(new Regex(@"^-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
+                        firstLineEncountered = true;
+                        lineCount++;
+                        if (targetUnitString == "")
+                            targetUnitString = "digits";
+                        value += exVal;
+                    }
+                    else if (new Regex(@"^\-?\d+(\.\d+)? " + CurrencyPattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(CurrencyPattern).IsMatch(targetUnitString)))
+                    {
+                        lineCount++;
+                        firstLineEncountered = true;
+                        if (targetUnitString == "")
+                        {
+                            targetUnitString = new Regex(CurrencyPattern + "$").Match(previousLine).Value;
+                            string exVal = new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value;
+                            value = double.Parse(exVal, CultureInfo.InvariantCulture);
+                        }
+                        else
+                        {
+                            string currentUnit = new Regex(CurrencyPattern + @"$").Match(previousLine).Value;
+                            if (currentUnit == targetUnitString)
+                            {
+                                string exVal = new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value;
+                                value = value + double.Parse(exVal, CultureInfo.InvariantCulture);
+                            }
+                            else
+                            {
+                                string extractedString = new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value;
+                                double exVal = double.Parse(extractedString, CultureInfo.InvariantCulture);
+                                exVal = exVal / currencyDict[currentUnit];
+                                if (targetUnitString != "EUR")
+                                    exVal = exVal * currencyDict[targetUnitString];
+                                exVal = System.Math.Round(exVal, 2);
+                                value = value + exVal;
+                            }
+                        }
+                    }
+                    else if (new Regex(@"^\-?\d+(\.\d+)? " + MassPattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(MassPattern).IsMatch(targetUnitString)))
+                    {
+                        lineCount++;
+                        firstLineEncountered = true;
+                        string currentUnitString = new Regex(MassPattern + "$").Match(previousLine).Value.ToLower();
+                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value);
+                        MassUnit currentUnit = MassUnit.None;
+                        MassUnit targetUnit = MassUnit.None;
+                        if (targetUnitString == "")
+                        {
+                            targetUnitString = currentUnitString;
+                            value += exVal;
+                        }
+                        else
+                        {
+                            targetUnit = massDict[targetUnitString];
+                            targetUnitString = massExt[targetUnit];
+                            currentUnit = massDict[currentUnitString];
+                            if (currentUnit != targetUnit)
+                                exVal = Converter.MassConverter(exVal, currentUnit, targetUnit);
+                            if (targetUnit == MassUnit.Pounds)
+                                targetUnitString = exVal == 1 || exVal == -1 ? "lb" : "lbs";
+                            value += exVal;
+
+                        }
+                    }
+                    else if (new Regex(@"^\-?\d+(\.\d+)? " + TemperaturePattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(TemperaturePattern).IsMatch(targetUnitString)))
+                    {
+                        lineCount++;
+                        firstLineEncountered = true;
+                        string currentUnitString = new Regex(TemperaturePattern + "$").Match(previousLine).Value;
+                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
+                        TemperatureUnit currentUnit = TemperatureUnit.None;
+                        TemperatureUnit targetUnit = TemperatureUnit.None;
+                        if (targetUnitString == "")
+                        {
+                            targetUnitString = currentUnitString;
+                            value = exVal;
+                        }
+                        else
+                        {
+                            currentUnit = temperatureDict[currentUnitString];
+                            targetUnit = temperatureDict[targetUnitString];
+                            targetUnitString = temperatureExt[targetUnit];
+                            if (currentUnit != targetUnit)
+                                exVal = Converter.TemperatureConverter(exVal, currentUnit, targetUnit);
+                            value += exVal;
+                        }
+                    }
+                    else if (new Regex(@"^\-?\d+(\.\d+)? " + DataSizePattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(DataSizePattern).IsMatch(targetUnitString)))
+                    {
+                        lineCount++;
+                        firstLineEncountered = true;
+                        string currentUnitString = new Regex(DataSizePattern + "$").Match(previousLine).Value;
+                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
+                        DataSizeUnit currentUnit = DataSizeUnit.None;
+                        DataSizeUnit targetUnit = DataSizeUnit.None;
+                        if (currentUnitString != "b" && currentUnitString != "B")
+                            currentUnitString = currentUnitString.ToLower();
+                        if (targetUnitString != "b" && targetUnitString != "B")
+                            targetUnitString = targetUnitString.ToLower();
+                        if (targetUnitString == "")
+                        {
+                            targetUnitString = currentUnitString;
+                            value += exVal;
+                            targetUnit = dataSizeDict[targetUnitString];
+                            targetUnitString = dataSizeExt[targetUnit];
+                        }
+                        else
+                        {
+                            targetUnit = dataSizeDict[targetUnitString];
+                            targetUnitString = dataSizeExt[targetUnit];
+                            currentUnit = dataSizeDict[currentUnitString];
+                            if (targetUnit != currentUnit)
+                                exVal = Converter.DataSizeConverter(exVal, currentUnit, targetUnit);
+                            value += exVal;
+                        }
+                    }
+                    else if (new Regex(@"^\-?\d+(\.\d+)? " + TimePattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(TimePattern).IsMatch(targetUnitString)))
+                    {
+                        lineCount++;
+                        firstLineEncountered = true;
+                        string currentUnitString = new Regex(TimePattern + "$").Match(previousLine).Value;
+                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
+                        TimeUnit currentUnit = TimeUnit.None;
+                        TimeUnit targetUnit = TimeUnit.None;
+                        if (targetUnitString == "")
+                        {
+                            targetUnitString = currentUnitString;
+                            value += exVal;
+                        }
+                        else
+                        {
+                            targetUnit = timeDict[targetUnitString];
+                            targetUnitString = timeExt[targetUnit];
+                            currentUnit = timeDict[currentUnitString];
+                            if (targetUnit != currentUnit)
+                                exVal = Converter.TimeConverter(exVal, currentUnit, targetUnit);
+                            value += exVal;
+                        }
+                    }
+                    else if (new Regex(@"^\-?\d+(\.\d+)? " + FrequencyPattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(FrequencyPattern).IsMatch(targetUnitString)))
+                    {
+                        lineCount++;
+                        firstLineEncountered = true;
+                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
+                        string currentUnitString = new Regex(FrequencyPattern).Match(new Regex(@"^\-?\d+(\.\d+)? " + FrequencyPattern).Match(previousLine).Value).Value.ToLower().Trim();
+                        if (targetUnitString == "")
+                            targetUnitString = currentUnitString;
+                        FrequencyUnit targetUnit = FrequencyUnit.None;
+                        FrequencyUnit currentUnit = FrequencyUnit.None;
+                        targetUnitString = targetUnitString.ToLower();
+                        targetUnit = frequencyDict[targetUnitString];
+                        targetUnitString = frequencyExt[targetUnit];
+                        currentUnit = frequencyDict[currentUnitString];
+                        if (targetUnit != currentUnit)
+                            exVal = Converter.FrequencyConverter(exVal, currentUnit, targetUnit);
+                        value += exVal;
+                    }
+                    else if (new Regex(@"^\-?\d+(\.\d+)?" + AnglePattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(AnglePattern).IsMatch(targetUnitString)))
+                    {
+                        lineCount++;
+                        firstLineEncountered = true;
+                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
+                        string currentUnitString = new Regex(AnglePattern).Match(previousLine).Value.ToLower().Trim();
+                        if (targetUnitString == "")
+                            targetUnitString = currentUnitString;
+                        AngleUnit targetUnit = AngleUnit.None;
+                        AngleUnit currentUnit = AngleUnit.None;
+                        targetUnit = angleDict[targetUnitString];
+                        targetUnitString = angleExt[targetUnit];
+                        currentUnit = angleDict[currentUnitString];
+                        if (currentUnit != targetUnit)
+                            exVal = Converter.AngleConverter(exVal, currentUnit, targetUnit);
+                        value += exVal;
+                    }
+                    else if (new Regex(@"^\-?\d+(\.\d+)? " + LengthPattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(LengthPattern).IsMatch(targetUnitString)))
+                    {
+                        lineCount++;
+                        firstLineEncountered = true;
+                        string currentUnitString = new Regex(LengthPattern + "$").Match(previousLine).Value;
+                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
+                        targetUnitString = targetUnitString == "" ? currentUnitString : targetUnitString;
+                        LengthUnit currentUnit = LengthUnit.None;
+                        LengthUnit targetUnit = LengthUnit.None;
+                        targetUnit = lengthDict[targetUnitString];
+                        targetUnitString = lengthExt[targetUnit];
+                        currentUnit = lengthDict[currentUnitString];
+                        if (targetUnit != currentUnit)
+                            exVal = Converter.LengthConverter(exVal, currentUnit, targetUnit);
+                        value += exVal;
+                    }
+                    else
+                        break;
+                }
+
+                summedLineCount = lineCount;
+                if (targetUnitString != "digits")
+                {
+                    if (System.Math.Round(value, Properties.Settings.Default.Digits) != 0)
+                        return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + targetUnitString;
+                    else
+                        return ToNumberString(value) + " " + targetUnitString;
+                }
+                else
+                {
+                    if (System.Math.Round(value, Properties.Settings.Default.Digits) != 0)
+                        return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits));
+                    else
+                        return ToNumberString(value);
+                }
+            }
+            else
+                summedLineCount = 0;
+            return "";
         }
 
         /// <summary>

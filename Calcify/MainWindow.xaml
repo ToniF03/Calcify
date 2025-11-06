@@ -106,7 +106,7 @@
             </Button>
 
             <!-- Label with the title -->
-            <Label x:Name="titleLabel" Content="Calcify" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="3" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="60, 0, 0, 0" />
+            <Label x:Name="titleLabel" Content="Calcify" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="3" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="60, 0, 0, 0" WindowChrome.IsHitTestVisibleInChrome="True" ToolTipService.ShowDuration="120000"/>
             <!-- MinimizeButton -->
             <Button x:Name="MinimizeButton" Grid.Column="4" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" >
                 <Button.Content>
