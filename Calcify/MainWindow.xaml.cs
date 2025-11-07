@@ -30,7 +30,7 @@ namespace Calcify
         #region Variables
         #region Pattern
         string AnglePattern = Math.Units.Patterns.AnglePattern;
-        string CurrencyPattern = @"\b(EUR|AED|AFN|ALL|AMD|ANG|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BGN|BHD|BIF|BMD|BND|BOB|BRL|BSD|BTC|BTN|BWP|BYN|BYR|BZD|CAD|CDF|CHF|CLF|CLP|CNY|COP|CRC|CUC|CUP|CVE|CZK|DJF|DKK|DOP|DZD|EGP|ERN|ETB|EUR|FJD|FKP|GBP|GEL|GGP|GHS|GIP|GMD|GNF|GTQ|GYD|HKD|HNL|HRK|HTG|HUF|IDR|ILS|IMP|INR|IQD|IRR|ISK|JEP|JMD|JOD|JPY|KES|KGS|KHR|KMF|KPW|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LSL|LTL|LVL|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|MRO|MUR|MVR|MWK|MXN|MYR|MZN|NAD|NGN|NIO|NOK|NPR|NZD|OMR|PAB|PEN|PGK|PHP|PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLL|SOS|SRD|STD|SVC|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TWD|TZS|UAH|UGX|USD|UYU|UZS|VEF|VND|VUV|WST|XAF|XAG|XAU|XCD|XDR|XOF|XPF|YER|ZAR|ZMK|ZMW|ZWL)\b";
+        public string CurrencyPattern = @"\b(EUR|AED|AFN|ALL|AMD|ANG|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BGN|BHD|BIF|BMD|BND|BOB|BRL|BSD|BTC|BTN|BWP|BYN|BYR|BZD|CAD|CDF|CHF|CLF|CLP|CNY|COP|CRC|CUC|CUP|CVE|CZK|DJF|DKK|DOP|DZD|EGP|ERN|ETB|EUR|FJD|FKP|GBP|GEL|GGP|GHS|GIP|GMD|GNF|GTQ|GYD|HKD|HNL|HRK|HTG|HUF|IDR|ILS|IMP|INR|IQD|IRR|ISK|JEP|JMD|JOD|JPY|KES|KGS|KHR|KMF|KPW|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LSL|LTL|LVL|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|MRO|MUR|MVR|MWK|MXN|MYR|MZN|NAD|NGN|NIO|NOK|NPR|NZD|OMR|PAB|PEN|PGK|PHP|PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLL|SOS|SRD|STD|SVC|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TWD|TZS|UAH|UGX|USD|UYU|UZS|VEF|VND|VUV|WST|XAF|XAG|XAU|XCD|XDR|XOF|XPF|YER|ZAR|ZMK|ZMW|ZWL)\b";
         string DataSizePattern = Math.Units.Patterns.DataSizePattern;
         string FrequencyPattern = Math.Units.Patterns.FrequencyPattern;
         string LengthPattern = Math.Units.Patterns.LengthPattern;
@@ -55,14 +55,11 @@ namespace Calcify
         Regex dateTimeCalculationRegex = new Regex(@"^(\d{2}(\d{2})?\/\d{1,2}\/\d{1,2}( \d{1,2}:\d{1,2}(:\d{1,2})?)?|\d{1,2}:\d{1,2}(:\d{1,2})?)( (in|add|plus|\+|minus|remove|\-) \d+ (c|yr|mth|wk|d|h|min|s|(?i)(centur(y|ies)|decade(s)?|year(s)?|month(s)?|week(s)?|day(s)?|hour(s)?|minute(s)?|second(s)?)(?-i))|)*$");
         Regex PermutationRegex = new Regex(@"(?<n>\d+)C(?<r>\d+)");
         Regex calculatorRegex = new Regex(@"^((\d+(\.\d+)?)|\||(\+|\-|\*|\/|\^)(?!\+|\*|\/|\^|\!)|(|\(|\)|\!))*$");
-        Regex numberRegex = new Regex(@"^\-?\d+(\.\d+)?$");
-        Regex numeralFormatRegex = new Regex(@"^(0x[0-9a-fA-F]+|\-?\d+(\.\d+)?)$");
-        Regex directBinOctRegex = new Regex(@"^(bin:|oct:)?([0-7]| )+$");
         Regex constantsRegex;
         Regex sumAvgRegex;
         Regex angleRegex;
         Regex frequencyRegex;
-        Regex currencyRegex;
+        public Regex currencyRegex;
         Regex dataSizeRegex;
         Regex lengthRegex;
         Regex temperatureRegex;
@@ -113,15 +110,13 @@ namespace Calcify
         private string oldTotalValue = "";
         private string windowTitle = "";
         private bool unsavedChanges = false;
-        // By https://www.frankfurter.app/
-        private string exchangeRateLink = "https://api.frankfurter.app/latest";
-        private Dictionary<string, double> currencyDict = new Dictionary<string, double>();
         private RegistryWatcher watcher = null;
         private SyntaxFile lightSyntax = new SyntaxFile(SyntaxFile.Theme.Light);
         private SyntaxFile darkSyntax = new SyntaxFile(SyntaxFile.Theme.Dark);
 
         public int returnState = -1;
         public About aboutWindow = null;
+        public Dictionary<string, double> currencyDict = new Dictionary<string, double>();
         public DialogWindow dialogWindow = null;
         public Settings settingsWindow = null;
 
@@ -440,58 +435,6 @@ namespace Calcify
         }
 
         #region Functions
-        #region Exchange Rate
-        /// <summary>
-        /// Downloads the current exchange rate of the day
-        /// </summary>
-        /// <returns>Returns success as bool.</returns>
-        public bool DownloadExchangeRate()
-        {
-            InternetConnectionState_e flags = 0;
-            bool isConnected = InternetGetConnectedState(ref flags, 0);
-            if (isConnected)
-            {
-                try
-                {
-                    string downloadedContent;
-                    WebClient webClient = new WebClient();
-                    downloadedContent = webClient.DownloadString(exchangeRateLink);
-                    File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "exchangerate.json"), downloadedContent);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    return false;
-                }
-            }
-            else
-                return false;
-        }
-
-        /// <summary>
-        /// Loads the exchange rate
-        /// </summary>
-        public void LoadExchangeRate()
-        {
-            // Creates an dictionary that contains the ISO-4217 codes and the exchange rate to USD
-            Dictionary<string, double> newCurrencyDict = new Dictionary<string, double>();
-            if (File.Exists(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "exchangerate.json")))
-            {
-                JObject exchangerate = JObject.Parse(File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "exchangerate.json")));
-                foreach (JProperty child in exchangerate["rates"].Children())
-                {
-                    newCurrencyDict.Add(child.Name, double.Parse(child.Value.ToString()));
-                }
-                currencyDict = newCurrencyDict;
-                CurrencyPattern = "(EUR|" + string.Join("|", currencyDict.Keys) + ")";
-
-                // Re-create currency regex with updated pattern
-                currencyRegex = new Regex(@"^\-?\d+(\.\d+)? " + CurrencyPattern + " (in(to)?|to|as) " + CurrencyPattern + "$");
-                UpdateSyntaxHighlighting();
-            }
-        }
-        #endregion
         #region Open & Save File
         /// <summary>
         /// Open a file
@@ -684,21 +627,6 @@ namespace Calcify
             DocumentChanged();
         }
         #endregion
-        #region Check Internet Connection State
-        [DllImport("wininet.dll", CharSet = CharSet.Auto)]
-        private extern static bool InternetGetConnectedState(ref InternetConnectionState_e lpdwFlags, int dwReserved);
-
-        [Flags]
-        enum InternetConnectionState_e : int
-        {
-            INTERNET_CONNECTION_MODEM = 0x1,
-            INTERNET_CONNECTION_LAN = 0x2,
-            INTERNET_CONNECTION_PROXY = 0x4,
-            INTERNET_RAS_INSTALLED = 0x10,
-            INTERNET_CONNECTION_OFFLINE = 0x20,
-            INTERNET_CONNECTION_CONFIGURED = 0x40
-        }
-        #endregion
 
         /// <summary>
         /// (De)activate the dark mode
@@ -801,7 +729,8 @@ namespace Calcify
             input = TemperatureConversion(input);
 
             // Execute Calculation
-            input = parseCalculation(input);
+            if (calculatorRegex.IsMatch(input))
+                input = parseCalculation(input);
 
             return input;
         }

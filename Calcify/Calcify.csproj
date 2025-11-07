@@ -98,6 +98,7 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Classes\ExchangeRateLoader.cs" />
     <Compile Include="Classes\RegistryWatcher.cs" />
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>

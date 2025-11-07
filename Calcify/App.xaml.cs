@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Calcify.Classes;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -48,21 +49,22 @@ namespace Calcify
 
 
 
-            if (!File.Exists(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "exchangerate.json")))
-                mainWindow.DownloadExchangeRate();
+            string exchPath = Path.Combine(AppContext.BaseDirectory, "exchangerate.json");
+            if (!File.Exists(exchPath))
+                ExchangeRateLoader.DownloadExchangeRate();
             else
             {
-                JObject exchangerate = JObject.Parse(System.IO.File.ReadAllText(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "exchangerate.json")));
+                JObject exchangerate = JObject.Parse(System.IO.File.ReadAllText(exchPath));
                 string[] dateArray = exchangerate["date"].ToString().Split('-');
                 double unixtimestamp = Math.Calculator.DateTimeToUnixTimeStamp(new DateTime(int.Parse(dateArray[0]), int.Parse(dateArray[1]), int.Parse(dateArray[2])));
                 DateTime timestamp = Math.Calculator.UnixTimeStampToDateTime(unixtimestamp);
                 DateTime now = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 12, 0, 0);
                 if (timestamp < now)
                 {
-                    mainWindow.DownloadExchangeRate();
+                    ExchangeRateLoader.DownloadExchangeRate();
                 }
             }
-            mainWindow.LoadExchangeRate();
+            ExchangeRateLoader.LoadExchangeRate(out mainWindow.CurrencyPattern, out mainWindow.currencyRegex, out mainWindow.currencyDict);
 
             if (openFile)
                 mainWindow.openFile(filePath);

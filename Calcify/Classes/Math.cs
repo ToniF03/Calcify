@@ -5394,7 +5394,7 @@ namespace Calcify.Math
             }
 
             if (task.StartsWith("+")) task = task.Substring(1);
-            return givenRegex["Numbers"].IsMatch(task) ? double.Parse(task, CultureInfo.InvariantCulture) : double.NaN;
+            return givenRegex["Numbers"].IsMatch(task.Replace(",", "")) ? double.Parse(task, CultureInfo.InvariantCulture) : double.NaN;
         }
 
         /// <summary>
