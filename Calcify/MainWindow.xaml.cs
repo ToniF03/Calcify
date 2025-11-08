@@ -42,18 +42,16 @@ namespace Calcify
         #region Regex
         Regex prevRegex = new Regex(@"\b(previous|prev|answer|ans)\b");
 
-        Regex randRegex = new Regex(@"(\brand\(\d+(\.\d+)?, \d+(\.\d+)?\)( |$)|\brandint\(\d+, \d+\)( |$))");
-        Regex diffRegex = new Regex(@"\bdiff\(-?\d+(\.\d+)?, -?\d+(\.\d+)?\)( |$)");
-        Regex roundRegex = new Regex(@"\bround\(\d+(\.\d+)?, \d+\)( |$)");
-
         Regex sqrtRegex = new Regex(@"\b(?<func>sqrt)\((?<variable1>(-)?\d+(\.\d+)?)\)(( )?|$)");
 
         Regex dateTimeKeyWordsRegex = new Regex(@"\b(?i)(now|time|yesterday|date|today|tomorrow)(?-i)\b");
         Regex dateTimeRegex = new Regex(@"^(\d{2}(\d{2})?\/\d{1,2}\/\d{1,2}( \d{1,2}:\d{1,2}(:\d{1,2})?)?|\d{1,2}:\d{1,2}(:\d{1,2})?)$");
         Regex PermutationRegex = new Regex(@"(?<n>\d+)C(?<r>\d+)");
         Regex calculatorRegex = new Regex(@"^((\d+(\.\d+)?)|\||(\+|\-|\*|\/|\^)(?!\+|\*|\/|\^|\!)|(|\(|\)|\!))*$");
+        Regex directRegex = new Regex(@"^-?((\d{1,3},)*\d{3}|\d+)(\.\d+)?( (" + Math.Units.Patterns.allUnitPatterns + "))?$");
         Regex constantsRegex;
         Regex sumAvgRegex;
+        Regex inlineCalculationRegex = new Regex(@"\{(?<subtask>[^{}]*)\}", RegexOptions.RightToLeft);
         public Regex currencyRegex;
 
         Regex allUnitRegex;
@@ -223,7 +221,7 @@ namespace Calcify
                     }
                     else
                     {
-                        SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.Calcify)|*.Calcify|All Files (*.*)|*.*", FileName = "" };
+                        SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
                         if (saveFileDialog.ShowDialog() == true)
                         {
                             saveFile(saveFileDialog.FileName);
@@ -314,13 +312,13 @@ namespace Calcify
             constantsRegex = new Regex(ConstantsPattern);
             sumAvgRegex = new Regex(@"\b(avg|sum)\b");
             currencyRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + CurrencyPattern + ") (in(to)?|to|as) (?<targetUnit>" + CurrencyPattern + ")$");
+            allUnitRegex = new Regex(@"(?<result>(?<value>-?((\d{1,3},)*\d{3}|\d+)(\.\d+)?) (?<srcUnit>(" + Math.Units.Patterns.allUnitPatterns + "))) (in(to)?|to) (?<targetUnit>(" + Math.Units.Patterns.allUnitPatterns + "))");
             #endregion
 
             this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
             this.MaxWidth = SystemParameters.MaximizedPrimaryScreenWidth;
             DropPanel.Visibility = Visibility.Visible;
             resultEditor.TextArea.Caret.CaretBrush = Brushes.Transparent;
-            allUnitRegex = new Regex(@"(?<value>-?\d+(\.\d+)?) (?<srcUnit>(" + Math.Units.Patterns.allUnitPatterns + ")) (in(to)?|to) (?<targetUnit>(" + Math.Units.Patterns.allUnitPatterns + "))");
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -383,10 +381,10 @@ namespace Calcify
             {
                 string result = "";
                 DocumentLine line = mainEditor.Document.GetLineByNumber(i);
-                result = Calculate(mainEditor.Document.GetText(line.Offset, line.Length));
-                newDocument.Text = newDocument.Text + result + '\n';
-                foreach (Match m in allUnitRegex.Matches(mainEditor.Document.GetText(line.Offset, line.Length)))
-                    Console.WriteLine("Value: " + m.Groups["value"] + " ; Unit: " + m.Groups["srcUnit"]);
+                result = Calculate(mainEditor.Document.GetText(line.Offset, line.Length)).Trim();
+                Match m = directRegex.Match(result);
+                if (directRegex.Match(result).Success)
+                    newDocument.Text = newDocument.Text + result + '\n';
             }
             resultEditor.Document = newDocument;
         }
@@ -665,6 +663,13 @@ namespace Calcify
             if (acceptPrevious)
                 input = prevRegex.Replace(input, "{/last/}");
 
+            while (inlineCalculationRegex.IsMatch(input))
+            {
+                string subtask = inlineCalculationRegex.Match(input).Groups["subtask"].Value;
+                string inlineResult = Calculate(subtask, acceptPrevious);
+                input = input.Replace("{" + subtask + "}", inlineResult);
+            }
+
             // Replace all permutation expressions in the input
             input = ReplacePermutations(input);
 
@@ -699,7 +704,7 @@ namespace Calcify
                         continue;
                     Type type = srcUnit.GetType();
                     double convertedValue = converterDict[type].Invoke(value, srcUnit, targetUnit);
-                    input = input.Replace(match.Value, ToNumberString(System.Math.Round(convertedValue, Properties.Settings.Default.Digits)));
+                    input = input.Replace(match.Value, ToNumberString(System.Math.Round(convertedValue, Properties.Settings.Default.Digits)) + " " + allUnitsExt[targetUnit]);
                 }
             }
 
@@ -802,13 +807,11 @@ namespace Calcify
         /// numeric results.</returns>
         private string ReplaceTwoVariableFunctions(string input)
         {
-            MatchCollection matches;
-
-            Regex functionsRegex = new Regex(@"\b(?<func>(diff|rand|randint|round))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)");
+            Regex functionsRegex = new Regex(@"\b(?<func>(diff|rand|randint|round))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
             // Replace and execute functions
-            matches = functionsRegex.Matches(input);
-            foreach (Match match in matches)
+            while (functionsRegex.IsMatch(input))
             {
+                Match match = functionsRegex.Match(input);
                 string function = match.Groups["func"].Value;
                 double minNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
                 double maxNumber = double.Parse(match.Groups["variable2"].Value, CultureInfo.InvariantCulture);
@@ -829,23 +832,23 @@ namespace Calcify
                     case "diff":
                         generatedNumber = maxNumber - minNumber;
                         generatedNumber = System.Math.Round(generatedNumber, Properties.Settings.Default.Digits);
-                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(generatedNumber, Properties.Settings.Default.Digits)) + " ");
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(generatedNumber, Properties.Settings.Default.Digits)));
                         break;
                     // Generate random double
                     case "rand":
                         generatedNumber = GetRandomDouble(minNumber, maxNumber);
                         generatedNumber = System.Math.Round(generatedNumber, Properties.Settings.Default.Digits);
-                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(generatedNumber, Properties.Settings.Default.Digits)) + " ");
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(generatedNumber, Properties.Settings.Default.Digits)));
                         break;
                     // Generate random integer
                     case "randint":
                         generatedNumber = new Random().Next((int)minNumber, (int)maxNumber);
-                        input = input.Replace(match.Value, ToNumberString(generatedNumber) + " ").Trim();
+                        input = input.Replace(match.Value, ToNumberString(generatedNumber)).Trim();
                         break;
                     // Round number
                     case "round":
                         generatedNumber = System.Math.Round(minNumber, (int)maxNumber);
-                        input = input.Replace(match.Value, ToNumberString(generatedNumber) + " ").Trim();
+                        input = input.Replace(match.Value, ToNumberString(generatedNumber)).Trim();
                         break;
                 }
             }
@@ -1386,10 +1389,7 @@ namespace Calcify
         private string ToNumberString(double val)
         {
             string valString = val.ToString("N10", CultureInfo.InvariantCulture);
-            if (valString.Contains("."))
-                while (valString.EndsWith("0"))
-                    valString = valString.Substring(0, valString.Length - 1);
-            if (valString.EndsWith("."))
+            while (valString.Contains(".") && (valString.EndsWith("0") || valString.EndsWith(".")))
                 valString = valString.Substring(0, valString.Length - 1);
             return valString;
         }
@@ -1449,7 +1449,7 @@ namespace Calcify
             AddUnit(MassUnit.Ounce, "oz.", "oz", "oz.", "ounce", "ounces");
 
             // Length
-            AddUnit(LengthUnit.Nanometer, "nm", "nanometer", "nm", "μm", "µm");
+            AddUnit(LengthUnit.Nanometer, "nm", "nanometer", "nm");
             AddUnit(LengthUnit.Micrometer, "μm", "micrometer", "μm", "µm");
             AddUnit(LengthUnit.Millimeter, "mm", "millimeter", "mm");
             AddUnit(LengthUnit.Centimeter, "cm", "centimeter", "cm");
@@ -1556,7 +1556,7 @@ namespace Calcify
                     }
                     else
                     {
-                        SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.Calcify)|*.Calcify|All Files (*.*)|*.*", FileName = "" };
+                        SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
                         if (saveFileDialog.ShowDialog() == true)
                         {
                             saveFile(saveFileDialog.FileName);
@@ -1659,7 +1659,7 @@ namespace Calcify
                     }
                     else
                     {
-                        SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.Calcify)|*.Calcify|All Files (*.*)|*.*", FileName = "" };
+                        SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
                         if (saveFileDialog.ShowDialog() == true)
                         {
                             saveFile(saveFileDialog.FileName);
@@ -1677,14 +1677,14 @@ namespace Calcify
 
         private void CtrlO_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog { Filter = "Calcify File (*.Calcify)|*.Calcify|All Files (*.*)|*.*", FileName = "" };
+            OpenFileDialog openFileDialog = new OpenFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
             if (openFileDialog.ShowDialog() == true)
                 openFile(openFileDialog.FileName);
         }
 
         private void CtrlShiftS_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.Calcify)|*.Calcify|All Files (*.*)|*.*", FileName = documentPath != "" ? Path.GetFileNameWithoutExtension(documentPath) : "" };
+            SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = documentPath != "" ? Path.GetFileNameWithoutExtension(documentPath) : "" };
             if (saveFileDialog.ShowDialog() == true)
                 saveFile(saveFileDialog.FileName);
         }
@@ -1693,7 +1693,7 @@ namespace Calcify
         {
             if (documentPath == "")
             {
-                SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.Calcify)|*.Calcify|All Files (*.*)|*.*", FileName = "" };
+                SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
                 if (saveFileDialog.ShowDialog() == true)
                     saveFile(saveFileDialog.FileName);
             }
@@ -1777,6 +1777,7 @@ namespace Calcify
 //    - σ (Stefan-Boltzmann constant) >> add to docs (math-functions.md)
 //    - g (standard gravity) >> add to docs (math-functions.md)
 //  - implement variables
+//  - calculations within functions
 
 //  - Recent Files List
 //  - toolbar
@@ -1845,3 +1846,4 @@ namespace Calcify
 //  - Optimized data value conversion
 //  - Added Permutations and Combinations functions
 //  - time parts (today.year, today.month, today.day, today.dayOfWeek, now.hour, now.minute, now.second)
+//  - added inline tasks
