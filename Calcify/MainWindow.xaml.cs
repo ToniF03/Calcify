@@ -49,30 +49,14 @@ namespace Calcify
         Regex sqrtRegex = new Regex(@"\b(?<func>sqrt)\((?<variable1>(-)?\d+(\.\d+)?)\)(( )?|$)");
 
         Regex dateTimeKeyWordsRegex = new Regex(@"\b(?i)(now|time|yesterday|date|today|tomorrow)(?-i)\b");
-        Regex dateRegex = new Regex(@"^(\d{4}|\d{2})\/(\d{2}|\d)\/(\d{2}|\d)$");
-        Regex timeRegex = new Regex(@"^(\d{1,2}:\d{1,2}(:\d{1,2})?)?|\d{1,2}:\d{1,2}(:\d{1,2})$");
         Regex dateTimeRegex = new Regex(@"^(\d{2}(\d{2})?\/\d{1,2}\/\d{1,2}( \d{1,2}:\d{1,2}(:\d{1,2})?)?|\d{1,2}:\d{1,2}(:\d{1,2})?)$");
-        Regex dateTimeCalculationRegex = new Regex(@"^(\d{2}(\d{2})?\/\d{1,2}\/\d{1,2}( \d{1,2}:\d{1,2}(:\d{1,2})?)?|\d{1,2}:\d{1,2}(:\d{1,2})?)( (in|add|plus|\+|minus|remove|\-) \d+ (c|yr|mth|wk|d|h|min|s|(?i)(centur(y|ies)|decade(s)?|year(s)?|month(s)?|week(s)?|day(s)?|hour(s)?|minute(s)?|second(s)?)(?-i))|)*$");
         Regex PermutationRegex = new Regex(@"(?<n>\d+)C(?<r>\d+)");
         Regex calculatorRegex = new Regex(@"^((\d+(\.\d+)?)|\||(\+|\-|\*|\/|\^)(?!\+|\*|\/|\^|\!)|(|\(|\)|\!))*$");
         Regex constantsRegex;
         Regex sumAvgRegex;
-        Regex angleRegex;
-        Regex frequencyRegex;
         public Regex currencyRegex;
-        Regex dataSizeRegex;
-        Regex lengthRegex;
-        Regex temperatureRegex;
-        Regex massRegex;
-        Regex timeCalculationRegex;
-        Regex directRegex;
-        Regex directMassRegex;
-        Regex directTemperatureRegex;
-        Regex directTimeRegex;
-        Regex directLengthRegex;
-        Regex directDataSizeRegex;
-        Regex directFrequencyRegex;
-        Regex directAngleRegex;
+
+        Regex allUnitRegex;
         #endregion
         #region Document Informations
         public string documentPath = "";
@@ -103,9 +87,11 @@ namespace Calcify
         Dictionary<FrequencyUnit, string> frequencyExt = new Dictionary<FrequencyUnit, string>();
         Dictionary<LengthUnit, string> lengthExt = new Dictionary<LengthUnit, string>();
         Dictionary<MassUnit, string> massExt = new Dictionary<MassUnit, string>();
-        Dictionary<NumeralSystemUnit, string> numeralSystemExt = new Dictionary<NumeralSystemUnit, string>();
         Dictionary<TemperatureUnit, string> temperatureExt = new Dictionary<TemperatureUnit, string>();
         Dictionary<TimeUnit, string> timeExt = new Dictionary<TimeUnit, string>();
+
+        Dictionary<string, Enum> allUnitsDict = new Dictionary<string, Enum>();
+        Dictionary<Enum, string> allUnitsExt = new Dictionary<Enum, string>();
         #endregion
         private string oldTotalValue = "";
         private string windowTitle = "";
@@ -120,6 +106,7 @@ namespace Calcify
         public DialogWindow dialogWindow = null;
         public Settings settingsWindow = null;
 
+        private Dictionary<Type, Func<double, Enum, Enum, double>> converterDict = new Dictionary<Type, Func<double, Enum, Enum, double>>();
         #endregion
         #region UI
         #region Chrome
@@ -326,28 +313,14 @@ namespace Calcify
             #region RegexSettings 
             constantsRegex = new Regex(ConstantsPattern);
             sumAvgRegex = new Regex(@"\b(avg|sum)\b");
-            angleRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + AnglePattern + ") (in(to)?|to|as) (?<targetUnit>" + AnglePattern + ")$");
-            frequencyRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + FrequencyPattern + ") (in(to)?|to|as) (?<targetUnit>" + FrequencyPattern + ")$");
             currencyRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + CurrencyPattern + ") (in(to)?|to|as) (?<targetUnit>" + CurrencyPattern + ")$");
-            dataSizeRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + DataSizePattern + ") (in(to)?|to|as) (?<targetUnit>" + DataSizePattern + ")$");
-            lengthRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + LengthPattern + ") (in(to)?|to|as) (?<targetUnit>" + LengthPattern + ")$");
-            massRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + MassPattern + ") (in(to)?|to|as) (?<targetUnit>" + MassPattern + ")$");
-            temperatureRegex = new Regex(@"^\-?\d+(\.\d+)? " + TemperaturePattern + " (in(to)?|to|as) " + TemperaturePattern + "$");
-            timeCalculationRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + TimePattern + ") (in(to)?|to|as) (?<targetUnit>" + TimePattern + ")$");
-            directRegex = new Regex(@"^\-?\d+(\.\d+)? (" + CurrencyPattern + ")$");
-            directTemperatureRegex = new Regex(@"^\-?\d+(\.\d+)? (" + TemperaturePattern + ")$");
-            directMassRegex = new Regex(@"^\-?\d+(\.\d+)? " + MassPattern + "$");
-            directTimeRegex = new Regex(@"^\-?\d+(\.\d+)? " + TimePattern + "$");
-            directLengthRegex = new Regex(@"^\-?\d+(\.\d+)? " + LengthPattern + "$");
-            directFrequencyRegex = new Regex(@"^\-?\d+(\.\d+)? " + FrequencyPattern + "$");
-            directDataSizeRegex = new Regex(@"^\-?\d+(\.\d+)? " + DataSizePattern + "$");
-            directAngleRegex = new Regex(@"^\-?\d+(\.\d+)? " + AnglePattern + "$");
             #endregion
 
             this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
             this.MaxWidth = SystemParameters.MaximizedPrimaryScreenWidth;
             DropPanel.Visibility = Visibility.Visible;
             resultEditor.TextArea.Caret.CaretBrush = Brushes.Transparent;
+            allUnitRegex = new Regex(@"(?<value>-?\d+(\.\d+)?) (?<srcUnit>(" + Math.Units.Patterns.allUnitPatterns + ")) (in(to)?|to) (?<targetUnit>(" + Math.Units.Patterns.allUnitPatterns + "))");
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -412,6 +385,8 @@ namespace Calcify
                 DocumentLine line = mainEditor.Document.GetLineByNumber(i);
                 result = Calculate(mainEditor.Document.GetText(line.Offset, line.Length));
                 newDocument.Text = newDocument.Text + result + '\n';
+                foreach (Match m in allUnitRegex.Matches(mainEditor.Document.GetText(line.Offset, line.Length)))
+                    Console.WriteLine("Value: " + m.Groups["value"] + " ; Unit: " + m.Groups["srcUnit"]);
             }
             resultEditor.Document = newDocument;
         }
@@ -484,7 +459,7 @@ namespace Calcify
                     }
                     else
                     {
-                        SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.Calcify)|*.Calcify|All Files (*.*)|*.*", FileName = "" };
+                        SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
                         if (saveFileDialog.ShowDialog() == true)
                         {
                             saveFile(saveFileDialog.FileName);
@@ -660,14 +635,14 @@ namespace Calcify
 
         private void CalculateTotal()
         {
-            int summedLines;
+            /*int summedLines;
             int currentLineNumber = mainEditor.Document.GetLineByOffset(mainEditor.CaretOffset).LineNumber + 1;
             string s = CalculateSum(currentLineNumber, resultEditor.Document, out summedLines);
             if (summedLines != 0)
                 totalLabel.Content = "Total: " + s;
             else
                 totalLabel.Content = "";
-
+            */
         }
 
         private string Calculate(string input, bool acceptPrevious = true)
@@ -707,26 +682,28 @@ namespace Calcify
                 foreach (Match match in sumAvgRegex.Matches(input))
                     input = input.Replace(match.Value, "{/" + match.Value + "/}");
 
-            // Execute Angle Conversion
-            input = AngleCalculation(input);
+            if (allUnitRegex.IsMatch(input))
+            {
+                foreach (Match match in allUnitRegex.Matches(input))
+                {
+                    double value = double.Parse(match.Groups["value"].Value, CultureInfo.InvariantCulture);
+                    string srcUnitRaw = match.Groups["srcUnit"].Value;
+                    string targetUnitRaw = match.Groups["targetUnit"].Value;
+                    if (!srcUnitRaw.StartsWith("°") && srcUnitRaw.Length != 1) srcUnitRaw = srcUnitRaw.ToLower();
+                    else if (srcUnitRaw.StartsWith("°")) srcUnitRaw = srcUnitRaw.ToUpper();
+                    if (!targetUnitRaw.StartsWith("°") && targetUnitRaw.Length != 1) targetUnitRaw = targetUnitRaw.ToLower();
+                    else if (targetUnitRaw.StartsWith("°")) targetUnitRaw = targetUnitRaw.ToUpper();
+                    Enum srcUnit = allUnitsDict[srcUnitRaw];
+                    Enum targetUnit = allUnitsDict[targetUnitRaw];
+                    if (srcUnit.GetType() != targetUnit.GetType())
+                        continue;
+                    Type type = srcUnit.GetType();
+                    double convertedValue = converterDict[type].Invoke(value, srcUnit, targetUnit);
+                    input = input.Replace(match.Value, ToNumberString(System.Math.Round(convertedValue, Properties.Settings.Default.Digits)));
+                }
+            }
 
-            // Execute Frequency Conversion
-            input = FrequencyCalculation(input);
-
-            // Execute Currency Conversion
             input = CurrencyConversion(input);
-
-            // Execute DataSize Conversion
-            input = DataSizeConversion(input);
-
-            // Execute Length Conversion
-            input = LengthConversion(input);
-
-            // Execute Mass Conversion
-            input = MassConversion(input);
-
-            // Execute Temperature Conversion
-            input = TemperatureConversion(input);
 
             // Execute Calculation
             if (calculatorRegex.IsMatch(input))
@@ -1112,62 +1089,6 @@ namespace Calcify
         }
 
         /// <summary>
-        /// Converts angle expressions within the input string from one unit to another and returns the result as a
-        /// formatted string.
-        /// </summary>
-        /// <remarks>The method supports conversion between supported angle units as defined in the
-        /// application's configuration. The result is rounded to the number of digits specified in application
-        /// settings.</remarks>
-        /// <param name="input">The input string containing an angle expression to be converted. Leading and trailing whitespace is ignored.</param>
-        /// <returns>A string representing the converted angle value in the target unit, formatted according to application
-        /// settings. If no convertible angle expression is found, returns the trimmed input string.</returns>
-        private string AngleCalculation(string input)
-        {
-            input = input.Trim();
-            while (angleRegex.IsMatch(input))
-            {
-                Match match = angleRegex.Match(input);
-                double value = double.Parse(match.Groups["value"].Value);
-                AngleUnit targetUnit = angleDict[match.Groups["targetUnit"].Value];
-                AngleUnit srcUnit = angleDict[match.Groups["srcUnit"].Value];
-                if (targetUnit == srcUnit)
-                    return input.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + angleExt[targetUnit]);
-                value = Converter.AngleConverter(value, srcUnit, targetUnit);
-                return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + angleExt[targetUnit];
-
-            }
-            return input;
-        }
-
-        /// <summary>
-        /// Calculates and converts frequency values in the input string to the specified target unit, returning the
-        /// result as a formatted string.
-        /// </summary>
-        /// <remarks>The conversion uses application-specific formatting for numeric precision. Only the
-        /// first matching frequency pattern in the input is processed; additional patterns are ignored.</remarks>
-        /// <param name="input">The input string containing a frequency value and unit to be converted. The string should match the expected
-        /// frequency format; otherwise, it will be returned unchanged.</param>
-        /// <returns>A string representing the converted frequency value in the target unit, formatted according to application
-        /// settings. If the input does not match a frequency pattern, the original input string is returned.</returns>
-        private string FrequencyCalculation(string input)
-        {
-            input.Trim();
-            while (frequencyRegex.IsMatch(input))
-            {
-                Match match = frequencyRegex.Match(input);
-                double value = double.Parse(match.Groups["value"].Value);
-                FrequencyUnit targetUnit = frequencyDict[match.Groups["targetUnit"].Value.ToLower()];
-                FrequencyUnit srcUnit = frequencyDict[match.Groups["srcUnit"].Value.ToLower()];
-                if (targetUnit == srcUnit)
-                    return input.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + frequencyExt[targetUnit]);
-                value = Converter.FrequencyConverter(value, srcUnit, targetUnit);
-                return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + frequencyExt[targetUnit];
-
-            }
-            return input;
-        }
-
-        /// <summary>
         /// Converts currency values found in the input string from one unit to another using predefined exchange rates.
         /// </summary>
         /// <remarks>Currency conversion is performed using exchange rates defined in the internal
@@ -1204,118 +1125,6 @@ namespace Calcify
             return input;
         }
 
-        /// <summary>
-        /// Converts a data size expression within the input string from one unit to another and returns the result as a
-        /// formatted string.
-        /// </summary>
-        /// <remarks>The method supports conversion between recognized data size units as defined in the
-        /// application's configuration. The number of decimal digits in the result is determined by the current
-        /// settings. If the source and target units are the same, the value is rounded and formatted without
-        /// conversion.</remarks>
-        /// <param name="input">The input string containing a data size expression to convert. The expression should specify both the source
-        /// and target units (e.g., "10 MB to KB").</param>
-        /// <returns>A string with the converted data size value and unit. If no valid data size expression is found, returns the
-        /// original input string unchanged.</returns>
-        private string DataSizeConversion(string input)
-        {
-            input.Trim();
-            while (dataSizeRegex.IsMatch(input))
-            {
-                Match match = dataSizeRegex.Match(input);
-                double value = double.Parse(match.Groups["value"].Value, CultureInfo.InvariantCulture);
-                DataSizeUnit targetUnit = dataSizeDict[match.Groups["targetUnit"].Value.ToLower()];
-                DataSizeUnit srcUnit = dataSizeDict[match.Groups["srcUnit"].Value.ToLower()];
-                if (targetUnit == srcUnit)
-                    return input.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + dataSizeExt[targetUnit]);
-                value = Converter.DataSizeConverter(value, srcUnit, targetUnit);
-                return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + dataSizeExt[targetUnit];
-            }
-            return input;
-        }
-
-        /// <summary>
-        /// Converts a length value in the input string from one unit to another, replacing the matched value with its
-        /// converted equivalent.
-        /// </summary>
-        /// <remarks>If the source and target units are the same, the value is rounded and formatted
-        /// without conversion. The conversion uses the number of digits specified in application settings for rounding.
-        /// If no valid length conversion pattern is detected, the input is returned unchanged.</remarks>
-        /// <param name="input">The input string containing a length value and units to be converted. The string must include both source
-        /// and target units in a recognizable format.</param>
-        /// <returns>A string with the length value converted to the target unit if a valid conversion pattern is found;
-        /// otherwise, returns the original input string.</returns>
-        private string LengthConversion(string input)
-        {
-            input.Trim();
-            while (lengthRegex.IsMatch(input))
-            {
-                Match match = lengthRegex.Match(input);
-                double value = double.Parse(match.Groups["value"].Value, CultureInfo.InvariantCulture);
-                LengthUnit targetUnit = lengthDict[match.Groups["targetUnit"].Value.ToLower()];
-                LengthUnit srcUnit = lengthDict[match.Groups["srcUnit"].Value.ToLower()];
-                if (targetUnit == srcUnit)
-                    return input.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + lengthExt[targetUnit]);
-                value = Converter.LengthConverter(value, srcUnit, targetUnit);
-                return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + lengthExt[targetUnit];
-            }
-            return input;
-        }
-
-        /// <summary>
-        /// Converts mass values in the specified input string from one unit to another, replacing recognized mass
-        /// expressions with their converted equivalents.
-        /// </summary>
-        /// <remarks>Only mass expressions matching the expected pattern are converted. If the source and
-        /// target units are the same, the value is rounded and formatted without conversion. The method does not modify
-        /// the input string if no valid mass expressions are detected.</remarks>
-        /// <param name="input">The input string containing mass values and units to be converted. The string should include mass
-        /// expressions in a supported format.</param>
-        /// <returns>A string with mass values converted to the target units. If no mass expressions are found, returns the
-        /// original input string.</returns>
-        private string MassConversion(string input)
-        {
-            input.Trim();
-            while (massRegex.IsMatch(input))
-            {
-                Match match = massRegex.Match(input);
-                double value = double.Parse(match.Groups["value"].Value, CultureInfo.InvariantCulture);
-                MassUnit targetUnit = massDict[match.Groups["targetUnit"].Value.ToLower()];
-                MassUnit srcUnit = massDict[match.Groups["srcUnit"].Value.ToLower()];
-                if (targetUnit == srcUnit)
-                    return input.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + massExt[targetUnit]);
-                value = Converter.MassConverter(value, srcUnit, targetUnit);
-                return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + massExt[targetUnit];
-            }
-            return input;
-        }
-
-        /// <summary>
-        /// Converts a temperature value in the input string from one unit to another, if a valid temperature conversion
-        /// pattern is detected.
-        /// </summary>
-        /// <remarks>If the input string does not match a recognized temperature conversion pattern, the
-        /// method returns the input unchanged. The conversion uses the number of digits specified in application
-        /// settings for rounding. Supported units and formats depend on the application's configuration.</remarks>
-        /// <param name="input">The input string containing a temperature value and units to convert. The string should match the expected
-        /// temperature conversion format.</param>
-        /// <returns>A string with the converted temperature value and target unit if a valid conversion pattern is found;
-        /// otherwise, returns the original input string.</returns>
-        private string TemperatureConversion(string input)
-        {
-            input.Trim();
-            while (temperatureRegex.IsMatch(input))
-            {
-                Match match = temperatureRegex.Match(input);
-                double value = double.Parse(match.Groups["value"].Value, CultureInfo.InvariantCulture);
-                TemperatureUnit targetUnit = temperatureDict[match.Groups["targetUnit"].Value.ToLower()];
-                TemperatureUnit srcUnit = temperatureDict[match.Groups["srcUnit"].Value.ToLower()];
-                if (targetUnit == srcUnit)
-                    return input.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + temperatureExt[targetUnit]);
-                value = Converter.TemperatureConverter(value, srcUnit, targetUnit);
-                return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + temperatureExt[targetUnit];
-            }
-            return input;
-        }
 
         /// <summary>
         /// Parses a calculation expression from the specified input string and returns the computed result as a
@@ -1585,225 +1394,110 @@ namespace Calcify
             return valString;
         }
 
+        /// <summary>
+        /// Associates an enumeration value with a display name and a set of synonym strings for lookup purposes.
+        /// </summary>
+        /// <remarks>This method enables flexible lookup of enumeration values by allowing multiple
+        /// synonyms and a display name to be mapped to a single value. Synonyms should be unique within the context to
+        /// avoid key collisions.</remarks>
+        /// <typeparam name="T">The enumeration type to associate with the display name and synonyms. Must be derived from <see
+        /// cref="Enum"/>.</typeparam>
+        /// <param name="enumValue">The enumeration value to register.</param>
+        /// <param name="display">The display name to associate with the enumeration value.</param>
+        /// <param name="synonyms">An array of synonym strings that can be used to reference the enumeration value.</param>
+        private void AddUnit<T>(T enumValue, string display, params string[] synonyms) where T : Enum
+        {
+            var e = (Enum)(object)enumValue;
+            foreach (var s in synonyms)
+                allUnitsDict.Add(s, e);
+            allUnitsExt.Add(e, display);
+        }
+
         private void setUpDictionaries()
         {
             // Temperatures
-            temperatureDict.Add("K", TemperatureUnit.Kelvin);
-            temperatureDict.Add("°F", TemperatureUnit.Fahrenheit);
-            temperatureDict.Add("°C", TemperatureUnit.Celsius);
-            temperatureDict.Add("°RE", TemperatureUnit.Reaumur);
-            temperatureDict.Add("°R", TemperatureUnit.Rankine);
-            temperatureDict.Add("°RA", TemperatureUnit.Rankine);
+            AddUnit(TemperatureUnit.Kelvin, "K", "K");
+            AddUnit(TemperatureUnit.Fahrenheit, "°F", "°F");
+            AddUnit(TemperatureUnit.Celsius, "°C", "°C");
+            AddUnit(TemperatureUnit.Reaumur, "°Re", "°RE");
+            AddUnit(TemperatureUnit.Rankine, "°R", "°R", "°RA");
 
-            temperatureExt.Add(TemperatureUnit.Reaumur, "°Re");
-            temperatureExt.Add(TemperatureUnit.Rankine, "°Ra");
-            temperatureExt.Add(TemperatureUnit.Kelvin, "K");
-            temperatureExt.Add(TemperatureUnit.Celsius, "°C");
-            temperatureExt.Add(TemperatureUnit.Fahrenheit, "°F");
             // Time
-            timeDict.Add("c", TimeUnit.Century);
-            timeDict.Add("century", TimeUnit.Century);
-            timeDict.Add("centuries", TimeUnit.Century);
-            timeDict.Add("decades", TimeUnit.Decade);
-            timeDict.Add("decade", TimeUnit.Decade);
-            timeDict.Add("years", TimeUnit.Year);
-            timeDict.Add("year", TimeUnit.Year);
-            timeDict.Add("yrs", TimeUnit.Year);
-            timeDict.Add("yr", TimeUnit.Year);
-            timeDict.Add("mth", TimeUnit.Month);
-            timeDict.Add("month", TimeUnit.Month);
-            timeDict.Add("months", TimeUnit.Month);
-            timeDict.Add("weeks", TimeUnit.Week);
-            timeDict.Add("week", TimeUnit.Week);
-            timeDict.Add("wk", TimeUnit.Week);
-            timeDict.Add("d", TimeUnit.Day);
-            timeDict.Add("day", TimeUnit.Day);
-            timeDict.Add("days", TimeUnit.Day);
-            timeDict.Add("hours", TimeUnit.Hour);
-            timeDict.Add("hour", TimeUnit.Hour);
-            timeDict.Add("h", TimeUnit.Hour);
-            timeDict.Add("min", TimeUnit.Minute);
-            timeDict.Add("minute", TimeUnit.Minute);
-            timeDict.Add("minutes", TimeUnit.Minute);
-            timeDict.Add("seconds", TimeUnit.Second);
-            timeDict.Add("second", TimeUnit.Second);
-            timeDict.Add("sec", TimeUnit.Second);
-            timeDict.Add("s", TimeUnit.Second);
-            timeDict.Add("ms", TimeUnit.Millisecond);
-            timeDict.Add("millisecond", TimeUnit.Millisecond);
-            timeDict.Add("milliseconds", TimeUnit.Millisecond);
-            timeDict.Add("microseconds", TimeUnit.Microsecond);
-            timeDict.Add("microsecond", TimeUnit.Microsecond);
-            timeDict.Add("μs", TimeUnit.Microsecond);
-            timeDict.Add("µs", TimeUnit.Microsecond);
-            timeDict.Add("ns", TimeUnit.Nanosecond);
-            timeDict.Add("nanosecond", TimeUnit.Nanosecond);
-            timeDict.Add("nanoseconds", TimeUnit.Nanosecond);
+            AddUnit(TimeUnit.Century, "century", "c", "century", "centuries");
+            AddUnit(TimeUnit.Decade, "decade", "decade", "decades");
+            AddUnit(TimeUnit.Year, "year", "year", "years", "yr", "yrs");
+            AddUnit(TimeUnit.Month, "month", "month", "months", "mth");
+            AddUnit(TimeUnit.Week, "week", "week", "weeks", "wk");
+            AddUnit(TimeUnit.Day, "day", "day", "days", "d");
+            AddUnit(TimeUnit.Hour, "h", "h", "hour", "hours");
+            AddUnit(TimeUnit.Minute, "min", "min", "minute", "minutes");
+            AddUnit(TimeUnit.Second, "s", "s", "sec", "second", "seconds");
+            AddUnit(TimeUnit.Millisecond, "ms", "ms", "millisecond", "milliseconds");
+            AddUnit(TimeUnit.Microsecond, "µs", "µs", "μs", "microsecond", "microseconds");
+            AddUnit(TimeUnit.Nanosecond, "ns", "ns", "nanosecond", "nanoseconds");
 
-            timeExt.Add(TimeUnit.Century, "century");
-            timeExt.Add(TimeUnit.Decade, "decade");
-            timeExt.Add(TimeUnit.Year, "year");
-            timeExt.Add(TimeUnit.Month, "month");
-            timeExt.Add(TimeUnit.Week, "week");
-            timeExt.Add(TimeUnit.Day, "day");
-            timeExt.Add(TimeUnit.Hour, "h");
-            timeExt.Add(TimeUnit.Minute, "min");
-            timeExt.Add(TimeUnit.Second, "s");
-            timeExt.Add(TimeUnit.Millisecond, "ms");
-            timeExt.Add(TimeUnit.Microsecond, "µs");
-            timeExt.Add(TimeUnit.Nanosecond, "ns");
             // Mass
-            massDict.Add("tons", MassUnit.Ton);
-            massDict.Add("ton", MassUnit.Ton);
-            massDict.Add("t", MassUnit.Ton);
-            massDict.Add("kg", MassUnit.Kilogram);
-            massDict.Add("kilogram", MassUnit.Kilogram);
-            massDict.Add("kilograms", MassUnit.Kilogram);
-            massDict.Add("grams", MassUnit.Gram);
-            massDict.Add("gram", MassUnit.Gram);
-            massDict.Add("g", MassUnit.Gram);
-            massDict.Add("milligrams", MassUnit.Milligram);
-            massDict.Add("milligram", MassUnit.Milligram);
-            massDict.Add("mg", MassUnit.Milligram);
-            massDict.Add("micrograms", MassUnit.Microgram);
-            massDict.Add("microgram", MassUnit.Microgram);
-            massDict.Add("µg", MassUnit.Microgram);
-            massDict.Add("μg", MassUnit.Microgram);
-            massDict.Add("long tons", MassUnit.LongTon);
-            massDict.Add("long ton", MassUnit.LongTon);
-            massDict.Add("lt", MassUnit.LongTon);
-            massDict.Add("short ton", MassUnit.ShortTon);
-            massDict.Add("short tons", MassUnit.ShortTon);
-            massDict.Add("tn", MassUnit.ShortTon);
-            massDict.Add("st", MassUnit.Stone);
-            massDict.Add("stone", MassUnit.Stone);
-            massDict.Add("stones", MassUnit.Stone);
-            massDict.Add("pounds", MassUnit.Pounds);
-            massDict.Add("pound", MassUnit.Pounds);
-            massDict.Add("lbs", MassUnit.Pounds);
-            massDict.Add("lb", MassUnit.Pounds);
-            massDict.Add("oz", MassUnit.Ounce);
-            massDict.Add("oz.", MassUnit.Ounce);
-            massDict.Add("ounce", MassUnit.Ounce);
-            massDict.Add("ounces", MassUnit.Ounce);
+            AddUnit(MassUnit.Ton, "t", "tons", "ton", "t");
+            AddUnit(MassUnit.Kilogram, "kg", "kg", "kilogram", "kilograms");
+            AddUnit(MassUnit.Gram, "g", "grams", "gram", "g");
+            AddUnit(MassUnit.Milligram, "mg", "milligrams", "milligram", "mg");
+            AddUnit(MassUnit.Microgram, "μg", "micrograms", "microgram", "µg", "μg");
+            AddUnit(MassUnit.LongTon, "lt", "long tons", "long ton", "lt");
+            AddUnit(MassUnit.ShortTon, "tn", "short ton", "short tons", "tn");
+            AddUnit(MassUnit.Stone, "st", "st", "stone", "stones");
+            AddUnit(MassUnit.Pounds, "lb", "pounds", "pound", "lbs", "lb");
+            AddUnit(MassUnit.Ounce, "oz.", "oz", "oz.", "ounce", "ounces");
 
-            massExt.Add(MassUnit.Ton, "t");
-            massExt.Add(MassUnit.Kilogram, "kg");
-            massExt.Add(MassUnit.Gram, "g");
-            massExt.Add(MassUnit.Milligram, "mg");
-            massExt.Add(MassUnit.Microgram, "μg");
-            massExt.Add(MassUnit.LongTon, "lt");
-            massExt.Add(MassUnit.ShortTon, "tn");
-            massExt.Add(MassUnit.Stone, "st");
-            massExt.Add(MassUnit.Pounds, "lb");
-            massExt.Add(MassUnit.Ounce, "oz.");
             // Length
-            lengthDict.Add("nanometer", LengthUnit.Nanometer);
-            lengthDict.Add("nm", LengthUnit.Nanometer);
-            lengthDict.Add("μm", LengthUnit.Nanometer);
-            lengthDict.Add("µm", LengthUnit.Nanometer);
-            lengthDict.Add("mm", LengthUnit.Millimeter);
-            lengthDict.Add("millimeter", LengthUnit.Millimeter);
-            lengthDict.Add("centimeter", LengthUnit.Centimeter);
-            lengthDict.Add("cm", LengthUnit.Centimeter);
-            lengthDict.Add("dm", LengthUnit.Decimeter);
-            lengthDict.Add("decimeter", LengthUnit.Decimeter);
-            lengthDict.Add("meter", LengthUnit.Meter);
-            lengthDict.Add("m", LengthUnit.Meter);
-            lengthDict.Add("km", LengthUnit.Kilometer);
-            lengthDict.Add("kilometer", LengthUnit.Kilometer);
-            lengthDict.Add("decameter", LengthUnit.Decameter);
-            lengthDict.Add("dam", LengthUnit.Decameter);
-            lengthDict.Add("hm", LengthUnit.Hectometer);
-            lengthDict.Add("hectometer", LengthUnit.Hectometer);
-            lengthDict.Add("miles", LengthUnit.Mile);
-            lengthDict.Add("mile", LengthUnit.Mile);
-            lengthDict.Add("mi", LengthUnit.Mile);
-            lengthDict.Add("yd", LengthUnit.Yard);
-            lengthDict.Add("yard", LengthUnit.Yard);
-            lengthDict.Add("foot", LengthUnit.Feet);
-            lengthDict.Add("feet", LengthUnit.Feet);
-            lengthDict.Add("ft", LengthUnit.Feet);
-            lengthDict.Add("in", LengthUnit.Inch);
-            lengthDict.Add("inch", LengthUnit.Inch);
+            AddUnit(LengthUnit.Nanometer, "nm", "nanometer", "nm", "μm", "µm");
+            AddUnit(LengthUnit.Micrometer, "μm", "micrometer", "μm", "µm");
+            AddUnit(LengthUnit.Millimeter, "mm", "millimeter", "mm");
+            AddUnit(LengthUnit.Centimeter, "cm", "centimeter", "cm");
+            AddUnit(LengthUnit.Decimeter, "dm", "decimeter", "dm");
+            AddUnit(LengthUnit.Meter, "m", "meter", "m");
+            AddUnit(LengthUnit.Kilometer, "km", "kilometer", "km");
+            AddUnit(LengthUnit.Decameter, "dam", "decameter", "dam");
+            AddUnit(LengthUnit.Hectometer, "hm", "hectometer", "hm");
+            AddUnit(LengthUnit.Mile, "mi", "mile", "miles", "mi");
+            AddUnit(LengthUnit.Yard, "yd", "yard", "yd");
+            AddUnit(LengthUnit.Feet, "ft", "foot", "feet", "ft");
+            AddUnit(LengthUnit.Inch, "in", "inch", "in");
 
-            lengthExt.Add(LengthUnit.Nanometer, "nm");
-            lengthExt.Add(LengthUnit.Micrometer, "μm");
-            lengthExt.Add(LengthUnit.Millimeter, "mm");
-            lengthExt.Add(LengthUnit.Centimeter, "cm");
-            lengthExt.Add(LengthUnit.Decimeter, "dm");
-            lengthExt.Add(LengthUnit.Meter, "m");
-            lengthExt.Add(LengthUnit.Kilometer, "km");
-            lengthExt.Add(LengthUnit.Decameter, "dam");
-            lengthExt.Add(LengthUnit.Hectometer, "hm");
-            lengthExt.Add(LengthUnit.Mile, "mi");
-            lengthExt.Add(LengthUnit.Yard, "yd");
-            lengthExt.Add(LengthUnit.Feet, "ft");
-            lengthExt.Add(LengthUnit.Inch, "in");
             // Frequency
-            frequencyDict.Add("hertz", FrequencyUnit.Hertz);
-            frequencyDict.Add("hz", FrequencyUnit.Hertz);
-            frequencyDict.Add("khz", FrequencyUnit.Kilohertz);
-            frequencyDict.Add("kilohertz", FrequencyUnit.Kilohertz);
-            frequencyDict.Add("megahertz", FrequencyUnit.Megahertz);
-            frequencyDict.Add("mhz", FrequencyUnit.Megahertz);
-            frequencyDict.Add("ghz", FrequencyUnit.Gigahertz);
-            frequencyDict.Add("gigahertz", FrequencyUnit.Gigahertz);
+            AddUnit(FrequencyUnit.Hertz, "Hz", "hz", "hertz");
+            AddUnit(FrequencyUnit.Kilohertz, "kHz", "khz", "kilohertz");
+            AddUnit(FrequencyUnit.Megahertz, "MHz", "mhz", "megahertz");
+            AddUnit(FrequencyUnit.Gigahertz, "GHz", "ghz", "gigahertz");
 
-            frequencyExt.Add(FrequencyUnit.Hertz, "Hz");
-            frequencyExt.Add(FrequencyUnit.Kilohertz, "kHz");
-            frequencyExt.Add(FrequencyUnit.Megahertz, "MHz");
-            frequencyExt.Add(FrequencyUnit.Gigahertz, "GHz");
             // Data size
-            dataSizeDict.Add("b", DataSizeUnit.Bit);
-            dataSizeDict.Add("bit", DataSizeUnit.Bit);
-            dataSizeDict.Add("B", DataSizeUnit.Byte);
-            dataSizeDict.Add("byte", DataSizeUnit.Byte);
-            dataSizeDict.Add("kb", DataSizeUnit.Kilobyte);
-            dataSizeDict.Add("mb", DataSizeUnit.Megabyte);
-            dataSizeDict.Add("gb", DataSizeUnit.Gigabyte);
-            dataSizeDict.Add("tb", DataSizeUnit.Terabyte);
-            dataSizeDict.Add("pb", DataSizeUnit.Petabyte);
-            dataSizeDict.Add("eb", DataSizeUnit.Exabyte);
-            dataSizeDict.Add("kilobyte", DataSizeUnit.Kilobyte);
-            dataSizeDict.Add("megabyte", DataSizeUnit.Megabyte);
-            dataSizeDict.Add("gigabyte", DataSizeUnit.Gigabyte);
-            dataSizeDict.Add("terabyte", DataSizeUnit.Terabyte);
-            dataSizeDict.Add("petabyte", DataSizeUnit.Petabyte);
-            dataSizeDict.Add("exabyte", DataSizeUnit.Exabyte);
+            AddUnit(DataSizeUnit.Bit, "b", "b", "bit", "bits");
+            AddUnit(DataSizeUnit.Byte, "B", "B", "byte", "bytes");
+            AddUnit(DataSizeUnit.Kilobyte, "KB", "kb", "kilobyte", "kilobytes");
+            AddUnit(DataSizeUnit.Megabyte, "MB", "mb", "megabyte", "megabytes");
+            AddUnit(DataSizeUnit.Gigabyte, "GB", "gb", "gigabyte", "gigabytes");
+            AddUnit(DataSizeUnit.Terabyte, "TB", "tb", "terabyte", "terabytes");
+            AddUnit(DataSizeUnit.Petabyte, "PB", "pb", "petabyte", "petabytes");
+            AddUnit(DataSizeUnit.Exabyte, "EB", "eb", "exabyte", "exabytes");
 
-            dataSizeExt.Add(DataSizeUnit.Bit, "b");
-            dataSizeExt.Add(DataSizeUnit.Byte, "B");
-            dataSizeExt.Add(DataSizeUnit.Kilobyte, "KB");
-            dataSizeExt.Add(DataSizeUnit.Megabyte, "MB");
-            dataSizeExt.Add(DataSizeUnit.Gigabyte, "GB");
-            dataSizeExt.Add(DataSizeUnit.Terabyte, "TB");
-            dataSizeExt.Add(DataSizeUnit.Petabyte, "PB");
-            dataSizeExt.Add(DataSizeUnit.Exabyte, "EB");
             // Angle
-            angleDict.Add("gradian", AngleUnit.Gradian);
-            angleDict.Add("gon", AngleUnit.Gradian);
-            angleDict.Add("grad", AngleUnit.Gradian);
-            angleDict.Add("degree", AngleUnit.Degree);
-            angleDict.Add("deg", AngleUnit.Degree);
-            angleDict.Add("°", AngleUnit.Degree);
-            angleDict.Add("milliradian", AngleUnit.Milliradian);
-            angleDict.Add("mil", AngleUnit.Milliradian);
-            angleDict.Add("radian", AngleUnit.Radian);
-            angleDict.Add("rad", AngleUnit.Radian);
-            angleDict.Add("angular minutes", AngleUnit.AngularMinute);
-            angleDict.Add("angular minute", AngleUnit.AngularMinute);
-            angleDict.Add("arcmin", AngleUnit.AngularMinute);
-            angleDict.Add("arcsec", AngleUnit.AngularSecond);
-            angleDict.Add("angular second", AngleUnit.AngularSecond);
-            angleDict.Add("angular seconds", AngleUnit.AngularSecond);
+            AddUnit(AngleUnit.Gradian, "gon", "gradian", "gon", "grad");
+            AddUnit(AngleUnit.Degree, "deg", "degree", "deg", "°");
+            AddUnit(AngleUnit.Milliradian, "mil", "milliradian", "mil");
+            AddUnit(AngleUnit.Radian, "rad", "radian", "rad");
+            AddUnit(AngleUnit.AngularMinute, "arcmin", "angular minutes", "angular minute", "arcmin");
+            AddUnit(AngleUnit.AngularSecond, "arcsec", "arcsec", "angular second", "angular seconds");
 
-            angleExt.Add(AngleUnit.Gradian, "gon");
-            angleExt.Add(AngleUnit.Degree, "deg");
-            angleExt.Add(AngleUnit.Milliradian, "mil");
-            angleExt.Add(AngleUnit.Radian, "rad");
-            angleExt.Add(AngleUnit.AngularMinute, "arcmin");
-            angleExt.Add(AngleUnit.AngularSecond, "arcsec");
+            converterDict = new Dictionary<Type, Func<double, Enum, Enum, double>>
+            {
+                { typeof(MassUnit), (val, current, target) => Converter.MassConverter(val, (MassUnit)current, (MassUnit)target) },
+                { typeof(DataSizeUnit), (val, current, target) => Converter.DataSizeConverter(val, (DataSizeUnit)current, (DataSizeUnit)target) },
+                { typeof(FrequencyUnit), (val, current, target) => Converter.FrequencyConverter(val, (FrequencyUnit)current, (FrequencyUnit)target) },
+                { typeof(LengthUnit), (val, current, target) => Converter.LengthConverter(val, (LengthUnit)current, (LengthUnit)target) },
+                { typeof(AngleUnit), (val, current, target) => Converter.AngleConverter(val, (AngleUnit)current, (AngleUnit)target) },
+                { typeof(TimeUnit), (val, current, target) => Converter.TimeConverter(val, (TimeUnit)current, (TimeUnit)target) },
+                { typeof(TemperatureUnit), (val, current, target) => Converter.TemperatureConverter(val, (TemperatureUnit)current, (TemperatureUnit)target) }
+            };
+
         }
 
         private void UpdateSyntaxHighlighting()
@@ -2134,7 +1828,6 @@ namespace Calcify
 //  - multiple conversions (100 cm to m to feet)
 //  - ask to save when drag and dropped
 //  - currency calculation
-//  - time parts (today.year, today.month, today.day, today.dayOfWeek, now.hour, now.minute, now.second)
 //  - time difference (today - tomorrow, now - 09:00)
 //  - maybe update architecture.md
 //  - Time Formats (now.format("HH:mm:ss"), today.format("yyyy-MM-dd"))
@@ -2151,3 +1844,4 @@ namespace Calcify
 //  - Toggle theme button toolbar
 //  - Optimized data value conversion
 //  - Added Permutations and Combinations functions
+//  - time parts (today.year, today.month, today.day, today.dayOfWeek, now.hour, now.minute, now.second)

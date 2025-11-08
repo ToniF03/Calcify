@@ -31,6 +31,7 @@ namespace Calcify.Math.Units
         public static readonly string LengthPattern = @"(\b(nm|mm|cm|dm|km|dam|hm|mi|m|yd|ft|in)\b|\b(?i)(nanometer|millimeter|centimeter|decimeter|kilometer|decameter|hectometer|meter|mile(s)?|yard|foot|feet|inch)(?-i)\b)";
         public static readonly string AnglePattern = @"(°|( |\b)(?i)(gon|grad|deg|mil|rad|arcmin|arcsec|gradian|degree|milliradian|radian|angular minute(s)?|angular second(s)?)(?-i)\b)";
         public static readonly string FrequencyPattern = @"((k|M|G)?Hz|(?i)((kilo|mega|giga)?hertz)(?-i))";
+        public static readonly string allUnitPatterns = MassPattern + "|" + TemperaturePattern + "|" + DataSizePattern + "|" + TimePattern + "|" + LengthPattern + "|" + AnglePattern + "|" + FrequencyPattern;
     }
 }
 namespace Calcify.Math.Conversion
