@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Calcify.Classes.Math.Conversion.Angle
+﻿namespace Calcify.Classes.Math.Conversion.Angle
 {
     /// <summary>
     /// Provides static methods for converting angular minutes to other units of angular measurement, such as degrees,
