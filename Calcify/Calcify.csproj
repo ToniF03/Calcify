@@ -109,6 +109,7 @@
     <Compile Include="Classes\Math\Conversion\Converter.cs" />
     <Compile Include="Classes\Math\Conversion\DataSize\Bit.cs" />
     <Compile Include="Classes\Math\Conversion\DataSize\Byte.cs" />
+    <Compile Include="Classes\Math\Conversion\DataSize\Gigabyte.cs" />
     <Compile Include="Classes\Math\Conversion\DataSize\Kilobyte.cs" />
     <Compile Include="Classes\Math\Conversion\DataSize\Megabyte.cs" />
     <Compile Include="Classes\Math\Conversion\Enum.cs" />
