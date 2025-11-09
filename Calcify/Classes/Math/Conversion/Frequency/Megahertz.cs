@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Calcify.Classes.Math.Conversion.Frequency
+﻿namespace Calcify.Classes.Math.Conversion.Frequency
 {
     /// <summary>
     /// Provides static methods for converting frequency values from megahertz (MHz) to other units of frequency,

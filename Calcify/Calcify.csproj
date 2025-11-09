@@ -116,6 +116,7 @@
     <Compile Include="Classes\Math\Conversion\DataSize\Petabyte.cs" />
     <Compile Include="Classes\Math\Conversion\DataSize\Terabyte.cs" />
     <Compile Include="Classes\Math\Conversion\Enum.cs" />
+    <Compile Include="Classes\Math\Conversion\Frequency\Gigahertz.cs" />
     <Compile Include="Classes\Math\Conversion\Frequency\Hertz.cs" />
     <Compile Include="Classes\Math\Conversion\Frequency\Kilohertz.cs" />
     <Compile Include="Classes\Math\Conversion\Frequency\Megahertz.cs" />
