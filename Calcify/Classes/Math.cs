@@ -4,24 +4,35 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Calcify
+namespace Calcify.Math
 {
-    public static class Extensions
+    /// <summary>
+    /// Provides mathematical constants used throughout the application.
+    /// </summary>
+    /// <remarks>This class contains commonly used mathematical constants as static readonly fields for
+    /// convenience and consistency. All members are thread-safe and can be accessed without instantiating the
+    /// class.</remarks>
+    public static class Constants
     {
-        public static IEnumerable<string> Split(this string str, int n)
-        {
-            if (String.IsNullOrEmpty(str) || n < 1)
-            {
-                throw new ArgumentException();
-            }
-
-            return Enumerable.Range(0, str.Length / n)
-                            .Select(i => str.Substring(i * n, n));
-        }
+        /// <summary>
+        /// Represents the value of the negative golden ratio constant (approximately -0.618).
+        /// </summary>
+        /// <remarks>The negative golden ratio, often denoted as Phi, is defined as (1 - √5) / 2. It is
+        /// commonly used in mathematics, geometry, and design for its unique properties related to proportions and
+        /// aesthetics.</remarks>
+        public static readonly double Phi = (1 - System.Math.Sqrt(5)) / 2;
     }
 }
 namespace Calcify.Math.Units
 {
+    /// <summary>
+    /// Provides regular expression patterns for matching common measurement units such as mass, temperature, data size,
+    /// time, length, angle, and frequency.
+    /// </summary>
+    /// <remarks>These patterns can be used to identify and extract unit names and abbreviations from text.
+    /// Each pattern is designed to match a variety of formats and synonyms for the respective unit type. The patterns
+    /// are intended for use in parsing or validating user input, data extraction, or similar scenarios where
+    /// recognition of measurement units is required.</remarks>
     public static class Patterns
     {
         public static readonly string MassPattern = @"(\b((?i)(ton(s)?|kilogram|gram|milligram|microgram|long ton|short ton|stone(s)?|pound(s)?|ounce)(?-i)|(t|kg|g|mg|µg|μg|lt|tn|st|lb(s)?))\b|oz\.?)";
@@ -36,6 +47,12 @@ namespace Calcify.Math.Units
 }
 namespace Calcify.Math.Conversion
 {
+    /// <summary>
+    /// Specifies the units of measurement for angles, such as degrees, radians, or gradians.
+    /// </summary>
+    /// <remarks>Use this enumeration to indicate the unit in which an angle value is expressed or to convert
+    /// between different angle units. The <see cref="AngleUnit.None"/> value represents an unspecified or unknown unit
+    /// and should be used when the unit is not applicable or not provided.</remarks>
     public enum AngleUnit
     {
         Gradian,
@@ -46,6 +63,13 @@ namespace Calcify.Math.Conversion
         AngularSecond,
         None
     }
+    /// <summary>
+    /// Specifies units of digital data size for representing quantities such as bits, bytes, and larger multiples.
+    /// </summary>
+    /// <remarks>Use this enumeration to indicate the unit of measurement when working with data sizes in
+    /// storage, transmission, or processing contexts. The values range from individual bits and bytes to larger units
+    /// such as kilobytes, megabytes, gigabytes, terabytes, petabytes, and exabytes. The <see cref="DataSizeUnit.None"/>
+    /// value represents an unspecified or unknown unit.</remarks>
     public enum DataSizeUnit
     {
         Bit,
@@ -58,6 +82,12 @@ namespace Calcify.Math.Conversion
         Exabyte,
         None
     }
+    /// <summary>
+    /// Specifies units of frequency measurement, such as hertz, kilohertz, megahertz, or gigahertz.
+    /// </summary>
+    /// <remarks>Use this enumeration to indicate the unit of frequency for values or calculations involving
+    /// periodic signals, oscillations, or other frequency-based measurements. The <see cref="FrequencyUnit.None"/>
+    /// value represents an unspecified or unknown unit.</remarks>
     public enum FrequencyUnit
     {
         Hertz,
@@ -66,6 +96,12 @@ namespace Calcify.Math.Conversion
         Gigahertz,
         None
     }
+    /// <summary>
+    /// Specifies the units of length supported by the application.
+    /// </summary>
+    /// <remarks>This enumeration provides a standardized set of length units for representing and converting
+    /// measurements. The values range from nanometers to miles, including both metric and imperial units. The <see
+    /// cref="LengthUnit.None"/> value indicates that no unit is specified or applicable.</remarks>
     public enum LengthUnit
     {
         Nanometer,
@@ -83,6 +119,12 @@ namespace Calcify.Math.Conversion
         Inch,
         None
     }
+    /// <summary>
+    /// Specifies units of mass for measurement and conversion operations.
+    /// </summary>
+    /// <remarks>Use this enumeration to indicate the unit of mass when performing calculations, conversions,
+    /// or representing mass values. The <see cref="MassUnit.None"/> value indicates that no specific unit is
+    /// assigned.</remarks>
     public enum MassUnit
     {
         Ton,
@@ -97,6 +139,12 @@ namespace Calcify.Math.Conversion
         Ounce,
         None
     }
+    /// <summary>
+    /// Specifies the supported units for numeral systems, such as binary, octal, hexadecimal, and decimal.
+    /// </summary>
+    /// <remarks>Use this enumeration to indicate the numeral system context for parsing, formatting, or
+    /// displaying numeric values. The <see cref="NumeralSystemUnit.None"/> value represents the absence of a specific
+    /// numeral system.</remarks>
     public enum NumeralSystemUnit
     {
         Binary,
@@ -105,6 +153,13 @@ namespace Calcify.Math.Conversion
         Decimal,
         None
     }
+    /// <summary>
+    /// Specifies the supported units of temperature measurement.
+    /// </summary>
+    /// <remarks>Use this enumeration to indicate the unit when converting, displaying, or interpreting
+    /// temperature values. The values correspond to common temperature scales, including Celsius, Fahrenheit, Kelvin,
+    /// Rankine, and Réaumur. The <see cref="TemperatureUnit.None"/> value represents an unspecified or unknown
+    /// unit.</remarks>
     public enum TemperatureUnit
     {
         Reaumur,
@@ -114,6 +169,12 @@ namespace Calcify.Math.Conversion
         Fahrenheit,
         None
     }
+    /// <summary>
+    /// Specifies units of time for representing durations or intervals.
+    /// </summary>
+    /// <remarks>Use this enumeration to indicate the granularity of time measurements, such as when
+    /// converting between time units or specifying time-based operations. The <see cref="TimeUnit.None"/> value
+    /// represents an unspecified or unknown time unit.</remarks>
     public enum TimeUnit
     {
         Century,
@@ -130,8 +191,30 @@ namespace Calcify.Math.Conversion
         Nanosecond,
         None
     }
+    /// <summary>
+    /// Provides static methods for converting values between different units of measurement, including angle, data
+    /// size, frequency, length, mass, numeral systems, temperature, and time.
+    /// </summary>
+    /// <remarks>All conversion methods require valid and distinct source and target units. If either unit is
+    /// set to None or both units are the same, an exception is thrown. These methods are intended for direct, one-step
+    /// conversions and do not perform validation on the input value beyond unit checks. Thread safety is guaranteed as
+    /// all methods are static and stateless.</remarks>
     public static class Converter
     {
+        /// <summary>
+        /// Converts an angle value from one unit of measurement to another.
+        /// </summary>
+        /// <remarks>Use this method to convert between supported angle units, such as degrees, radians,
+        /// gradians, milliradians, angular minutes, and angular seconds. The method does not perform validation on the
+        /// value of <paramref name="val"/>; ensure that the input is appropriate for the specified units.</remarks>
+        /// <param name="val">The angle value to convert, expressed in the unit specified by <paramref name="currentUnit"/>.</param>
+        /// <param name="currentUnit">The unit of measurement of <paramref name="val"/>. Must be a valid <see cref="AngleUnit"/> value other than
+        /// <see cref="AngleUnit.None"/>.</param>
+        /// <param name="targetUnit">The unit of measurement to convert <paramref name="val"/> to. Must be a valid <see cref="AngleUnit"/> value
+        /// other than <see cref="AngleUnit.None"/> and different from <paramref name="currentUnit"/>.</param>
+        /// <returns>The converted angle value expressed in the unit specified by <paramref name="targetUnit"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="currentUnit"/> or <paramref name="targetUnit"/> is <see cref="AngleUnit.None"/>,
+        /// or if <paramref name="targetUnit"/> is the same as <paramref name="currentUnit"/>.</exception>
         public static double AngleConverter(double val, AngleUnit currentUnit, AngleUnit targetUnit)
         {
             if (currentUnit == AngleUnit.None || targetUnit == AngleUnit.None || targetUnit == currentUnit)
@@ -214,6 +297,21 @@ namespace Calcify.Math.Conversion
             }
             return result;
         }
+        /// <summary>
+        /// Converts a data size value from one unit to another.
+        /// </summary>
+        /// <remarks>This method supports conversion between common data size units, including bits,
+        /// bytes, kilobytes, megabytes, gigabytes, terabytes, petabytes, and exabytes. The conversion is performed
+        /// using standard binary unit relationships.</remarks>
+        /// <param name="val">The numeric value representing the data size to convert.</param>
+        /// <param name="currentUnit">The unit of measurement for the input value. Must be a valid <see cref="DataSizeUnit"/> value other than
+        /// <see cref="DataSizeUnit.None"/>.</param>
+        /// <param name="targetUnit">The unit of measurement to convert the value to. Must be a valid <see cref="DataSizeUnit"/> value other than
+        /// <see cref="DataSizeUnit.None"/> and different from <paramref name="currentUnit"/>.</param>
+        /// <returns>A <see cref="double"/> representing the converted data size in the specified target unit.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="currentUnit"/> or <paramref name="targetUnit"/> is <see
+        /// cref="DataSizeUnit.None"/>, or if <paramref name="currentUnit"/> and <paramref name="targetUnit"/> are the
+        /// same.</exception>
         public static double DataSizeConverter(double val, DataSizeUnit currentUnit, DataSizeUnit targetUnit)
         {
             if (currentUnit == DataSizeUnit.None || targetUnit == DataSizeUnit.None || currentUnit == targetUnit)
@@ -358,6 +456,15 @@ namespace Calcify.Math.Conversion
             }
             return result;
         }
+        /// <summary>
+        /// Converts a frequency value from one unit to another.
+        /// </summary>
+        /// <param name="val">The frequency value to convert.</param>
+        /// <param name="currentUnit">The unit of the input frequency value.</param>
+        /// <param name="targetUnit">The unit to which the frequency value will be converted.</param>
+        /// <returns>The converted frequency value expressed in the target unit.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="currentUnit"/> or <paramref name="targetUnit"/> is <c>FrequencyUnit.None</c>, or
+        /// if <paramref name="currentUnit"/> and <paramref name="targetUnit"/> are the same.</exception>
         public static double FrequencyConverter(double val, FrequencyUnit currentUnit, FrequencyUnit targetUnit)
         {
             double result = 0;
@@ -401,6 +508,20 @@ namespace Calcify.Math.Conversion
             }
             return result;
         }
+        /// <summary>
+        /// Converts a length value from one unit of measurement to another.
+        /// </summary>
+        /// <remarks>Supported units include nanometers, micrometers, millimeters, centimeters,
+        /// decimeters, meters, kilometers, decameters, hectometers, miles, yards, feet, and inches. The method does not
+        /// perform conversions if the source and target units are the same or if either unit is unspecified.</remarks>
+        /// <param name="val">The length value to convert.</param>
+        /// <param name="currentUnit">The unit of measurement of the input value. Must be a valid member of <see cref="LengthUnit"/> other than
+        /// <see cref="LengthUnit.None"/>.</param>
+        /// <param name="targetUnit">The unit of measurement to convert the value to. Must be a valid member of <see cref="LengthUnit"/> other
+        /// than <see cref="LengthUnit.None"/> and different from <paramref name="currentUnit"/>.</param>
+        /// <returns>A <see cref="double"/> representing the converted length value in the specified target unit.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="currentUnit"/> or <paramref name="targetUnit"/> is <see cref="LengthUnit.None"/>,
+        /// or if <paramref name="currentUnit"/> and <paramref name="targetUnit"/> are the same.</exception>
         public static double LengthConverter(double val, LengthUnit currentUnit, LengthUnit targetUnit)
         {
             if (currentUnit == LengthUnit.None || targetUnit == LengthUnit.None || currentUnit == targetUnit)
@@ -762,6 +883,21 @@ namespace Calcify.Math.Conversion
 
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from one unit to another.
+        /// </summary>
+        /// <remarks>Supported mass units include ton, kilogram, gram, milligram, microgram, long ton,
+        /// short ton, stone, pounds, and ounce. This method does not perform conversions if the source and target units
+        /// are the same or if either unit is unspecified.</remarks>
+        /// <param name="val">The mass value to convert.</param>
+        /// <param name="currentUnit">The unit of the input mass value. Must be a valid member of <see cref="MassUnit"/> other than <see
+        /// cref="MassUnit.None"/>.</param>
+        /// <param name="targetUnit">The unit to convert the mass value to. Must be a valid member of <see cref="MassUnit"/> other than <see
+        /// cref="MassUnit.None"/> and different from <paramref name="currentUnit"/>.</param>
+        /// <returns>The converted mass value expressed in the target unit.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="currentUnit"/> or <paramref name="targetUnit"/> is <see cref="MassUnit.None"/>, or
+        /// if <paramref name="currentUnit"/> and <paramref name="targetUnit"/> are the same.</exception>
         public static double MassConverter(double val, MassUnit currentUnit, MassUnit targetUnit)
         {
             if (currentUnit == MassUnit.None || targetUnit == MassUnit.None || currentUnit == targetUnit)
@@ -982,6 +1118,20 @@ namespace Calcify.Math.Conversion
 
             return result;
         }
+
+        /// <summary>
+        /// Converts a numeric value from one numeral system to another.
+        /// </summary>
+        /// <remarks>The method supports conversion between binary, octal, decimal, and hexadecimal
+        /// numeral systems. The input value must be valid for the specified source numeral system; otherwise, a
+        /// format-related exception may occur.</remarks>
+        /// <param name="val">The string representation of the numeric value to convert. The format must match the specified <paramref
+        /// name="currentUnit"/>.</param>
+        /// <param name="currentUnit">The numeral system in which <paramref name="val"/> is currently represented.</param>
+        /// <param name="targetUnit">The numeral system to which <paramref name="val"/> will be converted.</param>
+        /// <returns>A string containing the converted value in the target numeral system.</returns>
+        /// <exception cref="ArgumentException">Thrown if either <paramref name="currentUnit"/> or <paramref name="targetUnit"/> is <see
+        /// cref="NumeralSystemUnit.None"/>, or if both units are the same.</exception>
         public static string NumeralSystemConverter(string val, NumeralSystemUnit currentUnit, NumeralSystemUnit targetUnit)
         {
             if (currentUnit == NumeralSystemUnit.None || targetUnit == NumeralSystemUnit.None || currentUnit == targetUnit)
@@ -1049,6 +1199,23 @@ namespace Calcify.Math.Conversion
             }
             return result;
         }
+        /// <summary>
+        /// Converts a temperature value from one unit to another using the specified source and target temperature
+        /// units.
+        /// </summary>
+        /// <remarks>Supported temperature units include Celsius, Fahrenheit, Kelvin, Rankine, and
+        /// Reaumur. This method does not perform conversions if the source and target units are the same, or if either
+        /// unit is unspecified.</remarks>
+        /// <param name="val">The temperature value to convert.</param>
+        /// <param name="currentUnit">The unit of the input temperature value. Must be a valid member of <see cref="TemperatureUnit"/> other than
+        /// <see cref="TemperatureUnit.None"/>.</param>
+        /// <param name="targetUnit">The unit to which the temperature value will be converted. Must be a valid member of <see
+        /// cref="TemperatureUnit"/> other than <see cref="TemperatureUnit.None"/> and different from <paramref
+        /// name="currentUnit"/>.</param>
+        /// <returns>The converted temperature value expressed in the target unit.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="currentUnit"/> or <paramref name="targetUnit"/> is <see
+        /// cref="TemperatureUnit.None"/>, or if <paramref name="targetUnit"/> is the same as <paramref
+        /// name="currentUnit"/>.</exception>
         public static double TemperatureConverter(double val, TemperatureUnit currentUnit, TemperatureUnit targetUnit)
         {
             if (currentUnit == TemperatureUnit.None || targetUnit == TemperatureUnit.None || targetUnit == currentUnit)
@@ -1109,6 +1276,22 @@ namespace Calcify.Math.Conversion
             }
             return result;
         }
+        /// <summary>
+        /// Converts a time value from one unit to another.
+        /// </summary>
+        /// <remarks>This method supports conversion between a wide range of time units, including
+        /// centuries, decades, years, months, weeks, days, hours, minutes, seconds, milliseconds, microseconds, and
+        /// nanoseconds. The conversion is performed using standard time unit relationships. The result may be subject
+        /// to rounding errors for very large or very small values.</remarks>
+        /// <param name="val">The numeric value representing the time to convert. Must be expressed in the unit specified by <paramref
+        /// name="currentUnit"/>.</param>
+        /// <param name="currentUnit">The unit of time for the input value. Cannot be <see cref="TimeUnit.None"/> and must differ from <paramref
+        /// name="targetUnit"/>.</param>
+        /// <param name="targetUnit">The unit of time to convert the input value to. Cannot be <see cref="TimeUnit.None"/> and must differ from
+        /// <paramref name="currentUnit"/>.</param>
+        /// <returns>A double representing the converted time value in the specified target unit.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="currentUnit"/> or <paramref name="targetUnit"/> is <see cref="TimeUnit.None"/>, or
+        /// if <paramref name="currentUnit"/> and <paramref name="targetUnit"/> are the same.</exception>
         public static double TimeConverter(double val, TimeUnit currentUnit, TimeUnit targetUnit)
         {
             if (currentUnit == TimeUnit.None || targetUnit == TimeUnit.None || targetUnit == currentUnit)
@@ -1814,176 +1997,421 @@ namespace Calcify.Math.Conversion
         }
     }
 }
+
 namespace Calcify.Math.Conversion.Angle
 {
+
+    /// <summary>
+    /// Provides static methods for converting angles measured in gradians to other units, including degrees, radians,
+    /// milliradians, angular minutes, and angular seconds.
+    /// </summary>
+    /// <remarks>A gradian, also known as a gon, is an angular unit where 100 gradians equal a right angle and
+    /// 400 gradians equal a full circle. This class is intended for use in mathematical, scientific, or engineering
+    /// applications where gradian-based angle conversions are required. All methods are thread-safe and do not maintain
+    /// any internal state.</remarks>
     public static class Gradian
     {
         private static double pi = System.Math.PI;
+
+        /// <summary>
+        /// Converts a value from grads (also known as gradians or gon) to degrees.
+        /// </summary>
+        /// <remarks>Grads are an alternative unit of angular measurement where a full circle is 400 grads. This
+        /// method uses the conversion factor that 200 grads equal 180 degrees.</remarks>
+        /// <param name="val">The angle value in grads to convert. Typically ranges from 0 to 200 for a full circle.</param>
+        /// <returns>The equivalent angle in degrees.</returns>
         public static double ToDegree(double val)
         {
             double result = val * 180 / 200;
             return result;
         }
+
+        /// <summary>
+        /// Converts an angle measured in gon (gradian) to milliradian.
+        /// </summary>
+        /// <remarks>Milliradian is commonly used in scientific and engineering applications for precise
+        /// angular measurements. One gon equals 0.01570796 radians, and one milliradian equals 0.001 radians.</remarks>
+        /// <param name="val">The angle value in gon to convert. Represents a measurement where 400 gon equals a full circle.</param>
+        /// <returns>A double representing the equivalent angle in milliradian.</returns>
         public static double ToMilliradian(double val)
         {
             double result = val * 1000 * pi / 200;
             return result;
         }
+
+        /// <summary>
+        /// Converts an angle measured in gradians to its equivalent in radians.
+        /// </summary>
+        /// <param name="val">The angle value in gradians to convert. Typically, 200 gradians equals π radians.</param>
+        /// <returns>The angle in radians that corresponds to the specified gradian value.</returns>
         public static double ToRadian(double val)
         {
             double result = val * pi / 200;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value to angular minutes using a fixed conversion factor.
+        /// </summary>
+        /// <param name="val">The value to convert to angular minutes.</param>
+        /// <returns>A double representing the converted value in angular minutes.</returns>
         public static double ToAngularMinute(double val)
         {
             double result = val * 54;
             return result;
         }
+        /// <summary>
+        /// Converts a value from degrees to angular seconds.
+        /// </summary>
+        /// <param name="val">The value in degrees to convert to angular seconds.</param>
+        /// <returns>A double representing the equivalent value in angular seconds.</returns>
         public static double ToAngularSecond(double val)
         {
             double result = val * 3240;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting angles measured in degrees to other units, including gradians,
+    /// milliradians, radians, angular minutes, and angular seconds.
+    /// </summary>
+    /// <remarks>This class is intended for use in mathematical and scientific calculations where angle unit
+    /// conversions are required. All methods are static and do not require instantiation of the class.</remarks>
     public static class Degree
     {
         private static double pi = System.Math.PI;
+
+        /// <summary>
+        /// Converts an angle measured in degrees to its equivalent in gradians.
+        /// </summary>
+        /// <remarks>One degree is equal to 200/180 (approximately 1.1111) gradians. Gradians are commonly
+        /// used in some fields such as surveying and engineering, where a right angle is 100 gradians.</remarks>
+        /// <param name="val">The angle in degrees to convert. Typically, this value should be within the range 0 to 360, but any real
+        /// number is accepted.</param>
+        /// <returns>A double-precision floating-point number representing the angle in gradians.</returns>
         public static double ToGradian(double val)
         {
             double result = val * 200 / 180;
             return result;
         }
+
+        /// <summary>
+        /// Converts an angle measured in degrees to milliradians.
+        /// </summary>
+        /// <param name="val">The angle value, in degrees, to convert to milliradians.</param>
+        /// <returns>A double representing the equivalent angle in milliradians.</returns>
         public static double ToMilliradian(double val)
         {
             double result = val * 1000 * pi / 180;
             return result;
         }
+
+        /// <summary>
+        /// Converts an angle from degrees to radians.
+        /// </summary>
+        /// <param name="val">The angle in degrees to convert. Typically, this value should be in the range 0 to 360, but any real number
+        /// is accepted.</param>
+        /// <returns>A double representing the equivalent angle in radians.</returns>
         public static double ToRadian(double val)
         {
             double result = val * pi / 180;
             return result;
         }
+
+        /// <summary>
+        /// Converts an angular value from degrees to angular minutes.
+        /// </summary>
+        /// <param name="val">The value, in degrees, to convert to angular minutes.</param>
+        /// <returns>A double representing the equivalent angular minutes of the specified degree value.</returns>
         public static double ToAngularMinute(double val)
         {
             double result = val * 60;
             return result;
         }
+
+        /// <summary>
+        /// Converts an angle measured in degrees to its equivalent value in angular seconds.
+        /// </summary>
+        /// <param name="val">The angle in degrees to convert to angular seconds.</param>
+        /// <returns>A double representing the angle in angular seconds.</returns>
         public static double ToAngularSecond(double val)
         {
             double result = val * 3600;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting angular measurements from milliradians to other units, including degrees,
+    /// radians, gradians, angular minutes, and angular seconds.
+    /// </summary>
+    /// <remarks>This class is intended for use in mathematical, scientific, or engineering applications where
+    /// milliradian-based angle conversions are required. All methods are static and do not require instantiation of the
+    /// class.</remarks>
     public static class Milliradian
     {
         private static double pi = System.Math.PI;
+
+        /// <summary>
+        /// Converts an angle measured in radians to its equivalent value in gradians.
+        /// </summary>
+        /// <remarks>One gradian is equal to 1/400 of a full circle. This method assumes the input value
+        /// is in radians and returns the corresponding value in gradians.</remarks>
+        /// <param name="val">The angle, in radians, to convert to gradians.</param>
+        /// <returns>The angle measured in gradians that is equivalent to the specified value in radians.</returns>
         public static double ToGradian(double val)
         {
             double result = val * 200 / (1000 * pi);
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from milliradians to degrees.
+        /// </summary>
+        /// <param name="val">The angle in milliradians to convert to degrees.</param>
+        /// <returns>The equivalent angle in degrees.</returns>
         public static double ToDegree(double val)
         {
             double result = val * 180 / (1000 * pi);
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from milliradians to radians.
+        /// </summary>
+        /// <param name="val">The angle value in milliradians to convert. Must be a finite number.</param>
+        /// <returns>The equivalent angle in radians.</returns>
         public static double ToRadian(double val)
         {
             double result = val / 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from milliradians to angular minutes.
+        /// </summary>
+        /// <param name="val">The value in milliradians to convert to angular minutes.</param>
+        /// <returns>A double representing the equivalent value in angular minutes.</returns>
         public static double ToAngularMinute(double val)
         {
             double result = val * (60 * 180) / (1000 * pi);
             return result;
         }
+
+        /// <summary>
+        /// Converts an angle measured in milliradians to angular seconds.
+        /// </summary>
+        /// <param name="val">The angle value to convert, specified in milliradians.</param>
+        /// <returns>A double representing the equivalent angle in angular seconds.</returns>
         public static double ToAngularSecond(double val)
         {
             double result = val * (3600 * 180) / (1000 * pi);
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting angle measurements from radians to other units, including gradians,
+    /// degrees, milliradians, angular minutes, and angular seconds.
+    /// </summary>
+    /// <remarks>This class is intended for use when precise conversion between radians and other common
+    /// angular units is required. All methods assume the input value is in radians and return the corresponding value
+    /// in the target unit. The class is thread-safe and does not maintain any internal state.</remarks>
     public static class Radian
     {
         private static double pi = System.Math.PI;
+
+        /// <summary>
+        /// Converts an angle measured in radians to its equivalent value in gradians.
+        /// </summary>
+        /// <remarks>One radian is equal to approximately 63.662 gradians. Gradians are commonly used in
+        /// fields such as surveying and engineering, where a right angle is defined as 100 gradians.</remarks>
+        /// <param name="val">The angle, in radians, to convert to gradians.</param>
+        /// <returns>A double representing the angle in gradians equivalent to the specified radian value.</returns>
         public static double ToGradian(double val)
         {
             double result = val * 200 / pi;
             return result;
         }
+
+        /// <summary>
+        /// Converts an angle measured in radians to its equivalent in degrees.
+        /// </summary>
+        /// <param name="val">The angle value, in radians, to convert to degrees.</param>
+        /// <returns>A double representing the angle in degrees that corresponds to the specified radian value.</returns>
         public static double ToDegree(double val)
         {
             double result = val * 180 / pi;
             return result;
         }
+
+        /// <summary>
+        /// Converts an angle measured in radians to milliradians.
+        /// </summary>
+        /// <param name="val">The angle value, in radians, to convert to milliradians.</param>
+        /// <returns>A double representing the equivalent angle in milliradians.</returns>
         public static double ToMilliradian(double val)
         {
             double result = val * 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts an angle value from radians to angular minutes.
+        /// </summary>
+        /// <param name="val">The angle in radians to convert to angular minutes.</param>
+        /// <returns>A double representing the equivalent angle in angular minutes.</returns>
         public static double ToAngularMinute(double val)
         {
             double result = val * (60 * 180) / pi;
             return result;
         }
+
+        /// <summary>
+        /// Converts an angle value from radians to angular seconds.
+        /// </summary>
+        /// <param name="val">The angle in radians to convert to angular seconds.</param>
+        /// <returns>A double representing the equivalent angle in angular seconds.</returns>
         public static double ToAngularSecond(double val)
         {
             double result = val * (3600 * 180) / pi;
             return result;
         }
     }
+    /// <summary>
+    /// Provides static methods for converting angular minutes to other units of angular measurement, such as degrees,
+    /// radians, gradians, milliradians, and angular seconds.
+    /// </summary>
+    /// <remarks>This class is intended for use in mathematical and scientific calculations involving angle
+    /// conversions. All methods are static and do not require instantiation. The conversions assume standard
+    /// definitions for each unit.</remarks>
     public static class AngularMinute
     {
         private static double pi = System.Math.PI;
+
+        /// <summary>
+        /// Converts an angle measured in degrees to its equivalent value in gradians.
+        /// </summary>
+        /// <remarks>One degree is equal to 1.1111 gradians. This method performs a direct conversion
+        /// without rounding or validation.</remarks>
+        /// <param name="val">The angle in degrees to convert. Typically, this value should be in the range 0 to 360.</param>
+        /// <returns>A double representing the angle in gradians equivalent to the specified degree value.</returns>
         public static double ToGradian(double val)
         {
             double result = val / 54;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from minutes to degrees.
+        /// </summary>
+        /// <param name="val">The value in minutes to convert to degrees.</param>
+        /// <returns>A double representing the equivalent value in degrees.</returns>
         public static double ToDegree(double val)
         {
             double result = val / 60;
             return result;
         }
+
+        /// <summary>
+        /// Converts an angle measured in minutes of arc to milliradians.
+        /// </summary>
+        /// <param name="val">The angle value, in minutes of arc, to convert to milliradians.</param>
+        /// <returns>A double representing the equivalent angle in milliradians.</returns>
         public static double ToMilliradian(double val)
         {
             double result = val * 1000 * pi / (60 * 180);
             return result;
         }
+
+        /// <summary>
+        /// Converts an angle measured in minutes to its equivalent value in radians.
+        /// </summary>
+        /// <remarks>This method assumes the input value represents minutes of arc, not degrees. To
+        /// convert degrees to radians, use a different conversion method.</remarks>
+        /// <param name="val">The angle in minutes to convert to radians.</param>
+        /// <returns>The angle in radians that corresponds to the specified value in minutes.</returns>
         public static double ToRadian(double val)
         {
             double result = val * pi / (60 * 180);
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from angular minutes to angular seconds.
+        /// </summary>
+        /// <param name="val">The value, in angular minutes, to convert to angular seconds.</param>
+        /// <returns>A double representing the equivalent value in angular seconds.</returns>
         public static double ToAngularSecond(double val)
         {
             double result = val * 60;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting angular seconds to other units of angular measurement, including degrees,
+    /// radians, gradians, milliradians, and angular minutes.
+    /// </summary>
+    /// <remarks>An angular second is a unit of angular measurement equal to 1/3600 of a degree. This class is
+    /// intended for use in scientific, engineering, or geospatial applications where precise angle conversions are
+    /// required. All methods are thread-safe and do not maintain any internal state.</remarks>
     public static class AngularSecond
     {
         private static double pi = System.Math.PI;
+
+        /// <summary>
+        /// Converts an angle measured in seconds to its equivalent value in gradians.
+        /// </summary>
+        /// <param name="val">The angle value, in seconds, to convert to gradians.</param>
+        /// <returns>A double representing the angle in gradians equivalent to the specified value in seconds.</returns>
         public static double ToGradian(double val)
         {
             double result = val / 3240;
             return result;
         }
+
+        /// <summary>
+        /// Converts an angle value from arcseconds to degrees.
+        /// </summary>
+        /// <param name="val">The angle in arcseconds to convert. Must be a finite number.</param>
+        /// <returns>The equivalent angle in degrees.</returns>
         public static double ToDegree(double val)
         {
             double result = val / 3600;
             return result;
         }
+
+        /// <summary>
+        /// Converts an angle measured in arcseconds to milliradians.
+        /// </summary>
+        /// <param name="val">The angle value, in arcseconds, to convert to milliradians.</param>
+        /// <returns>A double representing the equivalent angle in milliradians.</returns>
         public static double ToMilliradian(double val)
         {
             double result = val * 1000 * pi / (180 * 3600);
             return result;
         }
+
+        /// <summary>
+        /// Converts an angle measured in arcseconds to its equivalent value in radians.
+        /// </summary>
+        /// <remarks>Use this method when working with astronomical or geodetic calculations that require
+        /// conversion from arcseconds to radians. One arcsecond is equal to 1/3600 of a degree.</remarks>
+        /// <param name="val">The angle, in arcseconds, to convert to radians.</param>
+        /// <returns>The angle in radians that corresponds to the specified arcseconds value.</returns>
         public static double ToRadian(double val)
         {
             double result = val * pi / (180 * 3600);
             return result;
         }
+
+        /// <summary>
+        /// Converts an angular value from minutes to degrees.
+        /// </summary>
+        /// <param name="val">The angular value in minutes to convert. Must be a finite number.</param>
+        /// <returns>The equivalent angular value in degrees.</returns>
         public static double ToAngularMinute(double val)
         {
             double result = val / 60;
@@ -1993,44 +2421,107 @@ namespace Calcify.Math.Conversion.Angle
 }
 namespace Calcify.Math.Conversion.DataSize
 {
+    /// <summary>
+    /// Provides static methods for converting a value in bits to larger digital storage units, including bytes,
+    /// kilobytes, megabytes, gigabytes, terabytes, petabytes, and exabytes.
+    /// </summary>
+    /// <remarks>All conversion methods assume binary (base-2) units, where each unit is a power of two
+    /// multiple of bits. These methods are useful for translating raw bit counts into more commonly used storage
+    /// measurements. The class is static and cannot be instantiated.</remarks>
     public static class Bit
     {
+        /// <summary>
+        /// Converts the specified value, in bytes, to its equivalent in exabytes.
+        /// </summary>
+        /// <remarks>One exabyte is equal to 9,223,372,036,854,775,808 bytes.</remarks>
+        /// <param name="val">The value in bytes to convert. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of exabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToExabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
             return val / 9223372036854775808.0;
         }
+
+        /// <summary>
+        /// Converts a value in bytes to its equivalent in petabytes.
+        /// </summary>
+        /// <remarks>One petabyte is equal to 9,007,199,254,740,992 bytes. This method performs a direct
+        /// conversion using this value.</remarks>
+        /// <param name="val">The number of bytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent number of petabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToPetabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
             return val / 9007199254740992.0;
         }
+
+        /// <summary>
+        /// Converts a value in bytes to its equivalent in terabytes.
+        /// </summary>
+        /// <remarks>One terabyte is equal to 8,796,093,022,208 bytes. This method performs a direct
+        /// division and does not round the result.</remarks>
+        /// <param name="val">The value in bytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent number of terabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToTerabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
             return val / 8796093022208.0;
         }
+
+        /// <summary>
+        /// Converts a value in bytes to its equivalent in gigabytes.
+        /// </summary>
+        /// <remarks>One gigabyte is defined as 8,589,934,592 bytes (2^33).</remarks>
+        /// <param name="val">The value in bytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in gigabytes as a double-precision floating-point number.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToGigabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
             return val / 8589934592.0;
         }
+
+        /// <summary>
+        /// Converts a value in bytes to its equivalent in megabytes.
+        /// </summary>
+        /// <param name="val">The value, in bytes, to convert to megabytes. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The number of megabytes equivalent to the specified byte value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMegabyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
             return val / 8388608.0;
         }
+
+        /// <summary>
+        /// Converts the specified value from bits to kilobytes using a factor of 8,192 bits per kilobyte.
+        /// </summary>
+        /// <remarks>This method uses 8,192 bits as the definition of one kilobyte, which is commonly used
+        /// in computing contexts. If the input value is not a valid number, an exception is thrown.</remarks>
+        /// <param name="val">The value in bits to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in kilobytes as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToKilobyte(double val)
         {
             if (double.IsNaN(val))
                 throw new ArgumentException();
             return val / 8192.0;
         }
+
+        /// <summary>
+        /// Converts the specified value from bits to bytes.
+        /// </summary>
+        /// <param name="val">The value, in bits, to convert to bytes. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The number of bytes equivalent to the specified bit value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToByte(double val)
         {
             if (double.IsNaN(val))
@@ -2038,8 +2529,25 @@ namespace Calcify.Math.Conversion.DataSize
             return val / 8;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting byte values to other digital storage units, such as bits, kilobytes,
+    /// megabytes, gigabytes, terabytes, petabytes, and exabytes.
+    /// </summary>
+    /// <remarks>All conversion methods assume binary (base-2) units, where 1 kilobyte equals 1,024 bytes, 1
+    /// megabyte equals 1,024 kilobytes, and so on. The methods throw an exception if the input value is not a valid
+    /// number (NaN). This class is intended for use in scenarios where precise conversions between byte-based units are
+    /// required.</remarks>
     public static class Byte
     {
+        /// <summary>
+        /// Converts a value in bytes to its equivalent in exabytes.
+        /// </summary>
+        /// <remarks>One exabyte is equal to 1,152,921,504,606,846,976 bytes. This method performs a
+        /// direct conversion without rounding.</remarks>
+        /// <param name="val">The number of bytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent value in exabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToExabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2047,6 +2555,14 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1152921504606846976.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in bytes to its equivalent in petabytes.
+        /// </summary>
+        /// <remarks>One petabyte is equal to 1,125,899,906,842,624 bytes.</remarks>
+        /// <param name="val">The value in bytes to convert. Must be a valid number.</param>
+        /// <returns>The equivalent value in petabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is not a number (NaN).</exception>
         public static double ToPetabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2054,6 +2570,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1125899906842624.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in bytes to its equivalent in terabytes.
+        /// </summary>
+        /// <param name="val">The value in bytes to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in terabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToTerabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2061,6 +2584,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1099511627776.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in bytes to its equivalent in gigabytes.
+        /// </summary>
+        /// <param name="val">The value in bytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in gigabytes as a <see cref="double"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToGigabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2068,6 +2598,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1073741824.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in bytes to its equivalent in megabytes.
+        /// </summary>
+        /// <param name="val">The value in bytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the number of megabytes equivalent to the specified byte value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMegabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2075,6 +2612,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1048576.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in bytes to its equivalent in kilobytes.
+        /// </summary>
+        /// <param name="val">The value in bytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the number of kilobytes equivalent to the specified byte value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToKilobyte(double val)
         {
             if (double.IsNaN(val))
@@ -2082,6 +2626,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1024.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from bytes to bits.
+        /// </summary>
+        /// <param name="val">The value in bytes to convert to bits. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of bits.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToBit(double val)
         {
             if (double.IsNaN(val))
@@ -2090,8 +2641,23 @@ namespace Calcify.Math.Conversion.DataSize
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting values in kilobytes to other digital storage units, including bits,
+    /// bytes, megabytes, gigabytes, terabytes, petabytes, and exabytes.
+    /// </summary>
+    /// <remarks>All conversion methods assume base-2 (binary) units, where 1 kilobyte equals 1,024 bytes.
+    /// These methods are intended for scenarios where precise binary conversions are required, such as file size
+    /// calculations or memory usage reporting. The class is static and cannot be instantiated.</remarks>
     public static class Kilobyte
     {
+
+        /// <summary>
+        /// Converts a value in bytes to its equivalent in exabytes.
+        /// </summary>
+        /// <param name="val">The value in bytes to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in exabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToExabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2099,6 +2665,15 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1125899906842624.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in bytes to its equivalent in petabytes.
+        /// </summary>
+        /// <remarks>One petabyte is equal to 1,099,511,627,776 bytes. This method performs a direct
+        /// conversion without rounding.</remarks>
+        /// <param name="val">The number of bytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent number of petabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToPetabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2106,6 +2681,15 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1099511627776.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in megabytes to its equivalent in terabytes.
+        /// </summary>
+        /// <remarks>One terabyte is equal to 1,073,741,824 megabytes. This method does not perform range
+        /// checking beyond validating that the input is not NaN.</remarks>
+        /// <param name="val">The value in megabytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent number of terabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToTerabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2113,6 +2697,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1073741824.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in megabytes to its equivalent in gigabytes.
+        /// </summary>
+        /// <param name="val">The value, in megabytes, to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent value in gigabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToGigabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2120,6 +2711,16 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1048576.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in kilobytes to its equivalent in megabytes.
+        /// </summary>
+        /// <remarks>This method performs a simple division by 1024 to convert kilobytes to megabytes. The
+        /// conversion does not account for binary (1024-based) versus decimal (1000-based) units; it uses 1024 as the
+        /// divisor, which is standard for binary megabytes.</remarks>
+        /// <param name="val">The value in kilobytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in megabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMegabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2127,6 +2728,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1024.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value in kilobytes to its equivalent in bytes.
+        /// </summary>
+        /// <param name="val">The value in kilobytes to convert. Must not be NaN.</param>
+        /// <returns>A double representing the number of bytes equivalent to the specified kilobyte value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToByte(double val)
         {
             if (double.IsNaN(val))
@@ -2134,6 +2742,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1024;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value to its equivalent in bits by multiplying by 8,192.
+        /// </summary>
+        /// <param name="val">The numeric value to convert to bits. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the input value converted to bits.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToBit(double val)
         {
             if (double.IsNaN(val))
@@ -2142,8 +2757,21 @@ namespace Calcify.Math.Conversion.DataSize
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting values in megabytes to other digital storage units.
+    /// </summary>
+    /// <remarks>This class includes conversion methods to exabytes, petabytes, terabytes, gigabytes,
+    /// kilobytes, bytes, and bits. All methods expect the input value to represent a quantity in megabytes and return
+    /// the equivalent value in the target unit. The class is static and cannot be instantiated.</remarks>
     public static class Megabyte
     {
+        /// <summary>
+        /// Converts a value in terabytes to its equivalent in exabytes.
+        /// </summary>
+        /// <param name="val">The value, in terabytes, to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in exabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToExabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2151,6 +2779,14 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1099511627776.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in gigabytes to its equivalent in petabytes.
+        /// </summary>
+        /// <remarks>One petabyte is equal to 1,073,741,824 gigabytes.</remarks>
+        /// <param name="val">The value in gigabytes to convert. Must be a valid number.</param>
+        /// <returns>The equivalent value in petabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is not a number (NaN).</exception>
         public static double ToPetabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2158,6 +2794,15 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1073741824.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in megabytes to its equivalent in terabytes.
+        /// </summary>
+        /// <remarks>One terabyte is equal to 1,048,576 megabytes. This method performs a direct
+        /// conversion by dividing the input value by 1,048,576.</remarks>
+        /// <param name="val">The value in megabytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in terabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToTerabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2165,6 +2810,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1048576.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in megabytes to its equivalent in gigabytes.
+        /// </summary>
+        /// <param name="val">The value in megabytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in gigabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToGigabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2172,6 +2824,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1024.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value in megabytes to its equivalent in kilobytes.
+        /// </summary>
+        /// <param name="val">The value in megabytes to convert. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of kilobytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToKilobyte(double val)
         {
             if (double.IsNaN(val))
@@ -2179,6 +2838,15 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1024;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from megabytes to bytes.
+        /// </summary>
+        /// <remarks>This method multiplies the input value by 1,048,576 to perform the conversion. The
+        /// result may be imprecise for very large or very small values due to floating-point limitations.</remarks>
+        /// <param name="val">The value in megabytes to convert. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of bytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToByte(double val)
         {
             if (double.IsNaN(val))
@@ -2186,6 +2854,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1048576;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value to its equivalent in bits by multiplying it by 8,388,608.
+        /// </summary>
+        /// <param name="val">The value to convert to bits. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the input value converted to bits.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToBit(double val)
         {
             if (double.IsNaN(val))
@@ -2194,8 +2869,23 @@ namespace Calcify.Math.Conversion.DataSize
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting values in gigabytes to other digital storage units.
+    /// </summary>
+    /// <remarks>This class includes conversion methods to exabytes, petabytes, terabytes, megabytes,
+    /// kilobytes, bytes, and bits using binary (base-2) multiples. All methods require a valid numeric value
+    /// representing gigabytes and will throw an exception if the input is not a number. The class is static and cannot
+    /// be instantiated.</remarks>
     public static class Gigabyte
     {
+        /// <summary>
+        /// Converts a value in gibibytes to exabytes.
+        /// </summary>
+        /// <remarks>One exabyte is equal to 1,073,741,824 gibibytes.</remarks>
+        /// <param name="val">The value, in gibibytes, to convert to exabytes. Must not be NaN.</param>
+        /// <returns>The equivalent value in exabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToExabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2203,6 +2893,15 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1073741824.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in terabytes to its equivalent in petabytes.
+        /// </summary>
+        /// <remarks>One petabyte is equal to 1,048,576 terabytes. This method performs a simple division
+        /// to convert the unit.</remarks>
+        /// <param name="val">The value in terabytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in petabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToPetabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2210,6 +2909,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1048576.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in gigabytes to its equivalent in terabytes.
+        /// </summary>
+        /// <param name="val">The value in gigabytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in terabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToTerabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2217,6 +2923,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1024.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from gigabytes to megabytes.
+        /// </summary>
+        /// <param name="val">The value in gigabytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent value in megabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMegabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2224,6 +2937,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1024;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value, in megabytes, to its equivalent in kilobytes.
+        /// </summary>
+        /// <param name="val">The value in megabytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent number of kilobytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToKilobyte(double val)
         {
             if (double.IsNaN(val))
@@ -2231,6 +2951,15 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1048576;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value to its equivalent in bytes by multiplying it by 1,073,741,824.
+        /// </summary>
+        /// <remarks>This method treats the input as a value in gigabytes and returns its equivalent in
+        /// bytes. The conversion uses the binary definition of a gigabyte (1 GB = 1,073,741,824 bytes).</remarks>
+        /// <param name="val">The numeric value to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the input value multiplied by 1,073,741,824.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToByte(double val)
         {
             if (double.IsNaN(val))
@@ -2238,6 +2967,15 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1073741824;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from gigabytes to bits.
+        /// </summary>
+        /// <remarks>This method multiplies the input value by 8,589,934,592 to perform the conversion.
+        /// The result may be subject to floating-point precision limitations for very large values.</remarks>
+        /// <param name="val">The value in gigabytes to convert. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of bits for the specified gigabyte value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToBit(double val)
         {
             if (double.IsNaN(val))
@@ -2246,8 +2984,25 @@ namespace Calcify.Math.Conversion.DataSize
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting values between terabytes and other digital storage units, including
+    /// exabytes, petabytes, gigabytes, megabytes, kilobytes, bytes, and bits.
+    /// </summary>
+    /// <remarks>All conversion methods require the input value to be a valid number (not NaN) and perform
+    /// direct mathematical conversions based on standard binary unit definitions. Results may be subject to
+    /// floating-point precision limitations for very large values. This class is thread-safe as it contains only
+    /// stateless static methods.</remarks>
     public static class Terabyte
     {
+        /// <summary>
+        /// Converts a value in terabytes to its equivalent in exabytes.
+        /// </summary>
+        /// <remarks>One exabyte is equal to 1,048,576 terabytes. This method performs a direct division
+        /// to convert the input value.</remarks>
+        /// <param name="val">The value in terabytes to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in exabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToExabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2255,6 +3010,15 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1048576.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in terabytes to its equivalent in petabytes.
+        /// </summary>
+        /// <remarks>One petabyte is equal to 1,024 terabytes. This method performs a simple division to
+        /// convert the input value.</remarks>
+        /// <param name="val">The value in terabytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in petabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToPetabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2262,6 +3026,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1024.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value in terabytes to its equivalent in gigabytes.
+        /// </summary>
+        /// <param name="val">The value, in terabytes, to convert to gigabytes. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of gigabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToGigabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2269,6 +3040,15 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1024;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from megabytes to bytes.
+        /// </summary>
+        /// <remarks>This method multiplies the input value by 1,048,576 to perform the conversion. The
+        /// result may be subject to floating-point precision limitations.</remarks>
+        /// <param name="val">The value in megabytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent number of bytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMegabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2276,6 +3056,15 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1048576;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from gigabytes to kilobytes.
+        /// </summary>
+        /// <remarks>This method multiplies the input value by 1,073,741,824 to perform the conversion, as
+        /// one gigabyte equals 1,073,741,824 kilobytes.</remarks>
+        /// <param name="val">The value in gigabytes to convert. Must be a valid number.</param>
+        /// <returns>The equivalent value in kilobytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is not a number (NaN).</exception>
         public static double ToKilobyte(double val)
         {
             if (double.IsNaN(val))
@@ -2283,6 +3072,16 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1073741824;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value, in terabytes, to its equivalent number of bytes.
+        /// </summary>
+        /// <remarks>This method multiplies the input value by 1,099,511,627,776 (the number of bytes in
+        /// one terabyte). The result may be subject to floating-point precision limitations for very large
+        /// values.</remarks>
+        /// <param name="val">The value to convert, expressed in terabytes. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the number of bytes equivalent to the specified terabyte value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToByte(double val)
         {
             if (double.IsNaN(val))
@@ -2290,6 +3089,15 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1099511627776.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from terabits to bits.
+        /// </summary>
+        /// <remarks>This method multiplies the input value by 8,796,093,022,208 to perform the conversion
+        /// from terabits to bits. The result may be subject to floating-point precision limitations.</remarks>
+        /// <param name="val">The value in terabits to convert. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of bits.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToBit(double val)
         {
             if (double.IsNaN(val))
@@ -2298,8 +3106,22 @@ namespace Calcify.Math.Conversion.DataSize
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting data storage values between petabytes and other units, including
+    /// exabytes, terabytes, gigabytes, megabytes, kilobytes, bytes, and bits.
+    /// </summary>
+    /// <remarks>All conversion methods require input values that are not <see cref="double.NaN"/> and may be
+    /// subject to floating-point precision limitations for very large numbers. The class is intended for use in
+    /// scenarios where precise conversions between large-scale data units are needed.</remarks>
     public static class Petabyte
     {
+        /// <summary>
+        /// Converts a value in petabytes to its equivalent in exabytes.
+        /// </summary>
+        /// <param name="val">The value, in petabytes, to convert to exabytes. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent value in exabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToExabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2307,6 +3129,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val / 1024.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in petabytes to its equivalent in terabytes.
+        /// </summary>
+        /// <param name="val">The value, in petabytes, to convert to terabytes. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of terabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToTerabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2314,6 +3143,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1024;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from terabytes to gigabytes.
+        /// </summary>
+        /// <param name="val">The value in terabytes to convert. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent value in gigabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToGigabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2321,6 +3157,15 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1048576;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value, in gigabytes, to its equivalent in megabytes.
+        /// </summary>
+        /// <remarks>One gigabyte is considered equal to 1,073,741,824 megabytes in this
+        /// conversion.</remarks>
+        /// <param name="val">The value in gigabytes to convert. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of megabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMegabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2328,6 +3173,16 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1073741824;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value, in terabytes, to its equivalent in kilobytes.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion using the factor 1 terabyte =
+        /// 1,099,511,627,776 kilobytes. The result may be subject to floating-point precision limitations for very
+        /// large values.</remarks>
+        /// <param name="val">The numeric value in terabytes to convert. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of kilobytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToKilobyte(double val)
         {
             if (double.IsNaN(val))
@@ -2335,6 +3190,16 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1099511627776.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value, interpreted as terabytes, to its equivalent number of bytes.
+        /// </summary>
+        /// <remarks>This method multiplies the input value by 1,125,899,906,842,624 (the number of bytes
+        /// in one terabyte). The result may be subject to floating-point precision limitations for very large
+        /// values.</remarks>
+        /// <param name="val">The value in terabytes to convert to bytes. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the number of bytes equivalent to the specified terabyte value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToByte(double val)
         {
             if (double.IsNaN(val))
@@ -2342,6 +3207,15 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1125899906842624.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified double-precision floating-point value to its bit representation as a double.
+        /// </summary>
+        /// <remarks>This method multiplies the input value by 2^53 (9007199254740992.0) to obtain its bit
+        /// representation. The result may be subject to floating-point precision limitations.</remarks>
+        /// <param name="val">The double-precision floating-point value to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A double representing the bit value of the input parameter.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToBit(double val)
         {
             if (double.IsNaN(val))
@@ -2350,8 +3224,23 @@ namespace Calcify.Math.Conversion.DataSize
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting between various digital storage units, including terabytes, petabytes,
+    /// gigabytes, megabytes, kilobytes, bytes, and bits.
+    /// </summary>
+    /// <remarks>All conversion methods use binary (IEC) units for calculations and accept double-precision
+    /// floating-point values as input. Each method throws an ArgumentException if the input value is NaN. These methods
+    /// are intended for large-scale data conversions and may return values that exceed the range of standard numeric
+    /// types.</remarks>
     public static class Exabyte
     {
+        /// <summary>
+        /// Converts a value in terabytes to its equivalent in petabytes.
+        /// </summary>
+        /// <param name="val">The value, in terabytes, to convert to petabytes.</param>
+        /// <returns>A double representing the equivalent value in petabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is not a valid number (NaN).</exception>
         public static double ToPetabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2359,6 +3248,15 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1024;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in gigabytes to its equivalent in terabytes.
+        /// </summary>
+        /// <remarks>This method assumes a conversion factor of 1 terabyte = 1,048,576 gigabytes. The
+        /// result is calculated by multiplying the input value by 1,048,576.</remarks>
+        /// <param name="val">The value in gigabytes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent value in terabytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToTerabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2366,6 +3264,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1048576;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from gigabytes to bytes.
+        /// </summary>
+        /// <param name="val">The value in gigabytes to convert. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of bytes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToGigabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2373,6 +3278,13 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1073741824;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from terabytes to megabytes.
+        /// </summary>
+        /// <param name="val">The value, in terabytes, to convert to megabytes.</param>
+        /// <returns>A double representing the equivalent number of megabytes for the specified terabyte value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is not a number (NaN).</exception>
         public static double ToMegabyte(double val)
         {
             if (double.IsNaN(val))
@@ -2380,6 +3292,15 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1099511627776.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value, interpreted as tebibytes (TiB), to kilobytes (KB).
+        /// </summary>
+        /// <remarks>One tebibyte (TiB) is equal to 1,125,899,906,842,624 bytes, or 1,125,899,906,842.624
+        /// kilobytes. This method uses binary (IEC) units for conversion.</remarks>
+        /// <param name="val">The numeric value in tebibytes to convert to kilobytes. Must not be NaN.</param>
+        /// <returns>The equivalent value in kilobytes as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToKilobyte(double val)
         {
             if (double.IsNaN(val))
@@ -2387,6 +3308,17 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1125899906842624.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified double-precision floating-point value to its equivalent byte value by multiplying it
+        /// by 2^60.
+        /// </summary>
+        /// <remarks>This method performs a scaling operation by multiplying the input value by 2^60. The
+        /// result may exceed the range of a byte and is returned as a double. Use this method when a large-scale
+        /// conversion is required.</remarks>
+        /// <param name="val">The double-precision floating-point value to convert. Must not be NaN.</param>
+        /// <returns>A double representing the input value multiplied by 1,152,921,504,606,846,976 (2^60).</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToByte(double val)
         {
             if (double.IsNaN(val))
@@ -2394,6 +3326,14 @@ namespace Calcify.Math.Conversion.DataSize
             double result = val * 1152921504606846976.0;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified double-precision floating-point value to its equivalent value in bits, represented as
+        /// a double.
+        /// </summary>
+        /// <param name="val">The double-precision floating-point value to convert. Must not be NaN.</param>
+        /// <returns>A double representing the bit-equivalent value of the input parameter.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToBit(double val)
         {
             if (double.IsNaN(val))
@@ -2405,72 +3345,172 @@ namespace Calcify.Math.Conversion.DataSize
 }
 namespace Calcify.Math.Conversion.Frequency
 {
+    /// <summary>
+    /// Provides static methods for converting frequency values from hertz to higher units such as kilohertz, megahertz,
+    /// and gigahertz.
+    /// </summary>
+    /// <remarks>This class is intended for use in scenarios where frequency conversions between hertz and its
+    /// multiples are required. All methods assume the input value is a finite number representing frequency in hertz.
+    /// The class cannot be instantiated.</remarks>
     public static class Hertz
     {
+        /// <summary>
+        /// Converts a frequency value from hertz to kilohertz.
+        /// </summary>
+        /// <param name="val">The frequency value in hertz to convert. Must be a finite number.</param>
+        /// <returns>The equivalent frequency in kilohertz.</returns>
         public static double ToKilohertz(double val)
         {
             double result = val / 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a frequency value from hertz to megahertz.
+        /// </summary>
+        /// <param name="val">The frequency value in hertz to convert. Must be a finite number.</param>
+        /// <returns>The equivalent frequency in megahertz.</returns>
         public static double ToMegahertz(double val)
         {
             double result = val / 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a frequency value from hertz to gigahertz.
+        /// </summary>
+        /// <param name="val">The frequency value in hertz to convert. Must be a finite number.</param>
+        /// <returns>The equivalent frequency in gigahertz.</returns>
         public static double ToGigahertz(double val)
         {
             double result = val / 1000000000;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting frequency values between kilohertz, hertz, megahertz, and gigahertz
+    /// units.
+    /// </summary>
+    /// <remarks>This class is intended for use in scenarios where frequency unit conversions are required,
+    /// such as signal processing or electronics calculations. All methods are static and do not require instantiation
+    /// of the class. Input values should be finite and within the valid range for the respective conversion
+    /// method.</remarks>
     public static class Kilohertz
     {
+        /// <summary>
+        /// Converts a frequency value from kilohertz to hertz.
+        /// </summary>
+        /// <param name="val">The frequency value in kilohertz to convert. Must be a finite number.</param>
+        /// <returns>The equivalent frequency in hertz.</returns>
         public static double ToHertz(double val)
         {
             double result = val * 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a frequency value from kilohertz to megahertz.
+        /// </summary>
+        /// <param name="val">The frequency value in kilohertz to convert. Must be a finite number.</param>
+        /// <returns>The equivalent frequency in megahertz.</returns>
         public static double ToMegahertz(double val)
         {
             double result = val / 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a frequency value from hertz to gigahertz.
+        /// </summary>
+        /// <param name="val">The frequency value in hertz to convert. Must be greater than or equal to zero.</param>
+        /// <returns>The equivalent frequency in gigahertz.</returns>
         public static double ToGigahertz(double val)
         {
             double result = val / 1000000;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting frequency values from megahertz (MHz) to other units of frequency,
+    /// including hertz (Hz), kilohertz (kHz), and gigahertz (GHz).
+    /// </summary>
+    /// <remarks>This class is intended for use in scenarios where frequency conversions between megahertz and
+    /// other standard units are required. All methods are static and do not require instantiation of the class. Input
+    /// values should be finite numbers; negative values may not be meaningful in typical frequency contexts.</remarks>
     public static class Megahertz
     {
+        /// <summary>
+        /// Converts a frequency value from megahertz (MHz) to hertz (Hz).
+        /// </summary>
+        /// <param name="val">The frequency value in megahertz (MHz) to convert. Must be a finite number.</param>
+        /// <returns>The equivalent frequency in hertz (Hz).</returns>
         public static double ToHertz(double val)
         {
             double result = val * 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a frequency value from megahertz to kilohertz.
+        /// </summary>
+        /// <param name="val">The frequency value in megahertz to convert. Must be a finite number.</param>
+        /// <returns>The equivalent frequency in kilohertz.</returns>
         public static double ToKilohertz(double val)
         {
             double result = val * 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a frequency value from megahertz to gigahertz.
+        /// </summary>
+        /// <param name="val">The frequency value in megahertz to convert. Must be greater than or equal to zero.</param>
+        /// <returns>The equivalent frequency in gigahertz.</returns>
         public static double ToGigahertz(double val)
         {
             double result = val / 1000;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting frequency values between gigahertz (GHz), megahertz (MHz), kilohertz
+    /// (kHz), and hertz (Hz).
+    /// </summary>
+    /// <remarks>This class is intended for use in scenarios where frequency unit conversions are required,
+    /// such as signal processing, hardware interfacing, or scientific calculations. All methods are static and do not
+    /// require instantiation of the class.</remarks>
     public static class Gigahertz
     {
+        /// <summary>
+        /// Converts a frequency value from gigahertz (GHz) to hertz (Hz).
+        /// </summary>
+        /// <param name="val">The frequency value in gigahertz to convert. Must be a finite number.</param>
+        /// <returns>The equivalent frequency in hertz.</returns>
         public static double ToHertz(double val)
         {
             double result = val * 1000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a frequency value from megahertz to kilohertz.
+        /// </summary>
+        /// <param name="val">The frequency value in megahertz to convert. Must be a finite number.</param>
+        /// <returns>A double representing the equivalent frequency in kilohertz.</returns>
         public static double ToKilohertz(double val)
         {
             double result = val * 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a frequency value from gigahertz to megahertz.
+        /// </summary>
+        /// <param name="val">The frequency value, in gigahertz, to convert to megahertz.</param>
+        /// <returns>A double representing the equivalent frequency in megahertz.</returns>
         public static double ToMegahertz(double val)
         {
             double result = val * 1000;
@@ -2480,819 +3520,1929 @@ namespace Calcify.Math.Conversion.Frequency
 }
 namespace Calcify.Math.Conversion.Length
 {
+    /// <summary>
+    /// Provides static methods for converting length values from nanometers (and picometers) to various metric and
+    /// imperial units.
+    /// </summary>
+    /// <remarks>All conversion methods perform direct calculations using fixed conversion factors. Results
+    /// may be subject to floating-point precision limitations for very large or very small input values. This class is
+    /// thread-safe and intended for utility use; it cannot be instantiated.</remarks>
     public static class Nanometer
     {
+        /// <summary>
+        /// Converts a value from nanometers to inches.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion using the factor 1 inch = 25,400,000
+        /// nanometers. The result may be imprecise for very large or very small values due to floating-point
+        /// limitations.</remarks>
+        /// <param name="val">The length in nanometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in inches.</returns>
         public static double ToInches(double val)
         {
             double result = val / 25400000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from nanometers to feet.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion using the factor that one foot equals
+        /// 304,800,000 nanometers. The result may be subject to floating-point precision limitations for very large or
+        /// very small values.</remarks>
+        /// <param name="val">The length to convert, specified in nanometers.</param>
+        /// <returns>The equivalent length in feet.</returns>
         public static double ToFeet(double val)
         {
             double result = val / 304800000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from nanometers to yards.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion using the factor that one yard equals
+        /// 914,400,000 nanometers. The result may be subject to floating-point precision limitations for very large or
+        /// very small input values.</remarks>
+        /// <param name="val">The length in nanometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in yards.</returns>
         public static double ToYards(double val)
         {
             double result = val / 914400000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance from nanometers to miles.
+        /// </summary>
+        /// <remarks>One mile is equal to 1,609,000,000,000 nanometers. This method performs a direct
+        /// conversion using this factor.</remarks>
+        /// <param name="val">The distance value in nanometers to convert. Must be greater than or equal to zero.</param>
+        /// <returns>The equivalent distance in miles.</returns>
         public static double ToMiles(double val)
         {
             double result = val / 1609000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from nanometers to hectometers.
+        /// </summary>
+        /// <param name="val">The length in nanometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in hectometers.</returns>
         public static double ToHectometer(double val)
         {
             double result = val / 100000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from nanometers to decameters.
+        /// </summary>
+        /// <param name="val">The length value in nanometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decameters.</returns>
         public static double ToDecameter(double val)
         {
             double result = val / 10000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from picometers to kilometers.
+        /// </summary>
+        /// <param name="val">The length in picometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in kilometers.</returns>
         public static double ToKilometer(double val)
         {
             double result = val / 1000000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from nanometers to meters.
+        /// </summary>
+        /// <param name="val">The length value in nanometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in meters.</returns>
         public static double ToMeter(double val)
         {
             double result = val / 1000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from nanometers to decimeters.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion by dividing the input value by 100,000,000.
+        /// The result may be positive or negative depending on the input value.</remarks>
+        /// <param name="val">The length value in nanometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decimeters.</returns>
         public static double ToDecimeter(double val)
         {
             double result = val / 100000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from nanometers to centimeters.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion by dividing the input value by 10,000,000.
+        /// The result may be subject to floating-point precision limitations for very large or very small
+        /// values.</remarks>
+        /// <param name="val">The length in nanometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in centimeters.</returns>
         public static double ToCentimeter(double val)
         {
             double result = val / 10000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from nanometers to millimeters.
+        /// </summary>
+        /// <param name="val">The value in nanometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in millimeters.</returns>
         public static double ToMillimeter(double val)
         {
             double result = val / 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in nanometers to micrometers.
+        /// </summary>
+        /// <param name="val">The length in nanometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in micrometers.</returns>
         public static double ToMicrometer(double val)
         {
             double result = val / 1000;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting length and area values between micrometers, nanometers, and various
+    /// metric and imperial units.
+    /// </summary>
+    /// <remarks>This class offers a set of unit conversion utilities for micrometers and nanometers,
+    /// including conversions to inches, feet, yards, miles, hectometers, decameters, kilometers, meters, decimeters,
+    /// centimeters, millimeters, and nanometers. All methods perform direct conversions using standard unit factors and
+    /// may be subject to floating-point precision limitations for very large or very small values. The class is static
+    /// and cannot be instantiated.</remarks>
     public static class Micrometer
     {
+        /// <summary>
+        /// Converts a value from micrometers to inches.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion using the factor that 1 inch equals 25,400
+        /// micrometers. The result may be imprecise for very large or very small values due to floating-point
+        /// limitations.</remarks>
+        /// <param name="val">The length in micrometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in inches.</returns>
         public static double ToInches(double val)
         {
             double result = val / 25400;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from micrometers to feet.
+        /// </summary>
+        /// <param name="val">The length in micrometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in feet.</returns>
         public static double ToFeet(double val)
         {
             double result = val / 304800;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in microns to yards.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion using the factor that one yard equals
+        /// 914,400 microns. The result may be a fractional value.</remarks>
+        /// <param name="val">The length in microns to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in yards.</returns>
         public static double ToYards(double val)
         {
             double result = val / 914400;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance from nanometers to miles.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion using the factor 1 mile = 1,609,344,000
+        /// nanometers. Negative input values will result in negative output values, which may not be meaningful for
+        /// physical distances.</remarks>
+        /// <param name="val">The distance value in nanometers to convert. Must be greater than or equal to zero.</param>
+        /// <returns>The equivalent distance in miles.</returns>
         public static double ToMiles(double val)
         {
             double result = val / 1609344000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in nanometers to hectometers.
+        /// </summary>
+        /// <param name="val">The length in nanometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in hectometers.</returns>
         public static double ToHectometer(double val)
         {
             double result = val / 100000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from nanometers to decameters.
+        /// </summary>
+        /// <param name="val">The length value in nanometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decameters.</returns>
         public static double ToDecameter(double val)
         {
             double result = val / 10000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from nanometers to kilometers.
+        /// </summary>
+        /// <param name="val">The length in nanometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in kilometers.</returns>
         public static double ToKilometer(double val)
         {
             double result = val / 1000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from micrometers to meters.
+        /// </summary>
+        /// <param name="val">The length in micrometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in meters.</returns>
         public static double ToMeter(double val)
         {
             double result = val / 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from micrometers to decimeters.
+        /// </summary>
+        /// <param name="val">The length value in micrometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decimeters.</returns>
         public static double ToDecimeter(double val)
         {
             double result = val / 100000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in square micrometers to square centimeters.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion by dividing the input value by 10,000. The
+        /// result may be subject to floating-point precision limitations for very large or very small values.</remarks>
+        /// <param name="val">The area value, in square micrometers, to convert to square centimeters.</param>
+        /// <returns>The equivalent area in square centimeters.</returns>
         public static double ToCentimeter(double val)
         {
             double result = val / 10000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from micrometers to millimeters.
+        /// </summary>
+        /// <param name="val">The value in micrometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent value in millimeters.</returns>
         public static double ToMillimeter(double val)
         {
             double result = val / 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from micrometers to nanometers.
+        /// </summary>
+        /// <param name="val">The length in micrometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in nanometers.</returns>
         public static double ToNanometer(double val)
         {
             double result = val * 1000;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting between millimeters, micrometers, and other units of length and area.
+    /// </summary>
+    /// <remarks>This class offers a set of utility methods for performing direct conversions between metric
+    /// and imperial units, including inches, feet, yards, miles, hectometers, decameters, kilometers, meters,
+    /// decimeters, centimeters, micrometers, and nanometers. All methods are static and do not require instantiation.
+    /// Negative and non-integer values are supported where appropriate. Input values should be finite numbers; passing
+    /// non-finite values (such as NaN or infinity) may result in undefined behavior.</remarks>
     public static class Millimeter
     {
+        /// <summary>
+        /// Converts a measurement from millimeters to inches.
+        /// </summary>
+        /// <param name="val">The value in millimeters to convert to inches.</param>
+        /// <returns>The equivalent measurement in inches.</returns>
         public static double ToInches(double val)
         {
             double result = val / 25.4;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from millimeters to feet.
+        /// </summary>
+        /// <param name="val">The length value in millimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in feet.</returns>
         public static double ToFeet(double val)
         {
             double result = val / 304.8;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from millimeters to yards.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion using the factor that one yard equals 914
+        /// millimeters. Negative values are supported and will return a negative result.</remarks>
+        /// <param name="val">The length in millimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in yards.</returns>
         public static double ToYards(double val)
         {
             double result = val / 914;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance from micrometers to miles.
+        /// </summary>
+        /// <param name="val">The distance value, in micrometers, to convert to miles.</param>
+        /// <returns>The equivalent distance in miles.</returns>
         public static double ToMiles(double val)
         {
             double result = val / 1609000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from micrometers to hectometers.
+        /// </summary>
+        /// <param name="val">The length in micrometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in hectometers.</returns>
         public static double ToHectometer(double val)
         {
             double result = val / 100000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from square centimeters to square decameters.
+        /// </summary>
+        /// <param name="val">The area, in square centimeters, to convert to square decameters.</param>
+        /// <returns>The equivalent area in square decameters.</returns>
         public static double ToDecameter(double val)
         {
             double result = val / 10000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from micrometers to kilometers.
+        /// </summary>
+        /// <param name="val">The length in micrometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in kilometers.</returns>
         public static double ToKilometer(double val)
         {
             double result = val / 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from millimeters to meters.
+        /// </summary>
+        /// <param name="val">The length in millimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in meters.</returns>
         public static double ToMeter(double val)
         {
             double result = val / 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from centimeters to decimeters.
+        /// </summary>
+        /// <param name="val">The length in centimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decimeters.</returns>
         public static double ToDecimeter(double val)
         {
             double result = val / 100;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from millimeters to centimeters.
+        /// </summary>
+        /// <param name="val">The length in millimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in centimeters.</returns>
         public static double ToCentimeter(double val)
         {
             double result = val / 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in millimeters to micrometers.
+        /// </summary>
+        /// <param name="val">The length in millimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in micrometers.</returns>
         public static double ToMicrometer(double val)
         {
             double result = val * 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in micrometers to nanometers.
+        /// </summary>
+        /// <param name="val">The length in micrometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in nanometers.</returns>
         public static double ToNanometer(double val)
         {
             double result = val * 1000000;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting length and area values between centimeters and other metric and imperial
+    /// units.
+    /// </summary>
+    /// <remarks>This class includes a variety of conversion methods for common units such as inches, feet,
+    /// yards, miles, meters, kilometers, millimeters, micrometers, nanometers, decimeters, decameters, and hectometers.
+    /// All methods are thread-safe and do not maintain any internal state. Input values should be finite numbers unless
+    /// otherwise specified in the method documentation. Negative input values will result in negative output values,
+    /// reflecting the direction of measurement.</remarks>
     public static class Centimeter
     {
+        /// <summary>
+        /// Converts a length value from centimeters to inches.
+        /// </summary>
+        /// <remarks>This method uses the conversion factor of 1 inch = 2.54 centimeters. The result may
+        /// be negative if the input value is negative.</remarks>
+        /// <param name="val">The length in centimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in inches.</returns>
         public static double ToInches(double val)
         {
             double result = val / 2.54;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from centimeters to feet.
+        /// </summary>
+        /// <param name="val">The length value in centimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in feet.</returns>
         public static double ToFeet(double val)
         {
             double result = val / 30.48;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from centimeters to yards.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion using the factor that one yard equals 91.44
+        /// centimeters. The result may be positive or negative depending on the input value.</remarks>
+        /// <param name="val">The length value in centimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in yards.</returns>
         public static double ToYards(double val)
         {
             double result = val / 91.44;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance from centimeters to miles.
+        /// </summary>
+        /// <param name="val">The distance to convert, in centimeters. Must be a finite number.</param>
+        /// <returns>The equivalent distance in miles.</returns>
         public static double ToMiles(double val)
         {
             double result = val / 160934;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from square centimeters to hectometers.
+        /// </summary>
+        /// <param name="val">The area value, in square centimeters, to convert to hectometers.</param>
+        /// <returns>The equivalent area in hectometers.</returns>
         public static double ToHectometer(double val)
         {
             double result = val / 10000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from meters to decameters.
+        /// </summary>
+        /// <param name="val">The length in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decameters.</returns>
         public static double ToDecameter(double val)
         {
             double result = val / 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from centimeters to kilometers.
+        /// </summary>
+        /// <param name="val">The length in centimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in kilometers.</returns>
         public static double ToKilometer(double val)
         {
             double result = val / 100000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from centimeters to meters.
+        /// </summary>
+        /// <param name="val">The length in centimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in meters.</returns>
         public static double ToMeter(double val)
         {
             double result = val / 100;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from millimeters to decimeters.
+        /// </summary>
+        /// <param name="val">The length in millimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decimeters.</returns>
         public static double ToDecimeter(double val)
         {
             double result = val / 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from centimeters to millimeters.
+        /// </summary>
+        /// <param name="val">The length in centimeters to convert. Can be any double value, including negative or zero.</param>
+        /// <returns>The equivalent length in millimeters.</returns>
         public static double ToMillimeter(double val)
         {
             double result = val * 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in millimeters to micrometers.
+        /// </summary>
+        /// <param name="val">The length in millimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in micrometers.</returns>
         public static double ToMicrometer(double val)
         {
             double result = val * 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from micrometers to nanometers.
+        /// </summary>
+        /// <param name="val">The length in micrometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in nanometers.</returns>
         public static double ToNanometer(double val)
         {
             double result = val * 1000000;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting length and distance measurements between metric and imperial units,
+    /// including centimeters, meters, millimeters, inches, feet, yards, miles, hectometers, decameters, kilometers,
+    /// micrometers, and nanometers.
+    /// </summary>
+    /// <remarks>All conversion methods are stateless and thread-safe. Input values should be finite numbers
+    /// unless otherwise specified. These methods are intended for straightforward unit conversions and do not perform
+    /// validation beyond the documented requirements for each parameter.</remarks>
     public static class Decimeter
     {
+
+        /// <summary>
+        /// Converts a measurement from centimeters to inches.
+        /// </summary>
+        /// <param name="val">The value in centimeters to convert to inches.</param>
+        /// <returns>The equivalent measurement in inches.</returns>
         public static double ToInches(double val)
         {
             double result = val * 3.93701;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from centimeters to feet.
+        /// </summary>
+        /// <param name="val">The length value in centimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in feet.</returns>
         public static double ToFeet(double val)
         {
             double result = val / 3.048;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from meters to yards.
+        /// </summary>
+        /// <param name="val">The length in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in yards.</returns>
         public static double ToYards(double val)
         {
             double result = val / 9.144;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance from meters to miles.
+        /// </summary>
+        /// <param name="val">The distance in meters to convert. Must be greater than or equal to zero.</param>
+        /// <returns>The equivalent distance in miles.</returns>
         public static double ToMiles(double val)
         {
             double result = val / 16093.4;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from meters to hectometers.
+        /// </summary>
+        /// <param name="val">The length in meters to convert to hectometers.</param>
+        /// <returns>The equivalent length in hectometers.</returns>
         public static double ToHectometer(double val)
         {
             double result = val / 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from centimeters to decameters.
+        /// </summary>
+        /// <param name="val">The length in centimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decameters.</returns>
         public static double ToDecameter(double val)
         {
             double result = val / 100;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from meters to kilometers.
+        /// </summary>
+        /// <param name="val">The distance in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent distance in kilometers.</returns>
         public static double ToKilometer(double val)
         {
             double result = val / 10000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from decimeters to meters.
+        /// </summary>
+        /// <param name="val">The length in decimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in meters.</returns>
         public static double ToMeter(double val)
         {
             double result = val / 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from millimeters to centimeters.
+        /// </summary>
+        /// <param name="val">The length in millimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in centimeters.</returns>
         public static double ToCentimeter(double val)
         {
             double result = val * 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from centimeters to millimeters.
+        /// </summary>
+        /// <param name="val">The length in centimeters to convert. Can be any double value, including negative or zero.</param>
+        /// <returns>The equivalent length in millimeters.</returns>
         public static double ToMillimeter(double val)
         {
             double result = val * 100;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in centimeters to micrometers.
+        /// </summary>
+        /// <param name="val">The length in centimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in micrometers.</returns>
         public static double ToMicrometer(double val)
         {
             double result = val * 100000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in centimeters to nanometers.
+        /// </summary>
+        /// <param name="val">The length in centimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in nanometers.</returns>
         public static double ToNanometer(double val)
         {
             double result = val * 100000000;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting length and distance values from meters to various metric and imperial
+    /// units.
+    /// </summary>
+    /// <remarks>All conversion methods use standard unit conversion factors and return the equivalent value
+    /// in the target unit. Methods accept finite double values; results may be imprecise for very large or very small
+    /// inputs due to floating-point limitations. This class is thread-safe and intended for utility use in measurement
+    /// and unit conversion scenarios.</remarks>
     public static class Meter
     {
+        /// <summary>
+        /// Converts a length from meters to inches.
+        /// </summary>
+        /// <param name="val">The length value in meters to convert to inches.</param>
+        /// <returns>The equivalent length in inches.</returns>
         public static double ToInches(double val)
         {
             double result = val * 39.3701;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from meters to feet.
+        /// </summary>
+        /// <remarks>This method uses the conversion factor 1 meter = 3.28084 feet. The result may be
+        /// imprecise for very large or very small values due to floating-point limitations.</remarks>
+        /// <param name="val">The length in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in feet.</returns>
         public static double ToFeet(double val)
         {
             double result = val * 3.28084;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from meters to yards.
+        /// </summary>
+        /// <param name="val">The length in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in yards.</returns>
         public static double ToYards(double val)
         {
             double result = val * 1.09361;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance from meters to miles.
+        /// </summary>
+        /// <remarks>One mile is defined as 1,609 meters. The conversion is performed using this fixed
+        /// ratio. Negative values are allowed but may not be meaningful for physical distances.</remarks>
+        /// <param name="val">The distance in meters to convert. Must be greater than or equal to zero.</param>
+        /// <returns>The equivalent distance in miles.</returns>
         public static double ToMiles(double val)
         {
             double result = val / 1609;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from meters to hectometers.
+        /// </summary>
+        /// <param name="val">The length in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in hectometers.</returns>
         public static double ToHectometer(double val)
         {
             double result = val / 100;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from meters to decameters.
+        /// </summary>
+        /// <param name="val">The length in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decameters.</returns>
         public static double ToDecameter(double val)
         {
             double result = val / 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from meters to kilometers.
+        /// </summary>
+        /// <param name="val">The distance in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent distance in kilometers.</returns>
         public static double ToKilometer(double val)
         {
             double result = val / 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from meters to decimeters.
+        /// </summary>
+        /// <param name="val">The length in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decimeters.</returns>
         public static double ToDecimeter(double val)
         {
             double result = val * 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from meters to centimeters.
+        /// </summary>
+        /// <param name="val">The length in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in centimeters.</returns>
         public static double ToCentimeter(double val)
         {
             double result = val * 100;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from meters to millimeters.
+        /// </summary>
+        /// <param name="val">The length in meters to convert to millimeters.</param>
+        /// <returns>The equivalent length in millimeters.</returns>
         public static double ToMillimeter(double val)
         {
             double result = val * 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in meters to micrometers.
+        /// </summary>
+        /// <param name="val">The length in meters to convert to micrometers.</param>
+        /// <returns>A double representing the equivalent length in micrometers.</returns>
         public static double ToMicrometer(double val)
         {
             double result = val * 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from meters to nanometers.
+        /// </summary>
+        /// <param name="val">The length in meters to convert to nanometers.</param>
+        /// <returns>A double representing the equivalent length in nanometers.</returns>
         public static double ToNanometer(double val)
         {
             double result = val * 1000000000;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting distances and lengths between kilometers, meters, and various imperial
+    /// and metric units.
+    /// </summary>
+    /// <remarks>This class includes conversion methods for units such as feet, yards, miles, hectometers,
+    /// decameters, decimeters, centimeters, millimeters, micrometers, and nanometers. All methods perform direct
+    /// conversions using standard conversion factors and return the result as a double. Negative values are supported
+    /// where applicable and will yield corresponding negative results. Callers should ensure that input values are
+    /// finite numbers to avoid unexpected results due to floating-point limitations.</remarks>
     public static class Kilometer
     {
+        /// <summary>
+        /// Converts a value from meters to inches.
+        /// </summary>
+        /// <param name="val">The length in meters to convert to inches.</param>
+        /// <returns>The equivalent length in inches.</returns>
         public static double ToInches(double val)
         {
             double result = val * 39370.1;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance from kilometers to feet.
+        /// </summary>
+        /// <param name="val">The distance in kilometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent distance in feet.</returns>
         public static double ToFeet(double val)
         {
             double result = val * 3280.84;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from kilometers to yards.
+        /// </summary>
+        /// <remarks>This method uses the conversion factor of 1 kilometer = 1,093.61 yards. Negative
+        /// values are supported and will return the corresponding negative yard value.</remarks>
+        /// <param name="val">The length value in kilometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in yards.</returns>
         public static double ToYards(double val)
         {
             double result = val * 1093.61;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance from kilometers to miles.
+        /// </summary>
+        /// <param name="val">The distance in kilometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent distance in miles.</returns>
         public static double ToMiles(double val)
         {
             double result = val / 1.609344;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from kilometers to hectometers.
+        /// </summary>
+        /// <param name="val">The length value in kilometers to convert to hectometers.</param>
+        /// <returns>The equivalent length in hectometers.</returns>
         public static double ToHectometer(double val)
         {
             double result = val * 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from meters to decameters.
+        /// </summary>
+        /// <param name="val">The length in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decameters.</returns>
         public static double ToDecameter(double val)
         {
             double result = val * 100;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from kilometers to meters.
+        /// </summary>
+        /// <param name="val">The distance in kilometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent distance in meters.</returns>
         public static double ToMeter(double val)
         {
             double result = val * 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from kilometers to decimeters.
+        /// </summary>
+        /// <param name="val">The length in kilometers to convert to decimeters.</param>
+        /// <returns>The equivalent length in decimeters.</returns>
         public static double ToDecimeter(double val)
         {
             double result = val * 10000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from kilometers to centimeters.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion by multiplying the input value by 100,000.
+        /// The result may be subject to floating-point precision limitations for very large or very small
+        /// values.</remarks>
+        /// <param name="val">The distance in kilometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent distance in centimeters.</returns>
         public static double ToCentimeter(double val)
         {
             double result = val * 100000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from meters to millimeters.
+        /// </summary>
+        /// <param name="val">The value in meters to convert to millimeters.</param>
+        /// <returns>A double representing the equivalent length in millimeters.</returns>
         public static double ToMillimeter(double val)
         {
             double result = val * 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from meters to micrometers.
+        /// </summary>
+        /// <param name="val">The length in meters to convert to micrometers.</param>
+        /// <returns>A double representing the equivalent length in micrometers.</returns>
         public static double ToMicrometer(double val)
         {
             double result = val * 1000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from meters to nanometers.
+        /// </summary>
+        /// <param name="val">The length in meters to convert to nanometers.</param>
+        /// <returns>A double representing the equivalent length in nanometers.</returns>
         public static double ToNanometer(double val)
         {
             double result = val * 1000000000000;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting length and distance measurements between meters, decimeters, centimeters,
+    /// and various imperial and metric units.
+    /// </summary>
+    /// <remarks>All conversion methods use standard conversion factors and return the result as a
+    /// double-precision floating-point value. Methods do not perform input validation; callers should ensure that input
+    /// values are within valid ranges and are finite numbers. This class is thread-safe as it contains only stateless
+    /// static methods.</remarks>
     public static class Decameter
     {
+        /// <summary>
+        /// Converts a measurement from meters to inches.
+        /// </summary>
+        /// <param name="val">The value in meters to convert to inches.</param>
+        /// <returns>The equivalent measurement in inches.</returns>
         public static double ToInches(double val)
         {
             double result = val * 393.701;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from meters to feet.
+        /// </summary>
+        /// <remarks>This method uses the conversion factor 1 meter = 3.28084 feet. The result may be
+        /// imprecise for very large or very small values due to floating-point arithmetic.</remarks>
+        /// <param name="val">The length value in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in feet.</returns>
         public static double ToFeet(double val)
         {
             double result = val * 32.8084;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from meters to yards.
+        /// </summary>
+        /// <param name="val">The length in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in yards.</returns>
         public static double ToYards(double val)
         {
             double result = val * 10.9361;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance from meters to miles.
+        /// </summary>
+        /// <param name="val">The distance in meters to convert. Must be greater than or equal to zero.</param>
+        /// <returns>The equivalent distance in miles.</returns>
         public static double ToMiles(double val)
         {
             double result = val / 160.93;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from meters to hectometers.
+        /// </summary>
+        /// <param name="val">The length in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in hectometers.</returns>
         public static double ToHectometer(double val)
         {
             double result = val / 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from meters to kilometers.
+        /// </summary>
+        /// <param name="val">The distance in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent distance in kilometers.</returns>
         public static double ToKilometer(double val)
         {
             double result = val / 100;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from decimeters to meters.
+        /// </summary>
+        /// <param name="val">The value in decimeters to convert to meters.</param>
+        /// <returns>The equivalent value in meters.</returns>
         public static double ToMeter(double val)
         {
             double result = val * 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from meters to decimeters.
+        /// </summary>
+        /// <param name="val">The length in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decimeters.</returns>
         public static double ToDecimeter(double val)
         {
             double result = val * 100;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from meters to centimeters.
+        /// </summary>
+        /// <param name="val">The length in meters to convert to centimeters.</param>
+        /// <returns>A double representing the equivalent length in centimeters.</returns>
         public static double ToCentimeter(double val)
         {
             double result = val * 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from centimeters to millimeters.
+        /// </summary>
+        /// <param name="val">The length value in centimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in millimeters.</returns>
         public static double ToMillimeter(double val)
         {
             double result = val * 10000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in centimeters to micrometers.
+        /// </summary>
+        /// <param name="val">The length in centimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in micrometers.</returns>
         public static double ToMicrometer(double val)
         {
             double result = val * 10000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from centimeters to nanometers.
+        /// </summary>
+        /// <param name="val">The length in centimeters to convert to nanometers.</param>
+        /// <returns>The equivalent length in nanometers.</returns>
         public static double ToNanometer(double val)
         {
             double result = val * 10000000000;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting between various metric and imperial length and area units, including
+    /// meters, kilometers, inches, feet, yards, miles, decameters, centimeters, millimeters, micrometers, and
+    /// nanometers.
+    /// </summary>
+    /// <remarks>All conversion methods use fixed conversion factors and operate on double-precision
+    /// floating-point values. Results may be imprecise for very large or very small values due to floating-point
+    /// arithmetic limitations. Negative values are accepted for area conversions where appropriate. This class is
+    /// thread-safe as it contains only static methods and does not maintain state.</remarks>
     public static class Hectometer
     {
+        /// <summary>
+        /// Converts a value from meters to inches.
+        /// </summary>
+        /// <remarks>This method uses a fixed conversion factor of 1 meter = 39.3701 inches. The result
+        /// may be imprecise for very large or very small values due to floating-point arithmetic.</remarks>
+        /// <param name="val">The length in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in inches.</returns>
         public static double ToInches(double val)
         {
             double result = val * 3937.01;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from kilometers to feet.
+        /// </summary>
+        /// <remarks>This method uses a fixed conversion factor of 1 kilometer = 328.084 feet. The result
+        /// may be imprecise for very large or very small values due to floating-point limitations.</remarks>
+        /// <param name="val">The length value in kilometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in feet.</returns>
         public static double ToFeet(double val)
         {
             double result = val * 328.084;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from meters to yards.
+        /// </summary>
+        /// <param name="val">The length in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in yards.</returns>
         public static double ToYards(double val)
         {
             double result = val * 109.361;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance from kilometers to miles.
+        /// </summary>
+        /// <param name="val">The distance value in kilometers to convert. Must be greater than or equal to zero.</param>
+        /// <returns>The equivalent distance in miles.</returns>
         public static double ToMiles(double val)
         {
             double result = val / 16.093;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from meters to decameters.
+        /// </summary>
+        /// <param name="val">The length in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decameters.</returns>
         public static double ToDecameter(double val)
         {
             double result = val * 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from hectometers to kilometers.
+        /// </summary>
+        /// <param name="val">The distance value in hectometers to convert. Must be a finite number.</param>
+        /// <returns>The equivalent distance in kilometers.</returns>
         public static double ToKilometer(double val)
         {
             double result = val / 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from centimeters to meters.
+        /// </summary>
+        /// <param name="val">The length in centimeters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in meters.</returns>
         public static double ToMeter(double val)
         {
             double result = val * 100;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in meters to its equivalent in decimeters.
+        /// </summary>
+        /// <param name="val">The length in meters to convert to decimeters.</param>
+        /// <returns>A double representing the equivalent length in decimeters.</returns>
         public static double ToDecimeter(double val)
         {
             double result = val * 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from square meters to square centimeters.
+        /// </summary>
+        /// <remarks>This method multiplies the input value by 10,000 to perform the conversion. Negative
+        /// values are allowed and will be converted accordingly.</remarks>
+        /// <param name="val">The area in square meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent area in square centimeters.</returns>
         public static double ToCentimeter(double val)
         {
             double result = val * 10000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from kilometers to millimeters.
+        /// </summary>
+        /// <param name="val">The value in kilometers to convert to millimeters.</param>
+        /// <returns>The equivalent length in millimeters.</returns>
         public static double ToMillimeter(double val)
         {
             double result = val * 100000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in centimeters to micrometers.
+        /// </summary>
+        /// <param name="val">The length value in centimeters to convert to micrometers.</param>
+        /// <returns>The equivalent length in micrometers.</returns>
         public static double ToMicrometer(double val)
         {
             double result = val * 100000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from meters to nanometers.
+        /// </summary>
+        /// <param name="val">The length in meters to convert to nanometers.</param>
+        /// <returns>A double representing the equivalent length in nanometers.</returns>
         public static double ToNanometer(double val)
         {
             double result = val * 100000000000;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting distances measured in miles to various other units of length, including
+    /// inches, feet, yards, metric units, and sub-metric units.
+    /// </summary>
+    /// <remarks>All conversion methods use fixed conversion factors and return the equivalent value in the
+    /// target unit. The input value should be a finite number representing the distance in miles. These methods are
+    /// thread-safe and suitable for use in mathematical calculations or unit conversions. For conversions requiring
+    /// high precision, verify the conversion factor used in each method, as some methods may use rounded values for
+    /// simplicity.</remarks>
     public static class Mile
     {
+        /// <summary>
+        /// Converts a value from miles to inches.
+        /// </summary>
+        /// <param name="val">The distance in miles to convert to inches.</param>
+        /// <returns>The equivalent distance in inches.</returns>
         public static double ToInches(double val)
         {
             double result = val * 63360;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance from miles to feet.
+        /// </summary>
+        /// <param name="val">The distance in miles to convert. Must be a finite number.</param>
+        /// <returns>The equivalent distance in feet.</returns>
         public static double ToFeet(double val)
         {
             double result = val * 5280;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance from miles to yards.
+        /// </summary>
+        /// <param name="val">The distance in miles to convert. Must be a finite number.</param>
+        /// <returns>The equivalent distance in yards.</returns>
         public static double ToYards(double val)
         {
             double result = val * 1760;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from miles to hectometers.
+        /// </summary>
+        /// <param name="val">The distance in miles to convert. Must be a finite number.</param>
+        /// <returns>The equivalent distance in hectometers.</returns>
         public static double ToHectometer(double val)
         {
             double result = val * 16.093;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from miles to decameters.
+        /// </summary>
+        /// <param name="val">The distance in miles to convert to decameters.</param>
+        /// <returns>The equivalent distance in decameters.</returns>
         public static double ToDecameter(double val)
         {
             double result = val * 161;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance from miles to kilometers.
+        /// </summary>
+        /// <param name="val">The distance in miles to convert. Must be a finite number.</param>
+        /// <returns>The equivalent distance in kilometers.</returns>
         public static double ToKilometer(double val)
         {
             double result = val * 1.609344;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance from miles to meters.
+        /// </summary>
+        /// <remarks>This method uses a conversion factor of 1 mile = 1,609 meters. For more precise
+        /// conversions, consider using the exact value of 1 mile = 1,609.344 meters.</remarks>
+        /// <param name="val">The distance in miles to convert. Must be a finite number.</param>
+        /// <returns>The equivalent distance in meters.</returns>
         public static double ToMeter(double val)
         {
             double result = val * 1609;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in miles to its equivalent length in decimeters.
+        /// </summary>
+        /// <param name="val">The distance in miles to convert to decimeters.</param>
+        /// <returns>The length in decimeters that corresponds to the specified value in miles.</returns>
         public static double ToDecimeter(double val)
         {
             double result = val * 16093;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from miles to centimeters.
+        /// </summary>
+        /// <param name="val">The distance in miles to convert to centimeters.</param>
+        /// <returns>The equivalent distance in centimeters.</returns>
         public static double ToCentimeter(double val)
         {
             double result = val * 160934;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in miles to millimeters.
+        /// </summary>
+        /// <param name="val">The distance in miles to convert to millimeters.</param>
+        /// <returns>The equivalent distance in millimeters.</returns>
         public static double ToMillimeter(double val)
         {
             double result = val * 1609340;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from miles to micrometers.
+        /// </summary>
+        /// <param name="val">The distance in miles to convert to micrometers.</param>
+        /// <returns>The equivalent distance in micrometers.</returns>
         public static double ToMicrometer(double val)
         {
             double result = val * 1609340000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from miles to nanometers.
+        /// </summary>
+        /// <param name="val">The distance in miles to convert to nanometers.</param>
+        /// <returns>The equivalent distance in nanometers.</returns>
         public static double ToNanometer(double val)
         {
             double result = val * 160934000000;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting lengths and distances between yards and various other units of
+    /// measurement, including inches, feet, miles, metric units, and more.
+    /// </summary>
+    /// <remarks>This class offers a set of utility methods for performing common unit conversions involving
+    /// yards. All methods are static and do not require instantiation of the class. The conversion factors used are
+    /// standard approximations suitable for general-purpose calculations; for applications requiring high precision,
+    /// verify the conversion factor as needed. Input values should be finite numbers, and some methods may require
+    /// non-negative values as specified in their documentation.</remarks>
     public static class Yard
     {
+        /// <summary>
+        /// Converts a measurement from yards to inches.
+        /// </summary>
+        /// <remarks>This method multiplies the input value by 36 to perform the conversion, as one yard
+        /// equals 36 inches.</remarks>
+        /// <param name="val">The value in yards to convert to inches.</param>
+        /// <returns>The equivalent length in inches.</returns>
         public static double ToInches(double val)
         {
             double result = val * 36;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from meters to feet.
+        /// </summary>
+        /// <remarks>This method uses an approximate conversion factor of 3 feet per meter. For precise
+        /// scientific or engineering calculations, consider using a more accurate conversion factor.</remarks>
+        /// <param name="val">The length value in meters to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in feet.</returns>
         public static double ToFeet(double val)
         {
             double result = val * 3;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance measured in yards to the equivalent distance in miles.
+        /// </summary>
+        /// <param name="val">The distance in yards to convert. Must be a non-negative value.</param>
+        /// <returns>The distance in miles that is equivalent to the specified number of yards.</returns>
         public static double ToMiles(double val)
         {
             double result = val / 1760;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from yards to hectometers.
+        /// </summary>
+        /// <param name="val">The length in yards to convert to hectometers.</param>
+        /// <returns>The equivalent length in hectometers.</returns>
         public static double ToHectometer(double val)
         {
             double result = val / 109.36;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from yards to decameters.
+        /// </summary>
+        /// <param name="val">The length in yards to convert to decameters.</param>
+        /// <returns>The equivalent length in decameters.</returns>
         public static double ToDecameter(double val)
         {
             double result = val / 10.936;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance measured in yards to its equivalent value in kilometers.
+        /// </summary>
+        /// <param name="val">The distance in yards to convert. Must be a finite number.</param>
+        /// <returns>The equivalent distance in kilometers.</returns>
         public static double ToKilometer(double val)
         {
             double result = val / 1093.6;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from yards to meters.
+        /// </summary>
+        /// <param name="val">The length value in yards to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in meters.</returns>
         public static double ToMeter(double val)
         {
             double result = val * 0.9144;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from yards to decimeters.
+        /// </summary>
+        /// <remarks>This method uses the conversion factor 1 yard = 9.144 decimeters. The result may be
+        /// positive or negative depending on the input value.</remarks>
+        /// <param name="val">The length value in yards to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decimeters.</returns>
         public static double ToDecimeter(double val)
         {
             double result = val * 9.144;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in yards to its equivalent length in centimeters.
+        /// </summary>
+        /// <param name="val">The length in yards to convert. Must be a finite number.</param>
+        /// <returns>The length in centimeters that corresponds to the specified value in yards.</returns>
         public static double ToCentimeter(double val)
         {
             double result = val * 91.44;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in yards to its equivalent length in millimeters.
+        /// </summary>
+        /// <param name="val">The length in yards to convert. Must be a finite number.</param>
+        /// <returns>The length in millimeters that corresponds to the specified value in yards.</returns>
         public static double ToMillimeter(double val)
         {
             double result = val * 914.4;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in yards to micrometers.
+        /// </summary>
+        /// <param name="val">The length in yards to convert to micrometers.</param>
+        /// <returns>The equivalent length in micrometers.</returns>
         public static double ToMicrometer(double val)
         {
             double result = val * 914400;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from inches to nanometers.
+        /// </summary>
+        /// <param name="val">The length in inches to convert to nanometers.</param>
+        /// <returns>The equivalent length in nanometers.</returns>
         public static double ToNanometer(double val)
         {
             double result = val * 914400000;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting length and distance values from feet to various other units of
+    /// measurement, including inches, yards, miles, metric units, and SI units.
+    /// </summary>
+    /// <remarks>All conversion methods use fixed conversion factors and operate on finite numeric values.
+    /// These methods are intended for straightforward unit conversions and do not perform input validation. Results may
+    /// be subject to floating-point precision limitations, especially for very large or very small values. This class
+    /// is thread-safe as it contains only stateless static methods.</remarks>
     public static class Feet
     {
+        /// <summary>
+        /// Converts a length value from feet to inches.
+        /// </summary>
+        /// <param name="val">The length, in feet, to convert to inches.</param>
+        /// <returns>The equivalent length in inches.</returns>
         public static double ToInches(double val)
         {
             double result = val * 12;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from feet to yards.
+        /// </summary>
+        /// <param name="val">The length in feet to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in yards.</returns>
         public static double ToYards(double val)
         {
             double result = val / 3;
             return result;
         }
+
+        /// <summary>
+        /// Converts a distance measured in feet to its equivalent in miles.
+        /// </summary>
+        /// <param name="val">The distance in feet to convert. Must be a finite number.</param>
+        /// <returns>The equivalent distance in miles.</returns>
         public static double ToMiles(double val)
         {
             double result = val / 5280;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from feet to hectometers.
+        /// </summary>
+        /// <param name="val">The length value in feet to convert to hectometers.</param>
+        /// <returns>The equivalent length in hectometers.</returns>
         public static double ToHectometer(double val)
         {
             double result = val / 328.1;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from feet to decameters.
+        /// </summary>
+        /// <param name="val">The length, in feet, to convert to decameters.</param>
+        /// <returns>The equivalent length in decameters.</returns>
         public static double ToDecameter(double val)
         {
             double result = val / 32.808;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from feet to kilometers.
+        /// </summary>
+        /// <remarks>This method uses a fixed conversion factor of 1 kilometer = 3,281 feet. The result
+        /// may be imprecise for very large or very small values due to floating-point arithmetic.</remarks>
+        /// <param name="val">The length in feet to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in kilometers.</returns>
         public static double ToKilometer(double val)
         {
             double result = val / 3281;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from feet to meters.
+        /// </summary>
+        /// <param name="val">The length in feet to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in meters.</returns>
         public static double ToMeter(double val)
         {
             double result = val / 3.281;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from feet to decimeters.
+        /// </summary>
+        /// <remarks>This method multiplies the input value by 3.048 to perform the conversion. The result
+        /// may be positive, negative, or zero depending on the input value.</remarks>
+        /// <param name="val">The length value in feet to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decimeters.</returns>
         public static double ToDecimeter(double val)
         {
             double result = val * 3.048;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from feet to centimeters.
+        /// </summary>
+        /// <param name="val">The length value in feet to convert to centimeters.</param>
+        /// <returns>The equivalent length in centimeters.</returns>
         public static double ToCentimeter(double val)
         {
             double result = val * 30.48;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in feet to millimeters.
+        /// </summary>
+        /// <param name="val">The length in feet to convert to millimeters.</param>
+        /// <returns>The equivalent length in millimeters.</returns>
         public static double ToMillimeter(double val)
         {
             double result = val * 304.8;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in feet to micrometers.
+        /// </summary>
+        /// <param name="val">The length in feet to convert to micrometers.</param>
+        /// <returns>The equivalent length in micrometers.</returns>
         public static double ToMicrometer(double val)
         {
             double result = val * 304800;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in feet to nanometers.
+        /// </summary>
+        /// <param name="val">The length in feet to convert to nanometers.</param>
+        /// <returns>The equivalent length in nanometers.</returns>
         public static double ToNanometer(double val)
         {
             double result = val * 304800000;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting length measurements from inches to various metric and imperial units.
+    /// </summary>
+    /// <remarks>This class offers a set of conversion methods for transforming values in inches to feet,
+    /// yards, miles, hectometers, decameters, kilometers, meters, decimeters, centimeters, millimeters, micrometers,
+    /// and nanometers. All methods use fixed conversion factors and return the converted value as a double. The methods
+    /// do not perform validation on input values; callers should ensure that input values are finite numbers. Results
+    /// may be imprecise for very large or very small values due to floating-point arithmetic limitations.</remarks>
     public static class Inches
     {
+        /// <summary>
+        /// Converts a length from inches to feet.
+        /// </summary>
+        /// <param name="val">The length value in inches to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in feet.</returns>
         public static double ToFeet(double val)
         {
             double result = val / 12;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from inches to yards.
+        /// </summary>
+        /// <param name="val">The length value, in inches, to convert to yards.</param>
+        /// <returns>The equivalent length in yards.</returns>
         public static double ToYards(double val)
         {
             double result = val / 36;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from inches to miles.
+        /// </summary>
+        /// <param name="val">The length value, in inches, to convert to miles.</param>
+        /// <returns>The equivalent length in miles.</returns>
         public static double ToMiles(double val)
         {
             double result = val / 63360;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from inches to hectometers.
+        /// </summary>
+        /// <param name="val">The length in inches to convert to hectometers.</param>
+        /// <returns>The equivalent length in hectometers.</returns>
         public static double ToHectometer(double val)
         {
             double result = val / 3937;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from inches to decameters.
+        /// </summary>
+        /// <param name="val">The length in inches to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decameters.</returns>
         public static double ToDecameter(double val)
         {
             double result = val / 393.701;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from inches to kilometers.
+        /// </summary>
+        /// <remarks>This method uses a fixed conversion factor of 1 kilometer = 39,370 inches. The result
+        /// may be imprecise for very large or very small values due to floating-point arithmetic.</remarks>
+        /// <param name="val">The length value in inches to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in kilometers.</returns>
         public static double ToKilometer(double val)
         {
             double result = val / 39370;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from inches to meters.
+        /// </summary>
+        /// <param name="val">The length, in inches, to convert to meters.</param>
+        /// <returns>The equivalent length in meters.</returns>
         public static double ToMeter(double val)
         {
             double result = val / 39.37;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length value from inches to decimeters.
+        /// </summary>
+        /// <remarks>This method uses the conversion factor 1 inch = 0.254 decimeters. The result may be
+        /// imprecise for very large or very small values due to floating-point arithmetic.</remarks>
+        /// <param name="val">The length in inches to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in decimeters.</returns>
         public static double ToDecimeter(double val)
         {
             double result = val / 3.937;
             return result;
         }
+
+        /// <summary>
+        /// Converts a length from inches to centimeters.
+        /// </summary>
+        /// <param name="val">The length in inches to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in centimeters.</returns>
         public static double ToCentimeter(double val)
         {
             double result = val * 2.54;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from inches to millimeters.
+        /// </summary>
+        /// <param name="val">The length in inches to convert. Must be a finite number.</param>
+        /// <returns>The equivalent length in millimeters.</returns>
         public static double ToMillimeter(double val)
         {
             double result = val * 25.4;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from inches to micrometers.
+        /// </summary>
+        /// <param name="val">The length in inches to convert to micrometers.</param>
+        /// <returns>The equivalent length in micrometers.</returns>
         public static double ToMicrometer(double val)
         {
             double result = val * 25400;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in inches to nanometers.
+        /// </summary>
+        /// <param name="val">The length value in inches to convert to nanometers.</param>
+        /// <returns>The equivalent length in nanometers.</returns>
         public static double ToNanometer(double val)
         {
             double result = val * 25400000;
@@ -3302,8 +5452,22 @@ namespace Calcify.Math.Conversion.Length
 }
 namespace Calcify.Math.Conversion.Mass
 {
+    /// <summary>
+    /// Provides static methods for converting mass values between metric tons and other common units of mass, including
+    /// kilograms, grams, milligrams, micrograms, long tons, short tons, stones, pounds, and ounces.
+    /// </summary>
+    /// <remarks>All conversion methods require input values that are not <see cref="double.NaN"/>. If a NaN
+    /// value is provided, an <see cref="ArgumentException"/> is thrown. The conversion factors used are based on
+    /// standard definitions, but users should verify factors for scientific or regulatory precision where necessary.
+    /// This class is thread-safe as it contains only stateless static methods.</remarks>
     public static class Tons
     {
+        /// <summary>
+        /// Converts a value in metric tons to kilograms.
+        /// </summary>
+        /// <param name="val">The value in metric tons to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in kilograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToKilograms(double val)
         {
             if (double.IsNaN(val))
@@ -3311,6 +5475,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in metric tons to grams.
+        /// </summary>
+        /// <param name="val">The value in metric tons to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in grams.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToGrams(double val)
         {
             if (double.IsNaN(val))
@@ -3318,6 +5489,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in grams to milligrams.
+        /// </summary>
+        /// <param name="val">The value in grams to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in milligrams.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMilligrams(double val)
         {
             if (double.IsNaN(val))
@@ -3325,6 +5503,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 1000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in teragrams to micrograms.
+        /// </summary>
+        /// <param name="val">The value, in teragrams, to convert to micrograms. Must not be NaN.</param>
+        /// <returns>The equivalent value in micrograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMicrograms(double val)
         {
             if (double.IsNaN(val))
@@ -3332,6 +5517,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 1000000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from metric tonnes to long tons (imperial tons).
+        /// </summary>
+        /// <remarks>One long ton is equal to 1.016 metric tonnes. This method performs a direct
+        /// conversion using this factor.</remarks>
+        /// <param name="val">The mass value in metric tonnes to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in long tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToLongTons(double val)
         {
             if (double.IsNaN(val))
@@ -3339,6 +5533,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 1.016;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from metric tons to short tons (U.S. tons).
+        /// </summary>
+        /// <remarks>One metric ton is approximately equal to 1.102 short tons. This method does not
+        /// validate whether the input is negative.</remarks>
+        /// <param name="val">The mass value, in metric tons, to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in short tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToShortTons(double val)
         {
             if (double.IsNaN(val))
@@ -3346,6 +5549,16 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 1.102;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value in grams to stones.
+        /// </summary>
+        /// <remarks>One stone is equal to 6,350.29318 grams. The conversion uses a factor of 1 stone =
+        /// 157.473 grams for compatibility with certain measurement standards. For precise scientific calculations,
+        /// verify the conversion factor used.</remarks>
+        /// <param name="val">The mass value, in grams, to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in stones.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToStones(double val)
         {
             if (double.IsNaN(val))
@@ -3353,6 +5566,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 157.473;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from kilograms to pounds.
+        /// </summary>
+        /// <param name="val">The mass value in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in pounds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToPounds(double val)
         {
             if (double.IsNaN(val))
@@ -3360,6 +5580,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.00045359237;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from milligrams to ounces.
+        /// </summary>
+        /// <param name="val">The mass value in milligrams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in ounces as a double-precision floating-point number.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToOunces(double val)
         {
             if (double.IsNaN(val))
@@ -3370,6 +5597,12 @@ namespace Calcify.Math.Conversion.Mass
     }
     public static class Kilograms
     {
+        /// <summary>
+        /// Converts the specified value from kilograms to metric tons.
+        /// </summary>
+        /// <param name="val">The value in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in metric tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToTons(double val)
         {
             if (double.IsNaN(val))
@@ -3377,6 +5610,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from kilograms to grams.
+        /// </summary>
+        /// <param name="val">The value in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in grams.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToGrams(double val)
         {
             if (double.IsNaN(val))
@@ -3384,6 +5624,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in kilograms to its equivalent in milligrams.
+        /// </summary>
+        /// <param name="val">The value in kilograms to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in milligrams.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMilligrams(double val)
         {
             if (double.IsNaN(val))
@@ -3391,6 +5638,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in grams to micrograms.
+        /// </summary>
+        /// <param name="val">The value in grams to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in micrograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMicrograms(double val)
         {
             if (double.IsNaN(val))
@@ -3398,6 +5652,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 1000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in kilograms to long tons (imperial tons).
+        /// </summary>
+        /// <param name="val">The mass value in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in long tons. Returns 0 if the input value is 0.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToLongTons(double val)
         {
             if (double.IsNaN(val))
@@ -3405,6 +5666,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.000984;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from kilograms to short tons (U.S. tons).
+        /// </summary>
+        /// <param name="val">The mass value in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in short tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToShortTons(double val)
         {
             if (double.IsNaN(val))
@@ -3412,6 +5680,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.0011023;
             return result;
         }
+
+        /// <summary>
+        /// Converts a weight value from kilograms to stones.
+        /// </summary>
+        /// <remarks>One stone is equal to approximately 6.35029 kilograms. This method uses a conversion
+        /// factor of 0.15747 to convert kilograms to stones.</remarks>
+        /// <param name="val">The weight in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent weight in stones.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToStones(double val)
         {
             if (double.IsNaN(val))
@@ -3419,6 +5696,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.15747;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in kilograms to its equivalent weight in pounds.
+        /// </summary>
+        /// <param name="val">The weight in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent weight in pounds as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToPounds(double val)
         {
             if (double.IsNaN(val))
@@ -3426,6 +5710,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 2.2046;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in kilograms to its equivalent in ounces.
+        /// </summary>
+        /// <param name="val">The value in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent weight in ounces.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToOunces(double val)
         {
             if (double.IsNaN(val))
@@ -3434,8 +5725,22 @@ namespace Calcify.Math.Conversion.Mass
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting mass values between grams and other common metric and imperial units.
+    /// </summary>
+    /// <remarks>This class includes conversion methods for kilograms, metric tons, milligrams, micrograms,
+    /// long tons, short tons, stones, pounds, and ounces. All methods require valid numeric input values and will throw
+    /// an exception if the input is not a number (NaN). The class is thread-safe and intended for use in scenarios
+    /// where precise mass unit conversions are required.</remarks>
     public static class Grams
     {
+        /// <summary>
+        /// Converts a value from kilograms to metric tons.
+        /// </summary>
+        /// <param name="val">The value in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in metric tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToTons(double val)
         {
             if (double.IsNaN(val))
@@ -3443,6 +5748,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in grams to its equivalent in kilograms.
+        /// </summary>
+        /// <param name="val">The value in grams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in kilograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToKilograms(double val)
         {
             if (double.IsNaN(val))
@@ -3450,6 +5762,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in grams to its equivalent in milligrams.
+        /// </summary>
+        /// <param name="val">The value in grams to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in milligrams.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMilligrams(double val)
         {
             if (double.IsNaN(val))
@@ -3457,6 +5776,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from grams to micrograms.
+        /// </summary>
+        /// <param name="val">The value in grams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in micrograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMicrograms(double val)
         {
             if (double.IsNaN(val))
@@ -3464,6 +5790,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in micrograms to long tons.
+        /// </summary>
+        /// <param name="val">The value in micrograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in long tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToLongTons(double val)
         {
             if (double.IsNaN(val))
@@ -3471,6 +5804,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.00000098421;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from micrograms to short tons.
+        /// </summary>
+        /// <param name="val">The mass value in micrograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in short tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToShortTons(double val)
         {
             if (double.IsNaN(val))
@@ -3478,6 +5818,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.0000011023;
             return result;
         }
+
+        /// <summary>
+        /// Converts a weight value from kilograms to stones.
+        /// </summary>
+        /// <param name="val">The weight in kilograms to convert. Must be a valid numeric value.</param>
+        /// <returns>The equivalent weight in stones.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="val"/> is not a number (NaN).</exception>
         public static double ToStones(double val)
         {
             if (double.IsNaN(val))
@@ -3485,6 +5832,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.00015747;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from grams to pounds.
+        /// </summary>
+        /// <param name="val">The mass value in grams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in pounds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToPounds(double val)
         {
             if (double.IsNaN(val))
@@ -3492,6 +5846,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.0022046;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from grams to ounces.
+        /// </summary>
+        /// <param name="val">The mass value in grams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in ounces.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToOunces(double val)
         {
             if (double.IsNaN(val))
@@ -3500,8 +5861,22 @@ namespace Calcify.Math.Conversion.Mass
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting mass values between milligrams and other metric and imperial units.
+    /// </summary>
+    /// <remarks>This class includes conversion methods for common mass units such as kilograms, grams,
+    /// micrograms, pounds, ounces, stones, metric tons, long tons, and short tons. All methods validate input values to
+    /// ensure they are not NaN, and will throw an exception if invalid input is provided. The class is thread-safe and
+    /// intended for use in scenarios where precise mass unit conversions are required.</remarks>
     public static class Milligrams
     {
+        /// <summary>
+        /// Converts a value from nanograms to metric tons.
+        /// </summary>
+        /// <param name="val">The value in nanograms to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in metric tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToTons(double val)
         {
             if (double.IsNaN(val))
@@ -3509,6 +5884,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 1000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from milligrams to kilograms.
+        /// </summary>
+        /// <param name="val">The mass value in milligrams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in kilograms as a double-precision floating-point number.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToKilograms(double val)
         {
             if (double.IsNaN(val))
@@ -3516,6 +5898,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in milligrams to grams.
+        /// </summary>
+        /// <param name="val">The value in milligrams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in grams.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToGrams(double val)
         {
             if (double.IsNaN(val))
@@ -3523,6 +5912,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value in milligrams to micrograms.
+        /// </summary>
+        /// <param name="val">The value in milligrams to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in micrograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMicrograms(double val)
         {
             if (double.IsNaN(val))
@@ -3530,6 +5926,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in nanograms to long tons.
+        /// </summary>
+        /// <param name="val">The mass value in nanograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in long tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToLongTons(double val)
         {
             if (double.IsNaN(val))
@@ -3537,6 +5940,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.00000000098421;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in nanograms to short tons.
+        /// </summary>
+        /// <remarks>A short ton is equal to 2,000 pounds. This method uses a fixed conversion factor for
+        /// nanograms to short tons.</remarks>
+        /// <param name="val">The mass value in nanograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in short tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToShortTons(double val)
         {
             if (double.IsNaN(val))
@@ -3544,6 +5956,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.0000000011023;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from micrograms to stones.
+        /// </summary>
+        /// <remarks>One stone is equal to 6,350,293.18 micrograms. This method does not validate the
+        /// range of the input value beyond checking for NaN.</remarks>
+        /// <param name="val">The mass value in micrograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in stones.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToStones(double val)
         {
             if (double.IsNaN(val))
@@ -3551,6 +5972,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.00000015747;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in milligrams to its equivalent weight in pounds.
+        /// </summary>
+        /// <param name="val">The weight in milligrams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent weight in pounds as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToPounds(double val)
         {
             if (double.IsNaN(val))
@@ -3558,6 +5986,12 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.0000022046;
             return result;
         }
+        /// <summary>
+        /// Converts a value in grams to its equivalent in ounces.
+        /// </summary>
+        /// <param name="val">The value in grams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in ounces.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToOunces(double val)
         {
             if (double.IsNaN(val))
@@ -3566,8 +6000,23 @@ namespace Calcify.Math.Conversion.Mass
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting mass values between micrograms and other units of measurement, including
+    /// tons, kilograms, grams, milligrams, stones, pounds, and ounces.
+    /// </summary>
+    /// <remarks>All conversion methods validate that the input value is not <see cref="double.NaN"/> and
+    /// throw an <see cref="ArgumentException"/> if this condition is not met. The class is intended for use in
+    /// scenarios where precise mass unit conversions are required, and does not perform range or overflow checks beyond
+    /// NaN validation.</remarks>
     public static class Micrograms
     {
+        /// <summary>
+        /// Converts the specified value from units to trillions (tons).
+        /// </summary>
+        /// <param name="val">The numeric value to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in trillions (tons) as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToTons(double val)
         {
             if (double.IsNaN(val))
@@ -3575,6 +6024,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 1000000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in nanograms to kilograms.
+        /// </summary>
+        /// <param name="val">The mass value in nanograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in kilograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToKilograms(double val)
         {
             if (double.IsNaN(val))
@@ -3582,6 +6038,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 1000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from nanograms to grams.
+        /// </summary>
+        /// <param name="val">The value in nanograms to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in grams.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToGrams(double val)
         {
             if (double.IsNaN(val))
@@ -3589,6 +6052,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 1000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in grams to its equivalent in milligrams.
+        /// </summary>
+        /// <param name="val">The value in grams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in milligrams.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMilligrams(double val)
         {
             if (double.IsNaN(val))
@@ -3596,6 +6066,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from nanograms to long tons.
+        /// </summary>
+        /// <param name="val">The mass value in nanograms to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent mass in long tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToLongTons(double val)
         {
             if (double.IsNaN(val))
@@ -3603,6 +6080,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.00000000000098421;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from picograms to short tons (U.S. tons).
+        /// </summary>
+        /// <remarks>A short ton is equal to 2,000 pounds. This method uses a fixed conversion factor of
+        /// 1.1023 × 10⁻¹² to convert picograms to short tons.</remarks>
+        /// <param name="val">The mass value in picograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in short tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToShortTons(double val)
         {
             if (double.IsNaN(val))
@@ -3610,6 +6096,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.0000000000011023;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from nanograms to stones.
+        /// </summary>
+        /// <remarks>One stone is equal to 6,350,293,180 nanograms. This method does not validate the
+        /// range of the input value beyond checking for <see cref="double.NaN"/>.</remarks>
+        /// <param name="val">The mass value, in nanograms, to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent mass in stones.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToStones(double val)
         {
             if (double.IsNaN(val))
@@ -3617,6 +6112,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.00000000015747;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in nanograms to pounds.
+        /// </summary>
+        /// <remarks>This method uses a fixed conversion factor of 0.0000000022046 to convert nanograms to
+        /// pounds.</remarks>
+        /// <param name="val">The mass value in nanograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in pounds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToPounds(double val)
         {
             if (double.IsNaN(val))
@@ -3624,6 +6128,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.0000000022046;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in milligrams to its equivalent in ounces.
+        /// </summary>
+        /// <remarks>This method uses a fixed conversion factor of 0.000000035274 to convert milligrams to
+        /// ounces.</remarks>
+        /// <param name="val">The value in milligrams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in ounces.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToOunces(double val)
         {
             if (double.IsNaN(val))
@@ -3632,8 +6145,26 @@ namespace Calcify.Math.Conversion.Mass
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting mass and weight values between long tons (imperial tons) and other common
+    /// units, including metric tons, kilograms, grams, milligrams, micrograms, short tons, stones, pounds, and ounces.
+    /// </summary>
+    /// <remarks>All conversion methods validate input values to ensure they are not NaN and throw an
+    /// ArgumentException if invalid. The class uses fixed conversion factors for each unit, which may be subject to
+    /// floating-point precision limitations. Methods are thread-safe and intended for general-purpose unit conversions
+    /// in scientific, engineering, or everyday contexts.</remarks>
     public static class LongTons
     {
+
+        /// <summary>
+        /// Converts a mass value from metric tons to long tons (imperial tons).
+        /// </summary>
+        /// <remarks>One metric ton is approximately equal to 0.98421 long tons. This method does not
+        /// perform range checking beyond NaN validation.</remarks>
+        /// <param name="val">The mass value, in metric tons, to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in long tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToTons(double val)
         {
             if (double.IsNaN(val))
@@ -3641,6 +6172,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.98421;
             return result;
         }
+
+        /// <summary>
+        /// Converts a weight value from tons to kilograms.
+        /// </summary>
+        /// <param name="val">The weight value in tons to convert. Must not be NaN.</param>
+        /// <returns>The equivalent weight in kilograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToKilograms(double val)
         {
             if (double.IsNaN(val))
@@ -3648,6 +6186,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.00098421;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in ounces to its equivalent weight in grams.
+        /// </summary>
+        /// <remarks>This method uses a fixed conversion factor based on the relationship between ounces
+        /// and grams. The result may be subject to floating-point precision limitations.</remarks>
+        /// <param name="val">The weight in ounces to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>The equivalent weight in grams as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToGrams(double val)
         {
             if (double.IsNaN(val))
@@ -3655,6 +6202,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.00000098421;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from grams to milligrams.
+        /// </summary>
+        /// <param name="val">The value in grams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in milligrams.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMilligrams(double val)
         {
             if (double.IsNaN(val))
@@ -3662,6 +6216,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.00000000098421;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from grains to micrograms.
+        /// </summary>
+        /// <remarks>This method uses the conversion factor 1 grain = 64,798.91 micrograms. The result may
+        /// be subject to floating-point precision limitations.</remarks>
+        /// <param name="val">The mass value in grains to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in micrograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMicrograms(double val)
         {
             if (double.IsNaN(val))
@@ -3669,6 +6232,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.00000000000098421;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in metric tons to short tons (U.S. tons).
+        /// </summary>
+        /// <remarks>One metric ton is approximately equal to 1.12 short tons. This method multiplies the
+        /// input value by 1.12 to perform the conversion.</remarks>
+        /// <param name="val">The value, in metric tons, to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in short tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToShortTons(double val)
         {
             if (double.IsNaN(val))
@@ -3676,6 +6248,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 1.12;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value in kilograms to stones.
+        /// </summary>
+        /// <param name="val">The value in kilograms to convert. Must be a valid number.</param>
+        /// <returns>The equivalent weight in stones.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is not a valid number (NaN).</exception>
         public static double ToStones(double val)
         {
             if (double.IsNaN(val))
@@ -3683,6 +6262,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 160;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in long tons to pounds.
+        /// </summary>
+        /// <param name="val">The value, in long tons, to convert to pounds. Must not be NaN.</param>
+        /// <returns>The equivalent weight in pounds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToPounds(double val)
         {
             if (double.IsNaN(val))
@@ -3690,6 +6276,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 2240;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in tons to its equivalent in ounces.
+        /// </summary>
+        /// <param name="val">The value, in tons, to convert to ounces. Must not be NaN.</param>
+        /// <returns>The equivalent value in ounces as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToOunces(double val)
         {
             if (double.IsNaN(val))
@@ -3698,8 +6291,24 @@ namespace Calcify.Math.Conversion.Mass
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting mass and weight values between short tons and other common units,
+    /// including kilograms, grams, milligrams, micrograms, pounds, ounces, stones, and long tons.
+    /// </summary>
+    /// <remarks>All conversion methods use fixed conversion factors based on standard definitions for each
+    /// unit. Input values must not be NaN; otherwise, an ArgumentException is thrown. This class is thread-safe and
+    /// intended for utility use in applications requiring mass or weight conversions.</remarks>
     public static class ShortTons
     {
+        /// <summary>
+        /// Converts a value in kilograms to its equivalent in tons.
+        /// </summary>
+        /// <remarks>One ton is defined as 1,102.3 kilograms. This method performs a direct conversion
+        /// using this factor.</remarks>
+        /// <param name="val">The value in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in tons as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToTons(double val)
         {
             if (double.IsNaN(val))
@@ -3707,6 +6316,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 1.1023;
             return result;
         }
+
+        /// <summary>
+        /// Converts a weight value from short tons to kilograms.
+        /// </summary>
+        /// <param name="val">The weight value, in short tons, to convert. Must not be NaN.</param>
+        /// <returns>The equivalent weight in kilograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToKilograms(double val)
         {
             if (double.IsNaN(val))
@@ -3714,6 +6330,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.0011023;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in tons to its equivalent weight in grams.
+        /// </summary>
+        /// <param name="val">The weight in tons to convert. Must not be NaN.</param>
+        /// <returns>The equivalent weight in grams as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToGrams(double val)
         {
             if (double.IsNaN(val))
@@ -3721,6 +6344,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.0000011023;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in ounces to its equivalent in milligrams.
+        /// </summary>
+        /// <param name="val">The value, in ounces, to convert to milligrams. Must not be NaN.</param>
+        /// <returns>The equivalent value in milligrams as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMilligrams(double val)
         {
             if (double.IsNaN(val))
@@ -3728,6 +6358,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.0000000011023;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from short tons to micrograms.
+        /// </summary>
+        /// <param name="val">The mass value, in short tons, to convert to micrograms. Must not be NaN.</param>
+        /// <returns>The equivalent mass in micrograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMicrograms(double val)
         {
             if (double.IsNaN(val))
@@ -3735,6 +6372,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.0000000000011023;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from metric tons to long tons (imperial tons).
+        /// </summary>
+        /// <remarks>A long ton, also known as an imperial ton, is equal to 2,240 pounds. This method uses
+        /// a fixed conversion factor of 0.89286 to convert metric tons to long tons.</remarks>
+        /// <param name="val">The mass value in metric tons to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in long tons. The result is calculated as metric tons multiplied by 0.89286.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToLongTons(double val)
         {
             if (double.IsNaN(val))
@@ -3742,6 +6388,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.89286;
             return result;
         }
+
+        /// <summary>
+        /// Converts a weight value in grams to stones.
+        /// </summary>
+        /// <remarks>One stone is equal to 142.86 grams. The conversion does not round the
+        /// result.</remarks>
+        /// <param name="val">The weight value in grams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent weight in stones.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToStones(double val)
         {
             if (double.IsNaN(val))
@@ -3749,6 +6404,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 142.86;
             return result;
         }
+
+        /// <summary>
+        /// Converts a weight value from tons to pounds.
+        /// </summary>
+        /// <remarks>One ton is considered equal to 2,000 pounds. This method does not perform range
+        /// validation on the input value.</remarks>
+        /// <param name="val">The weight in tons to convert. Must not be NaN.</param>
+        /// <returns>The equivalent weight in pounds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToPounds(double val)
         {
             if (double.IsNaN(val))
@@ -3756,6 +6420,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 2000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in metric tons to ounces.
+        /// </summary>
+        /// <param name="val">The value, in metric tons, to convert to ounces. Must not be NaN.</param>
+        /// <returns>The equivalent value in ounces.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToOunces(double val)
         {
             if (double.IsNaN(val))
@@ -3764,8 +6435,23 @@ namespace Calcify.Math.Conversion.Mass
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting between various units of mass, including stones, kilograms, tons, carats,
+    /// grams, milligrams, micrograms, pounds, and ounces.
+    /// </summary>
+    /// <remarks>All conversion methods validate input values to ensure they are valid numbers and will throw
+    /// an exception if a value is NaN. This class is intended for use in scenarios where precise mass unit conversions
+    /// are required, such as scientific calculations or weight measurement applications. All methods are thread-safe
+    /// and can be used concurrently.</remarks>
     public static class Stones
     {
+        /// <summary>
+        /// Converts a value in kilograms to metric tons.
+        /// </summary>
+        /// <param name="val">The mass in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in metric tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToTons(double val)
         {
             if (double.IsNaN(val))
@@ -3773,6 +6459,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 157.47;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in stones to its equivalent weight in kilograms.
+        /// </summary>
+        /// <remarks>One stone is equal to approximately 6.35029 kilograms. This method uses a conversion
+        /// factor of 0.15747 stones per kilogram.</remarks>
+        /// <param name="val">The weight in stones to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>The equivalent weight in kilograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToKilograms(double val)
         {
             if (double.IsNaN(val))
@@ -3780,6 +6475,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.15747;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from carats to grams.
+        /// </summary>
+        /// <param name="val">The value in carats to convert. Must not be NaN.</param>
+        /// <returns>The equivalent weight in grams.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToGrams(double val)
         {
             if (double.IsNaN(val))
@@ -3787,6 +6489,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.00015747;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in grams to its equivalent in milligrams.
+        /// </summary>
+        /// <param name="val">The value in grams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in milligrams.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMilligrams(double val)
         {
             if (double.IsNaN(val))
@@ -3794,6 +6503,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.00000015747;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from grams to micrograms.
+        /// </summary>
+        /// <param name="val">The value in grams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in micrograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMicrograms(double val)
         {
             if (double.IsNaN(val))
@@ -3801,6 +6517,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.00000000015747;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in kilograms to long tons (imperial tons).
+        /// </summary>
+        /// <param name="val">The mass value in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in long tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToLongTons(double val)
         {
             if (double.IsNaN(val))
@@ -3808,6 +6531,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.0062500;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from kilograms to short tons (U.S. tons).
+        /// </summary>
+        /// <param name="val">The mass value in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in short tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToShortTons(double val)
         {
             if (double.IsNaN(val))
@@ -3815,6 +6545,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.0070000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in stones to its equivalent weight in pounds.
+        /// </summary>
+        /// <remarks>One stone is equal to 14 pounds. This method multiplies the input value by 14 to
+        /// perform the conversion.</remarks>
+        /// <param name="val">The weight in stones to convert. Must be a valid number.</param>
+        /// <returns>The equivalent weight in pounds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is not a valid number (NaN).</exception>
         public static double ToPounds(double val)
         {
             if (double.IsNaN(val))
@@ -3822,6 +6561,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 14;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in grams to ounces using a fixed conversion factor.
+        /// </summary>
+        /// <remarks>This method uses a conversion factor of 224 to convert grams to ounces. Ensure that
+        /// the input value is a valid number.</remarks>
+        /// <param name="val">The value in grams to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in ounces.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToOunces(double val)
         {
             if (double.IsNaN(val))
@@ -3830,8 +6578,22 @@ namespace Calcify.Math.Conversion.Mass
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting mass and weight values between pounds and other common units, including
+    /// metric tons, kilograms, grams, milligrams, micrograms, long tons, short tons, stones, and ounces.
+    /// </summary>
+    /// <remarks>All conversion methods validate that input values are numeric and will throw an exception if
+    /// a non-numeric value (NaN) is provided. This class is thread-safe and intended for use in scenarios where
+    /// accurate unit conversion between pounds and other mass or weight units is required.</remarks>
     public static class Pounds
     {
+        /// <summary>
+        /// Converts a mass value from pounds to metric tons.
+        /// </summary>
+        /// <param name="val">The mass value in pounds to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in metric tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToTons(double val)
         {
             if (double.IsNaN(val))
@@ -3839,6 +6601,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 2204.6;
             return result;
         }
+
+        /// <summary>
+        /// Converts a weight value from pounds to kilograms.
+        /// </summary>
+        /// <param name="val">The weight in pounds to convert. Must not be NaN.</param>
+        /// <returns>The equivalent weight in kilograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToKilograms(double val)
         {
             if (double.IsNaN(val))
@@ -3846,6 +6615,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 2.2046;
             return result;
         }
+
+        /// <summary>
+        /// Converts a weight value from pounds to grams.
+        /// </summary>
+        /// <param name="val">The weight in pounds to convert. Must not be NaN.</param>
+        /// <returns>The equivalent weight in grams.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToGrams(double val)
         {
             if (double.IsNaN(val))
@@ -3853,6 +6629,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.0022046;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in pounds to its equivalent in milligrams.
+        /// </summary>
+        /// <param name="val">The value in pounds to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in milligrams.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMilligrams(double val)
         {
             if (double.IsNaN(val))
@@ -3860,6 +6643,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.0000022046;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from pounds to micrograms.
+        /// </summary>
+        /// <param name="val">The mass value in pounds to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in micrograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMicrograms(double val)
         {
             if (double.IsNaN(val))
@@ -3867,6 +6657,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.0000000022046;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in kilograms to long tons (imperial tons).
+        /// </summary>
+        /// <remarks>One long ton is equal to 1,016.0469088 kilograms. This method uses a conversion
+        /// factor of 0.00044643 for approximate conversion.</remarks>
+        /// <param name="val">The mass value in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in long tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToLongTons(double val)
         {
             if (double.IsNaN(val))
@@ -3874,6 +6673,14 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.00044643;
             return result;
         }
+
+        /// <summary>
+        /// Converts a mass value from kilograms to short tons (U.S. tons).
+        /// </summary>
+        /// <param name="val">The mass value in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in short tons. One short ton is equal to 2,000 pounds or approximately 907.185
+        /// kilograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToShortTons(double val)
         {
             if (double.IsNaN(val))
@@ -3881,6 +6688,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.00050000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a weight value from kilograms to stones.
+        /// </summary>
+        /// <param name="val">The weight in kilograms to convert. Must be a valid numeric value.</param>
+        /// <returns>The equivalent weight in stones.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="val"/> is not a number (NaN).</exception>
         public static double ToStones(double val)
         {
             if (double.IsNaN(val))
@@ -3888,6 +6702,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.071429;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in pounds to its equivalent in ounces.
+        /// </summary>
+        /// <remarks>One pound is equal to 16 ounces. This method multiplies the input value by 16 to
+        /// perform the conversion.</remarks>
+        /// <param name="val">The value in pounds to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in ounces.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToOunces(double val)
         {
             if (double.IsNaN(val))
@@ -3896,8 +6719,25 @@ namespace Calcify.Math.Conversion.Mass
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting weight and mass values between ounces and other common units, including
+    /// grams, kilograms, tons, pounds, stones, milligrams, and micrograms.
+    /// </summary>
+    /// <remarks>All conversion methods validate that input values are numeric and will throw an exception if
+    /// a non-numeric value (NaN) is provided. This class is intended for use in scenarios where precise unit
+    /// conversions are required, such as scientific calculations or data processing. Methods do not check for negative
+    /// values unless specified; callers should ensure input values are appropriate for their use case.</remarks>
     public static class Ounces
     {
+        /// <summary>
+        /// Converts a weight value from grams to tons.
+        /// </summary>
+        /// <remarks>One ton is equal to 35,274 grams. This method performs a direct conversion using this
+        /// factor.</remarks>
+        /// <param name="val">The weight in grams to convert. Must be a valid numeric value.</param>
+        /// <returns>The equivalent weight in tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is not a number (NaN).</exception>
         public static double ToTons(double val)
         {
             if (double.IsNaN(val))
@@ -3905,6 +6745,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 35274;
             return result;
         }
+
+        /// <summary>
+        /// Converts a weight value from ounces to kilograms.
+        /// </summary>
+        /// <param name="val">The weight in ounces to convert. Must not be NaN.</param>
+        /// <returns>The equivalent weight in kilograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToKilograms(double val)
         {
             if (double.IsNaN(val))
@@ -3912,6 +6759,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 35.274;
             return result;
         }
+
+        /// <summary>
+        /// Converts a weight value from ounces to grams.
+        /// </summary>
+        /// <param name="val">The weight in ounces to convert. Must not be NaN.</param>
+        /// <returns>The equivalent weight in grams.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToGrams(double val)
         {
             if (double.IsNaN(val))
@@ -3919,6 +6773,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.035274;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in ounces to its equivalent in milligrams.
+        /// </summary>
+        /// <param name="val">The value in ounces to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in milligrams.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMilligrams(double val)
         {
             if (double.IsNaN(val))
@@ -3926,6 +6787,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.000035274;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in ounces to micrograms.
+        /// </summary>
+        /// <param name="val">The value in ounces to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in micrograms.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMicrograms(double val)
         {
             if (double.IsNaN(val))
@@ -3933,6 +6801,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val / 0.000000035274;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in kilograms to long tons (imperial tons).
+        /// </summary>
+        /// <remarks>One long ton is equal to 1,016.0469088 kilograms. This method uses a conversion
+        /// factor of 0.000027902 for the calculation.</remarks>
+        /// <param name="val">The mass value in kilograms to convert. Must not be NaN.</param>
+        /// <returns>The equivalent mass in long tons. Returns 0 if the input is 0.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToLongTons(double val)
         {
             if (double.IsNaN(val))
@@ -3940,6 +6817,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.000027902;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in pounds to its equivalent in short tons.
+        /// </summary>
+        /// <param name="val">The weight in pounds to convert. Must not be NaN.</param>
+        /// <returns>The equivalent weight in short tons.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToShortTons(double val)
         {
             if (double.IsNaN(val))
@@ -3947,6 +6831,15 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.000031250;
             return result;
         }
+
+        /// <summary>
+        /// Converts a weight value from kilograms to stones.
+        /// </summary>
+        /// <remarks>One stone is equal to approximately 6.35029 kilograms. This method does not validate
+        /// whether the input is negative.</remarks>
+        /// <param name="val">The weight in kilograms to convert. Must be a valid numeric value.</param>
+        /// <returns>The equivalent weight in stones.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is not a number (NaN).</exception>
         public static double ToStones(double val)
         {
             if (double.IsNaN(val))
@@ -3954,6 +6847,13 @@ namespace Calcify.Math.Conversion.Mass
             double result = val * 0.0044643;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in ounces to its equivalent in pounds.
+        /// </summary>
+        /// <param name="val">The value in ounces to convert. Must be a valid number.</param>
+        /// <returns>The equivalent weight in pounds as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is not a number (NaN).</exception>
         public static double ToPounds(double val)
         {
             if (double.IsNaN(val))
@@ -3965,8 +6865,26 @@ namespace Calcify.Math.Conversion.Mass
 }
 namespace Calcify.Math.Conversion.NumeralSystem
 {
+    /// <summary>
+    /// Provides static methods for converting decimal integers to formatted binary, hexadecimal, and octal string
+    /// representations.
+    /// </summary>
+    /// <remarks>This class offers utility functions for representing decimal values in various numeric bases,
+    /// with formatting options that enhance readability or support specific protocol requirements. All methods are
+    /// static and do not require instantiation. Negative values may not be supported by all methods; refer to
+    /// individual method documentation for details.</remarks>
     public static class Decimal
     {
+        /// <summary>
+        /// Converts the specified decimal integer to its binary representation, formatted in groups of four digits
+        /// separated by spaces.
+        /// </summary>
+        /// <remarks>If the binary representation does not align to a multiple of four digits, leading
+        /// zeros are added to ensure each group contains four digits. Negative values are not supported and may produce
+        /// unexpected results.</remarks>
+        /// <param name="dec">The decimal integer to convert to binary. Must be non-negative.</param>
+        /// <returns>A string containing the binary representation of the input value, with digits grouped in blocks of four
+        /// separated by spaces.</returns>
         public static string ToBinary(int dec)
         {
             string bin = Convert.ToString(dec, 2);
@@ -3975,10 +6893,29 @@ namespace Calcify.Math.Conversion.NumeralSystem
             bin = string.Join(" ", bin.Split(4));
             return bin;
         }
+
+        /// <summary>
+        /// Converts the specified decimal integer to its uppercase hexadecimal string representation, prefixed with
+        /// "0x".
+        /// </summary>
+        /// <param name="dec">The decimal integer value to convert to a hexadecimal string.</param>
+        /// <returns>A string containing the hexadecimal representation of <paramref name="dec"/>, in uppercase, prefixed with
+        /// "0x".</returns>
         public static string ToHexadecimal(int dec)
         {
             return "0x" + dec.ToString("x").ToUpper();
         }
+
+        /// <summary>
+        /// Converts a decimal integer to its octal string representation, grouping digits in blocks of four separated
+        /// by spaces.
+        /// </summary>
+        /// <remarks>This method pads the octal result with leading zeros so that its length is a multiple
+        /// of four, then splits the string into space-separated blocks of four digits. This formatting can be useful
+        /// for readability or for protocols that require fixed-width octal fields.</remarks>
+        /// <param name="dec">The decimal integer value to convert to octal.</param>
+        /// <returns>A string containing the octal representation of the input value, with digits grouped in blocks of four and
+        /// separated by spaces. Leading zeros are added if necessary to complete the final block.</returns>
         public static string ToOctal(int dec)
         {
             string oct = Convert.ToString(dec, 8);
@@ -3990,6 +6927,13 @@ namespace Calcify.Math.Conversion.NumeralSystem
     }
     public static class Binary
     {
+        /// <summary>
+        /// Converts a binary string representation to its equivalent decimal integer value.
+        /// </summary>
+        /// <param name="binary">A string containing the binary number to convert. Spaces within the string are ignored. The string must
+        /// consist only of '0' and '1' characters.</param>
+        /// <returns>The decimal integer value equivalent to the specified binary string.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="binary"/> contains characters other than '0', '1', or spaces.</exception>
         public static int ToDecimal(string binary)
         {
             if (binary.Contains(" "))
@@ -3999,6 +6943,14 @@ namespace Calcify.Math.Conversion.NumeralSystem
             else
                 throw new ArgumentException();
         }
+        /// <summary>
+        /// Converts a binary string to its equivalent hexadecimal representation.
+        /// </summary>
+        /// <param name="binary">A string containing the binary number to convert. Spaces within the string are ignored. The string must
+        /// consist only of '0' and '1' characters.</param>
+        /// <returns>A string representing the hexadecimal value of the input binary number, prefixed with "0x" and using
+        /// uppercase letters.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="binary"/> contains characters other than '0' or '1'.</exception>
         public static string ToHexadecimal(string binary)
         {
             if (binary.Contains(" "))
@@ -4008,6 +6960,17 @@ namespace Calcify.Math.Conversion.NumeralSystem
             else
                 throw new ArgumentException();
         }
+        /// <summary>
+        /// Converts a binary string to its octal representation, grouping digits in blocks of four separated by spaces.
+        /// </summary>
+        /// <remarks>If the resulting octal string does not divide evenly into blocks of four digits,
+        /// leading zeros are added to pad the first block. This method ignores spaces in the input binary
+        /// string.</remarks>
+        /// <param name="binary">The binary string to convert. Spaces within the string are ignored. Must contain only the characters '0' and
+        /// '1'.</param>
+        /// <returns>A string containing the octal representation of the input binary value, with digits grouped in blocks of
+        /// four separated by spaces.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="binary"/> contains characters other than '0' or '1'.</exception>
         public static string ToOctal(string binary)
         {
             if (binary.Contains(" "))
@@ -4021,8 +6984,23 @@ namespace Calcify.Math.Conversion.NumeralSystem
             return oct;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting hexadecimal strings to their decimal, binary, and octal representations.
+    /// </summary>
+    /// <remarks>All conversion methods accept hexadecimal strings that may optionally begin with the "0x"
+    /// prefix. Input validation is performed where appropriate, and exceptions may be thrown for invalid or improperly
+    /// formatted input. The class is intended for utility use and does not maintain any state.</remarks>
     public static class Hexadecimal
     {
+        /// <summary>
+        /// Converts a hexadecimal string to its equivalent 32-bit signed integer value.
+        /// </summary>
+        /// <remarks>If the input string does not match the expected hexadecimal format, the method
+        /// attempts to convert it as a binary string instead. The method does not validate for overflow; invalid or
+        /// excessively large input may result in exceptions from underlying conversion methods.</remarks>
+        /// <param name="hexadecimal">A string representing a hexadecimal number. The string may optionally begin with the "0x" prefix.</param>
+        /// <returns>The 32-bit signed integer value equivalent to the hexadecimal string.</returns>
         public static int ToDecimal(string hexadecimal)
         {
             if (!new Regex("^(0x)?[0-9a-fA-F]+$").IsMatch(hexadecimal))
@@ -4031,6 +7009,16 @@ namespace Calcify.Math.Conversion.NumeralSystem
                 hexadecimal = hexadecimal.Substring(2);
             return Convert.ToInt32(hexadecimal, 16);
         }
+
+        /// <summary>
+        /// Converts a hexadecimal string to its binary representation, grouping bits in sets of four separated by
+        /// spaces.
+        /// </summary>
+        /// <param name="hexadecimal">The hexadecimal string to convert. May optionally begin with the "0x" prefix. Must contain only valid
+        /// hexadecimal digits.</param>
+        /// <returns>A string containing the binary representation of the input, with bits grouped in sets of four and separated
+        /// by spaces.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="hexadecimal"/> is null, empty, or does not contain a valid hexadecimal value.</exception>
         public static string ToBinary(string hexadecimal)
         {
             if (!new Regex("^(0x)?[0-9a-fA-F]+$").IsMatch(hexadecimal))
@@ -4041,6 +7029,17 @@ namespace Calcify.Math.Conversion.NumeralSystem
             bin = string.Join(" ", bin.Split(4));
             return bin;
         }
+
+        /// <summary>
+        /// Converts a hexadecimal string to its octal representation, grouping digits in blocks of four.
+        /// </summary>
+        /// <remarks>The returned octal string is padded with leading zeros if necessary to ensure that
+        /// its length is a multiple of four, and groups are separated by spaces.</remarks>
+        /// <param name="hexadecimal">A string containing the hexadecimal value to convert. The string may optionally begin with '0x' and must
+        /// consist of valid hexadecimal digits (0-9, a-f, A-F).</param>
+        /// <returns>A string representing the octal equivalent of the input hexadecimal value, with digits separated into groups
+        /// of four.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="hexadecimal"/> is null, empty, or does not contain a valid hexadecimal value.</exception>
         public static string ToOctal(string hexadecimal)
         {
             if (!new Regex("^(0x)?[0-9a-fA-F]+$").IsMatch(hexadecimal))
@@ -4054,6 +7053,12 @@ namespace Calcify.Math.Conversion.NumeralSystem
     }
     public static class Octal
     {
+        /// <summary>
+        /// Converts a string representation of an octal number to its decimal string equivalent.
+        /// </summary>
+        /// <param name="octal">A string containing the octal number to convert. Spaces within the string are ignored.</param>
+        /// <returns>A string representing the decimal value of the specified octal number.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="octal"/> contains characters other than digits 0 through 7.</exception>
         public static string ToDecimal(string octal)
         {
             if (octal.Contains(" "))
@@ -4062,6 +7067,16 @@ namespace Calcify.Math.Conversion.NumeralSystem
                 throw new ArgumentException();
             return Convert.ToInt32(octal, 8).ToString();
         }
+
+        /// <summary>
+        /// Converts a string representing an octal number to its binary representation, grouping digits in blocks of
+        /// four separated by spaces.
+        /// </summary>
+        /// <param name="octal">A string containing the octal number to convert. Spaces within the string are ignored. All characters must
+        /// be valid octal digits (0–7).</param>
+        /// <returns>A string containing the binary representation of the specified octal number, with digits grouped in blocks
+        /// of four separated by spaces.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="octal"/> contains characters that are not valid octal digits (0–7).</exception>
         public static string ToBinary(string octal)
         {
             if (octal.Contains(" "))
@@ -4074,6 +7089,14 @@ namespace Calcify.Math.Conversion.NumeralSystem
             bin = string.Join(" ", bin.Split(4));
             return bin;
         }
+
+        /// <summary>
+        /// Converts a string representation of an octal number to its hexadecimal equivalent.
+        /// </summary>
+        /// <param name="octal">A string containing the octal number to convert. Spaces within the string are ignored.</param>
+        /// <returns>A string representing the hexadecimal equivalent of the specified octal number, prefixed with "0x" and using
+        /// uppercase letters.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="octal"/> contains characters other than digits 0 through 7.</exception>
         public static string ToHexadecimal(string octal)
         {
             if (octal.Contains(" "))
@@ -4086,117 +7109,314 @@ namespace Calcify.Math.Conversion.NumeralSystem
 }
 namespace Calcify.Math.Conversion.Temperature
 {
+    /// <summary>
+    /// Provides static methods for converting temperature values between a custom scale used by the application and
+    /// standard temperature units such as Fahrenheit, Celsius, Kelvin, and Rankine.
+    /// </summary>
+    /// <remarks>The conversion methods assume input values are expressed in a custom scale where 0.8 units
+    /// correspond to 1 degree Celsius. Ensure that temperature values are in the expected scale before using these
+    /// methods. These methods are intended for scenarios where interoperability between the application's custom
+    /// temperature scale and standard units is required.</remarks>
     public static class Reaumur
     {
+        /// <summary>
+        /// Converts a temperature value from the custom scale used by the application to degrees Fahrenheit.
+        /// </summary>
+        /// <remarks>The conversion assumes the input value is in a custom scale where 0.8 units
+        /// correspond to 1 degree Celsius. Use this method only with values measured in that scale.</remarks>
+        /// <param name="val">The temperature value to convert, expressed in the application's custom scale.</param>
+        /// <returns>The equivalent temperature in degrees Fahrenheit.</returns>
         public static double ToFahrenheit(double val)
         {
             double result = ((val / 0.8) * 1.8) + 32;
             return result;
         }
+
+        /// <summary>
+        /// Converts a temperature value from a scale where 0.8 units equal 1 degree Celsius to degrees Celsius.
+        /// </summary>
+        /// <param name="val">The temperature value to convert, expressed in units where 0.8 units equal 1 degree Celsius.</param>
+        /// <returns>The equivalent temperature in degrees Celsius.</returns>
         public static double ToCelsius(double val)
         {
             double result = val / 0.8;
             return result;
         }
+
+        /// <summary>
+        /// Converts a temperature value from an unspecified scale to Kelvin using a linear transformation.
+        /// </summary>
+        /// <remarks>This method assumes the input value is in a scale where dividing by 0.8 and adding
+        /// 273.15 yields the Kelvin temperature. Ensure the input value is in the expected scale before calling this
+        /// method.</remarks>
+        /// <param name="val">The temperature value to convert. Represents a value in a scale where 0.8 units correspond to 1 Kelvin.</param>
+        /// <returns>The equivalent temperature in Kelvin.</returns>
         public static double ToKelvin(double val)
         {
             double result = (val / 0.8) + 273.15;
             return result;
         }
+
+        /// <summary>
+        /// Converts a temperature value from Celsius to Rankine.
+        /// </summary>
+        /// <remarks>Use this method when working with thermodynamic calculations that require
+        /// temperatures in the Rankine scale. The conversion uses the formula: Rankine = Celsius × 2.25 +
+        /// 491.67.</remarks>
+        /// <param name="val">The temperature in degrees Celsius to convert. Typically represents an absolute temperature; negative values
+        /// are allowed.</param>
+        /// <returns>The equivalent temperature in degrees Rankine.</returns>
         public static double ToRankine(double val)
         {
             double result = val * 2.2500 + 491.67;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting temperatures from degrees Rankine to other temperature scales, including
+    /// Fahrenheit, Celsius, Kelvin, and Réaumur.
+    /// </summary>
+    /// <remarks>All conversion methods assume the input value is a finite number representing a temperature
+    /// in degrees Rankine. The methods perform direct mathematical conversions and do not validate the physical
+    /// plausibility of the input. Negative or extremely large values are converted according to the respective formulas
+    /// and may represent temperatures below absolute zero or outside typical ranges.</remarks>
     public static class Rankine
     {
+
+        /// <summary>
+        /// Converts a temperature value from degrees Rankine to degrees Fahrenheit.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion using the formula: Fahrenheit = Rankine -
+        /// 459.67. If the input value is not a valid number, the result may be undefined (such as NaN or
+        /// Infinity).</remarks>
+        /// <param name="val">The temperature in degrees Rankine to convert. Must be a finite number.</param>
+        /// <returns>The equivalent temperature in degrees Fahrenheit.</returns>
         public static double ToFahrenheit(double val)
         {
             double result = (val - 491.67) + 32.00;
             return result;
         }
+
+        /// <summary>
+        /// Converts a temperature from degrees Rankine to degrees Celsius.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion using the formula: (Rankine - 491.67) / 1.8.
+        /// The result may be negative for temperatures below absolute zero in Rankine.</remarks>
+        /// <param name="val">The temperature value in degrees Rankine to convert. Must be a finite number.</param>
+        /// <returns>The equivalent temperature in degrees Celsius.</returns>
         public static double ToCelsius(double val)
         {
             double result = (val - 491.67) / 1.8;
             return result;
         }
+
+        /// <summary>
+        /// Converts a temperature value from degrees Rankine to kelvins.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion using the standard formula for Rankine to
+        /// kelvin. Negative values are valid and represent temperatures below absolute zero in the Rankine
+        /// scale.</remarks>
+        /// <param name="val">The temperature in degrees Rankine to convert. Must be a finite number.</param>
+        /// <returns>The equivalent temperature in kelvins.</returns>
         public static double ToKelvin(double val)
         {
             double result = ((val - 491.67) / 1.8) + 273.15;
             return result;
         }
+
+        /// <summary>
+        /// Converts a temperature from degrees Rankine to degrees Réaumur.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion using the formula: Réaumur = (Rankine -
+        /// 491.67) / 2.25. The input value is not validated for physical plausibility; negative or extremely large
+        /// values will be converted mathematically.</remarks>
+        /// <param name="val">The temperature value in degrees Rankine to convert. Must be a finite number.</param>
+        /// <returns>The equivalent temperature in degrees Réaumur.</returns>
         public static double ToReaumur(double val)
         {
             double result = (val - 491.67) / 2.25;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting temperature values between Kelvin and other temperature scales.
+    /// </summary>
+    /// <remarks>This class includes methods for converting Kelvin temperatures to Celsius, Fahrenheit,
+    /// Réaumur, and for converting Celsius to Rankine. All methods are static and do not perform validation for
+    /// physically meaningful temperature ranges; callers should ensure input values are appropriate for the desired
+    /// conversion. The class is intended for use in scientific, engineering, or educational applications where
+    /// temperature conversions are required.</remarks>
     public static class Kelvin
     {
+
+        /// <summary>
+        /// Converts a temperature value from Kelvin to Celsius.
+        /// </summary>
+        /// <param name="val">The temperature in Kelvin to convert. Must be greater than or equal to 0.</param>
+        /// <returns>The equivalent temperature in Celsius.</returns>
         public static double ToCelsius(double val)
         {
             double result = val - 273.15;
             return result;
         }
+
+        /// <summary>
+        /// Converts a temperature value from Kelvin to Fahrenheit.
+        /// </summary>
+        /// <remarks>This method performs a direct conversion using the standard formula. Negative Kelvin
+        /// values are not physically meaningful and may result in unexpected output.</remarks>
+        /// <param name="val">The temperature in Kelvin to convert. Must be greater than or equal to 0.</param>
+        /// <returns>The equivalent temperature in Fahrenheit.</returns>
         public static double ToFahrenheit(double val)
         {
             double result = (val - 273.15) * 1.8 + 32.00;
             return result;
         }
+
+        /// <summary>
+        /// Converts a temperature from degrees Celsius to degrees Rankine.
+        /// </summary>
+        /// <param name="val">The temperature value in degrees Celsius to convert.</param>
+        /// <returns>The equivalent temperature in degrees Rankine.</returns>
         public static double ToRankine(double val)
         {
             double result = val * 1.8;
             return result;
         }
+
+        /// <summary>
+        /// Converts a temperature from Kelvin to Réaumur.
+        /// </summary>
+        /// <remarks>The Réaumur scale sets the freezing point of water at 0° and the boiling point at
+        /// 80°. This method does not validate that the input is above absolute zero; passing a value less than 0 may
+        /// result in nonsensical results.</remarks>
+        /// <param name="val">The temperature value in Kelvin to convert. Must be greater than or equal to absolute zero (0 K).</param>
+        /// <returns>The equivalent temperature in degrees Réaumur.</returns>
         public static double ToReaumur(double val)
         {
             double result = (val - 273.15) * 0.8;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting temperatures from degrees Celsius to other temperature scales, including
+    /// Kelvin, Fahrenheit, Rankine, and Réaumur.
+    /// </summary>
+    /// <remarks>This class is intended for use in scientific, engineering, and general applications where
+    /// temperature conversions from the Celsius scale are required. All methods are static and do not require
+    /// instantiation. The conversion formulas used are based on standard definitions for each temperature
+    /// scale.</remarks>
     public static class Celsius
     {
+
+        /// <summary>
+        /// Converts a temperature from degrees Celsius to Kelvin.
+        /// </summary>
+        /// <param name="val">The temperature value in degrees Celsius to convert. Can be any real number.</param>
+        /// <returns>The equivalent temperature in Kelvin.</returns>
         public static double ToKelvin(double val)
         {
             double result = val + 273.15;
             return result;
         }
+
+        /// <summary>
+        /// Converts a temperature value from degrees Celsius to degrees Fahrenheit.
+        /// </summary>
+        /// <param name="val">The temperature in degrees Celsius to convert.</param>
+        /// <returns>The equivalent temperature in degrees Fahrenheit.</returns>
         public static double ToFahrenheit(double val)
         {
             double result = (val * 1.8) + 32;
             return result;
         }
+
+        /// <summary>
+        /// Converts a temperature from degrees Celsius to degrees Rankine.
+        /// </summary>
+        /// <remarks>Use this method when working with thermodynamic calculations that require
+        /// temperatures in the Rankine scale. The conversion uses the formula: Rankine = (Celsius × 1.8) +
+        /// 491.67.</remarks>
+        /// <param name="val">The temperature value in degrees Celsius to convert. Typically represents an absolute or relative
+        /// temperature measurement.</param>
+        /// <returns>The equivalent temperature in degrees Rankine.</returns>
         public static double ToRankine(double val)
         {
             double result = (val * 1.8) + 491.67;
             return result;
         }
+
+        /// <summary>
+        /// Converts a temperature from degrees Celsius to degrees Réaumur.
+        /// </summary>
+        /// <param name="val">The temperature value in degrees Celsius to convert.</param>
+        /// <returns>The equivalent temperature in degrees Réaumur.</returns>
         public static double ToReaumur(double val)
         {
             double result = val * 0.8;
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting temperatures from degrees Fahrenheit to other temperature scales,
+    /// including Kelvin, Celsius, Rankine, and Réaumur.
+    /// </summary>
+    /// <remarks>All conversion methods use standard formulas for temperature conversion and do not perform
+    /// input validation. These methods are suitable for scientific and engineering calculations where precise
+    /// temperature conversions are required. The class is static and cannot be instantiated.</remarks>
     public static class Fahrenheit
     {
+        /// <summary>
+        /// Converts a temperature from degrees Fahrenheit to Kelvin.
+        /// </summary>
+        /// <remarks>This method uses the standard conversion formula: K = ((F - 32) × 5/9) + 273.15. The
+        /// result may be less than zero for sufficiently low input values.</remarks>
+        /// <param name="val">The temperature value in degrees Fahrenheit to convert. Must be a finite number.</param>
+        /// <returns>The equivalent temperature in Kelvin.</returns>
         public static double ToKelvin(double val)
         {
             double x = 5; double y = 9; double z = (val - (double)32) * (x / y) + (double)273.15;
             double result = z;
             return result;
         }
+
+        /// <summary>
+        /// Converts a temperature value from degrees Fahrenheit to degrees Celsius.
+        /// </summary>
+        /// <param name="val">The temperature in degrees Fahrenheit to convert.</param>
+        /// <returns>The equivalent temperature in degrees Celsius.</returns>
         public static double ToCelsius(double val)
         {
             double result = (val - 32) / 1.8;
             return result;
         }
+
+        /// <summary>
+        /// Converts a temperature from degrees Fahrenheit to degrees Rankine.
+        /// </summary>
+        /// <remarks>Degrees Rankine is an absolute temperature scale used primarily in engineering
+        /// fields. The conversion adds 459.67 to the Fahrenheit value to obtain the Rankine temperature.</remarks>
+        /// <param name="val">The temperature value in degrees Fahrenheit to convert. Typically represents an absolute temperature
+        /// measurement.</param>
+        /// <returns>The equivalent temperature in degrees Rankine.</returns>
         public static double ToRankine(double val)
         {
             double z = val + (double)459.67;
             double result = z;
             return result;
         }
+
+        /// <summary>
+        /// Converts a temperature from degrees Fahrenheit to degrees Réaumur.
+        /// </summary>
+        /// <remarks>The Réaumur scale is primarily used in some scientific contexts and historical
+        /// references. This method does not perform range validation on the input value.</remarks>
+        /// <param name="val">The temperature value in degrees Fahrenheit to convert.</param>
+        /// <returns>The equivalent temperature in degrees Réaumur.</returns>
         public static double ToReaumur(double val)
         {
             double result = (val - (double)32) / (double)1.8 * (double)0.8;
@@ -4206,8 +7426,20 @@ namespace Calcify.Math.Conversion.Temperature
 }
 namespace Calcify.Math.Conversion.Time
 {
+    /// <summary>
+    /// Provides static methods for converting between centuries, millennia, years, and other time units using fixed
+    /// conversion factors.
+    /// </summary>
+    /// <remarks>All conversion methods assume standard calendar years and do not account for leap years or
+    /// calendar variations. Each method throws an ArgumentException if the input value is NaN.</remarks>
     public static class Centuries
     {
+        /// <summary>
+        /// Converts a value representing years to its equivalent in decades.
+        /// </summary>
+        /// <param name="val">The number of years to convert. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of decades.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDecades(double val)
         {
             if (double.IsNaN(val))
@@ -4215,6 +7447,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value to its equivalent in years by multiplying it by 100.
+        /// </summary>
+        /// <param name="val">The value to convert to years. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the input value converted to years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToYears(double val)
         {
             if (double.IsNaN(val))
@@ -4222,6 +7461,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 100;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value to its equivalent in months.
+        /// </summary>
+        /// <param name="val">The value to convert. Must be a valid number; cannot be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the converted value in months.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMonths(double val)
         {
             if (double.IsNaN(val))
@@ -4229,6 +7475,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 1200;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value to an equivalent number of weeks using a fixed conversion factor.
+        /// </summary>
+        /// <param name="val">The value to convert to weeks. Must be a valid number; cannot be NaN.</param>
+        /// <returns>A double representing the equivalent number of weeks for the specified value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToWeeks(double val)
         {
             if (double.IsNaN(val))
@@ -4236,6 +7489,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 5214.29;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing centuries to the equivalent number of days.
+        /// </summary>
+        /// <param name="val">The number of centuries to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>The number of days equivalent to the specified number of centuries.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDays(double val)
         {
             if (double.IsNaN(val))
@@ -4243,6 +7503,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 36500;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value, representing centuries, to the equivalent number of hours.
+        /// </summary>
+        /// <param name="val">The number of centuries to convert to hours. Must not be NaN.</param>
+        /// <returns>The equivalent number of hours for the specified number of centuries.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToHours(double val)
         {
             if (double.IsNaN(val))
@@ -4250,6 +7517,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 876000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing centuries to the equivalent number of minutes.
+        /// </summary>
+        /// <param name="val">The number of centuries to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>The total number of minutes in the specified number of centuries.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMinutes(double val)
         {
             if (double.IsNaN(val))
@@ -4257,6 +7531,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 52560000;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value, representing millennia, to its equivalent in seconds.
+        /// </summary>
+        /// <param name="val">The number of millennia to convert to seconds. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> value representing the equivalent number of seconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToSeconds(double val)
         {
             if (double.IsNaN(val))
@@ -4264,6 +7545,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 3153600000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing millennia to its equivalent in milliseconds.
+        /// </summary>
+        /// <param name="val">The number of millennia to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the equivalent number of milliseconds for the specified number of millennia.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMilliseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4271,6 +7559,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 3153600000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing millennia to its equivalent in microseconds.
+        /// </summary>
+        /// <param name="val">The number of millennia to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> value representing the equivalent number of microseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMicroseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4278,6 +7573,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 3153600000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to its equivalent in nanoseconds.
+        /// </summary>
+        /// <remarks>One year is considered as 3,153,600,000,000,000,000 nanoseconds. This method does not
+        /// account for leap years or calendar variations.</remarks>
+        /// <param name="val">The number of years to convert to nanoseconds. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of nanoseconds for the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToNanoseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4286,8 +7590,22 @@ namespace Calcify.Math.Conversion.Time
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting between various time units, such as decades, centuries, years, months,
+    /// days, hours, minutes, seconds, milliseconds, microseconds, and nanoseconds.
+    /// </summary>
+    /// <remarks>All conversion methods assume fixed conversion factors and do not account for calendar
+    /// variations such as leap years unless otherwise noted. Input values must be valid numeric values and cannot be
+    /// NaN; methods will throw an ArgumentException if invalid input is provided.</remarks>
     public static class Decades
     {
+        /// <summary>
+        /// Converts a value representing decades to its equivalent in centuries.
+        /// </summary>
+        /// <param name="val">The number of decades to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the number of centuries equivalent to the specified number of decades.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToCenturies(double val)
         {
             if (double.IsNaN(val))
@@ -4295,6 +7613,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value to its equivalent in years.
+        /// </summary>
+        /// <param name="val">The value to convert. Must be a valid number; cannot be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the input value converted to years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToYears(double val)
         {
             if (double.IsNaN(val))
@@ -4302,6 +7627,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value to its equivalent in months.
+        /// </summary>
+        /// <param name="val">The value to convert to months. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the converted value in months.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMonths(double val)
         {
             if (double.IsNaN(val))
@@ -4309,6 +7641,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 120;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from days to weeks using a fixed conversion factor.
+        /// </summary>
+        /// <remarks>The conversion uses a factor of 521.429 to calculate weeks from days. This method
+        /// does not validate whether the input value is within a typical range for days.</remarks>
+        /// <param name="val">The number of days to convert to weeks. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of weeks for the specified number of days.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToWeeks(double val)
         {
             if (double.IsNaN(val))
@@ -4316,6 +7657,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 521.429;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value, representing years, to the equivalent number of days.
+        /// </summary>
+        /// <remarks>This method assumes a year consists of 365 days. Leap years are not accounted for in
+        /// the conversion.</remarks>
+        /// <param name="val">The number of years to convert to days. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> value representing the equivalent number of days for the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToDays(double val)
         {
             if (double.IsNaN(val))
@@ -4323,6 +7673,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 3650;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to the equivalent number of hours.
+        /// </summary>
+        /// <remarks>This method assumes a year consists of 8,760 hours (365 days). Leap years are not
+        /// accounted for in the calculation.</remarks>
+        /// <param name="val">The number of years to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>The number of hours equivalent to the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToHours(double val)
         {
             if (double.IsNaN(val))
@@ -4330,6 +7689,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 87600;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing millennia to the equivalent number of minutes.
+        /// </summary>
+        /// <param name="val">The number of millennia to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>The total number of minutes corresponding to the specified number of millennia.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMinutes(double val)
         {
             if (double.IsNaN(val))
@@ -4337,6 +7703,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 5256000;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value, representing centuries, to its equivalent in seconds.
+        /// </summary>
+        /// <param name="val">The number of centuries to convert to seconds. Must not be NaN.</param>
+        /// <returns>The number of seconds equivalent to the specified number of centuries.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToSeconds(double val)
         {
             if (double.IsNaN(val))
@@ -4344,6 +7717,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 315360000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to its equivalent duration in milliseconds.
+        /// </summary>
+        /// <param name="val">The number of years to convert to milliseconds. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the equivalent duration in milliseconds for the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMilliseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4351,6 +7731,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 315360000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to its equivalent in microseconds.
+        /// </summary>
+        /// <param name="val">The number of years to convert to microseconds. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of microseconds for the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="val"/> is NaN.</exception>
         public static double ToMicroseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4358,6 +7745,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 315360000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to its equivalent in nanoseconds.
+        /// </summary>
+        /// <remarks>This method assumes a year consists of 365 days. Leap years and calendar variations
+        /// are not considered.</remarks>
+        /// <param name="val">The number of years to convert to nanoseconds. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of nanoseconds for the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToNanoseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4366,8 +7762,23 @@ namespace Calcify.Math.Conversion.Time
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting a value representing years to equivalent durations in other time units,
+    /// such as centuries, decades, months, weeks, days, hours, minutes, seconds, milliseconds, microseconds, and
+    /// nanoseconds.
+    /// </summary>
+    /// <remarks>All conversion methods assume standard calendar values (e.g., 365 days per year) and do not
+    /// account for leap years or calendar variations unless otherwise noted. Methods will throw an ArgumentException if
+    /// the input value is NaN.</remarks>
     public static class Years
     {
+        /// <summary>
+        /// Converts a value representing years to its equivalent in centuries.
+        /// </summary>
+        /// <param name="val">The number of years to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the number of centuries equivalent to the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToCenturies(double val)
         {
             if (double.IsNaN(val))
@@ -4375,6 +7786,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 100;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to its equivalent in decades.
+        /// </summary>
+        /// <param name="val">The number of years to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> value representing the number of decades equivalent to the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToDecades(double val)
         {
             if (double.IsNaN(val))
@@ -4382,6 +7800,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 10;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to its equivalent in months.
+        /// </summary>
+        /// <param name="val">The number of years to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the equivalent number of months for the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMonths(double val)
         {
             if (double.IsNaN(val))
@@ -4389,6 +7814,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 12;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to the equivalent number of weeks.
+        /// </summary>
+        /// <remarks>The conversion uses an average of 52.1429 weeks per year, which accounts for leap
+        /// years over a 400-year cycle.</remarks>
+        /// <param name="val">The number of years to convert. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of weeks for the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToWeeks(double val)
         {
             if (double.IsNaN(val))
@@ -4396,6 +7830,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 52.1429;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to the equivalent number of days.
+        /// </summary>
+        /// <remarks>This method assumes a year consists of 365 days and does not account for leap years
+        /// or calendar variations.</remarks>
+        /// <param name="val">The number of years to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> value representing the equivalent number of days.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToDays(double val)
         {
             if (double.IsNaN(val))
@@ -4403,6 +7846,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 365;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to the equivalent number of hours.
+        /// </summary>
+        /// <remarks>This method assumes a year consists of 8,760 hours (365 days). Leap years are not
+        /// accounted for.</remarks>
+        /// <param name="val">The number of years to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the equivalent number of hours for the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToHours(double val)
         {
             if (double.IsNaN(val))
@@ -4410,6 +7862,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 8760;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to the equivalent number of minutes.
+        /// </summary>
+        /// <remarks>This method assumes a year consists of 525,600 minutes (i.e., 365 days). Leap years
+        /// are not accounted for.</remarks>
+        /// <param name="val">The number of years to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The number of minutes equivalent to the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMinutes(double val)
         {
             if (double.IsNaN(val))
@@ -4417,6 +7878,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 525600;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to its equivalent in seconds.
+        /// </summary>
+        /// <remarks>This method assumes a year consists of exactly 31,536,000 seconds (365 days). Leap
+        /// years and variations in calendar systems are not accounted for.</remarks>
+        /// <param name="val">The number of years to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the equivalent number of seconds for the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToSeconds(double val)
         {
             if (double.IsNaN(val))
@@ -4424,6 +7894,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 31536000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to its equivalent duration in milliseconds.
+        /// </summary>
+        /// <remarks>This method assumes a year consists of 365 days and does not account for leap years
+        /// or calendar variations.</remarks>
+        /// <param name="val">The number of years to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the equivalent duration in milliseconds for the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMilliseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4431,6 +7910,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 31536000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to its equivalent in microseconds.
+        /// </summary>
+        /// <param name="val">The number of years to convert to microseconds. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of microseconds for the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMicroseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4438,6 +7924,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 31536000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to its equivalent in nanoseconds.
+        /// </summary>
+        /// <param name="val">The number of years to convert to nanoseconds. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the equivalent number of nanoseconds for the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToNanoseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4446,8 +7939,25 @@ namespace Calcify.Math.Conversion.Time
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting time durations expressed in months or years to other units such as
+    /// centuries, decades, years, weeks, days, hours, minutes, seconds, milliseconds, microseconds, and nanoseconds.
+    /// All conversions use standard or average values for each unit and are intended for approximate calculations.
+    /// </summary>
+    /// <remarks>The conversion methods in this class use fixed or average values for time units (e.g.,
+    /// average days per month, hours per month, days per year) and may not reflect exact calendar durations. These
+    /// methods are suitable for general-purpose or approximate calculations, but may not be appropriate for scenarios
+    /// requiring precise date or time computations. All methods validate input values and throw an ArgumentException if
+    /// the input is NaN.</remarks>
     public static class Months
     {
+        /// <summary>
+        /// Converts a value representing months to its equivalent in centuries.
+        /// </summary>
+        /// <param name="val">The number of months to convert. Must not be NaN.</param>
+        /// <returns>A double value representing the number of centuries equivalent to the specified number of months.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToCenturies(double val)
         {
             if (double.IsNaN(val))
@@ -4455,6 +7965,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 1200;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing months to its equivalent in decades.
+        /// </summary>
+        /// <remarks>One decade is defined as 120 months. The conversion divides the input value by
+        /// 120.</remarks>
+        /// <param name="val">The number of months to convert. Must not be NaN.</param>
+        /// <returns>A double value representing the number of decades equivalent to the specified number of months.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDecades(double val)
         {
             if (double.IsNaN(val))
@@ -4462,6 +7981,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 120;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in months to its equivalent in years.
+        /// </summary>
+        /// <param name="val">The number of months to convert. Must not be NaN.</param>
+        /// <returns>The number of years equivalent to the specified number of months.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToYears(double val)
         {
             if (double.IsNaN(val))
@@ -4469,6 +7995,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 12;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in months to its approximate equivalent in weeks.
+        /// </summary>
+        /// <remarks>This method uses an average conversion factor of 4.345 weeks per month, which may not
+        /// reflect the exact number of weeks in every month.</remarks>
+        /// <param name="val">The number of months to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>The approximate number of weeks corresponding to the specified number of months.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToWeeks(double val)
         {
             if (double.IsNaN(val))
@@ -4476,6 +8011,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 4.345;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing months to the equivalent number of days using an average month length.
+        /// </summary>
+        /// <remarks>This method uses an average month length of 30.417 days for the conversion. The
+        /// result may not be precise for calendar calculations that require exact day counts.</remarks>
+        /// <param name="val">The number of months to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the approximate number of days corresponding to the specified number of months.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDays(double val)
         {
             if (double.IsNaN(val))
@@ -4483,6 +8027,17 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 30.417;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value, representing months, to the equivalent number of hours.
+        /// </summary>
+        /// <remarks>This method assumes a fixed value of 730 hours per month, which may not reflect
+        /// actual calendar month durations. Use this conversion for approximate calculations where such precision is
+        /// acceptable.</remarks>
+        /// <param name="val">The number of months to convert to hours. Must not be NaN.</param>
+        /// <returns>A double value representing the total number of hours in the specified number of months, assuming each month
+        /// has 730 hours.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToHours(double val)
         {
             if (double.IsNaN(val))
@@ -4490,6 +8045,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 730;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing years to the equivalent number of minutes.
+        /// </summary>
+        /// <remarks>This method assumes a year consists of 43,800 minutes, based on a 365-day year. Leap
+        /// years are not accounted for.</remarks>
+        /// <param name="val">The number of years to convert to minutes. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>The equivalent number of minutes for the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMinutes(double val)
         {
             if (double.IsNaN(val))
@@ -4497,6 +8061,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 43800;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing months into the equivalent number of seconds.
+        /// </summary>
+        /// <remarks>This method assumes a fixed conversion rate of 2,628,000 seconds per month, which may
+        /// not reflect the exact number of seconds in all calendar months.</remarks>
+        /// <param name="val">The number of months to convert to seconds. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>The equivalent number of seconds for the specified number of months.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToSeconds(double val)
         {
             if (double.IsNaN(val))
@@ -4504,6 +8077,16 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 2628000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing months into the equivalent number of milliseconds.
+        /// </summary>
+        /// <remarks>This method assumes a fixed month length of 30.44 days (the average length of a month
+        /// in the Gregorian calendar) when performing the conversion.</remarks>
+        /// <param name="val">The number of months to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> value representing the total number of milliseconds equivalent to the specified
+        /// number of months.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMilliseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4511,6 +8094,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 2628000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from years to microseconds.
+        /// </summary>
+        /// <remarks>This method assumes a year consists of 365.25 days to account for leap
+        /// years.</remarks>
+        /// <param name="val">The number of years to convert. Must not be NaN.</param>
+        /// <returns>The equivalent number of microseconds represented by the specified number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMicroseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4518,6 +8110,14 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 2628000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in years to its equivalent duration in nanoseconds.
+        /// </summary>
+        /// <remarks>This method assumes a year consists of 365.25 days for conversion purposes.</remarks>
+        /// <param name="val">The number of years to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>The equivalent duration in nanoseconds as a double-precision floating-point value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToNanoseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4526,8 +8126,23 @@ namespace Calcify.Math.Conversion.Time
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting time values between weeks and other units, including days, hours,
+    /// minutes, seconds, months, years, decades, centuries, and various time intervals.
+    /// </summary>
+    /// <remarks>All conversion methods require valid numeric input values and will throw an ArgumentException
+    /// if the provided value is NaN. Conversion factors are based on standard or average values and may result in
+    /// approximate results for units such as months, years, or decades. This class is thread-safe and intended for
+    /// utility use in time-related calculations.</remarks>
     public static class Weeks
     {
+        /// <summary>
+        /// Converts a value representing days to its equivalent in centuries.
+        /// </summary>
+        /// <param name="val">The number of days to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the number of centuries equivalent to the specified number of days.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToCenturies(double val)
         {
             if (double.IsNaN(val))
@@ -4535,6 +8150,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 5214.3;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from years to decades using a fixed conversion factor.
+        /// </summary>
+        /// <remarks>This method uses a conversion factor of 521.43 years per decade. The result may not
+        /// reflect standard calendar decades and is based on the specified factor.</remarks>
+        /// <param name="val">The number of years to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent number of decades.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToDecades(double val)
         {
             if (double.IsNaN(val))
@@ -4542,6 +8166,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 521.43;
             return result;
         }
+        /// <summary>
+        /// Converts a value representing weeks to its equivalent in years.
+        /// </summary>
+        /// <remarks>The conversion uses 52.143 weeks per year as the basis for calculation.</remarks>
+        /// <param name="val">The number of weeks to convert. Must be a valid numeric value.</param>
+        /// <returns>A double representing the equivalent number of years for the specified number of weeks.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is not a valid number (NaN).</exception>
         public static double ToYears(double val)
         {
             if (double.IsNaN(val))
@@ -4549,6 +8180,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 52.143;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing days to the equivalent number of months using an average month length.
+        /// </summary>
+        /// <remarks>This method uses an average month length of 4.345 weeks (approximately 30.44 days)
+        /// for the conversion. The result is an approximation and may not reflect calendar month boundaries.</remarks>
+        /// <param name="val">The number of days to convert to months. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the approximate number of months corresponding to the specified number of days.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMonths(double val)
         {
             if (double.IsNaN(val))
@@ -4556,6 +8196,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 4.345;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified number of weeks to the equivalent number of days.
+        /// </summary>
+        /// <param name="val">The number of weeks to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the total number of days corresponding to the specified number of weeks.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDays(double val)
         {
             if (double.IsNaN(val))
@@ -4563,6 +8210,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 7;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value, representing weeks, to the equivalent number of hours.
+        /// </summary>
+        /// <param name="val">The number of weeks to convert to hours. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the total number of hours in the specified number of weeks.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToHours(double val)
         {
             if (double.IsNaN(val))
@@ -4570,6 +8224,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 168;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing weeks to the equivalent number of minutes.
+        /// </summary>
+        /// <param name="val">The number of weeks to convert to minutes. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>The equivalent number of minutes for the specified number of weeks.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMinutes(double val)
         {
             if (double.IsNaN(val))
@@ -4577,6 +8238,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 10080;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing weeks to its equivalent in seconds.
+        /// </summary>
+        /// <param name="val">The number of weeks to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>The number of seconds equivalent to the specified number of weeks.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToSeconds(double val)
         {
             if (double.IsNaN(val))
@@ -4584,6 +8252,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 604800;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing weeks to its equivalent duration in milliseconds.
+        /// </summary>
+        /// <param name="val">The number of weeks to convert. Must be a valid numeric value; cannot be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> value representing the specified number of weeks in milliseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMilliseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4591,6 +8266,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 604800000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing weeks to its equivalent in microseconds.
+        /// </summary>
+        /// <param name="val">The number of weeks to convert to microseconds. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the number of microseconds equivalent to the specified number of weeks.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMicroseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4598,6 +8280,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 604800000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value, representing weeks, to its equivalent in nanoseconds.
+        /// </summary>
+        /// <param name="val">The number of weeks to convert to nanoseconds. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of nanoseconds for the specified number of weeks.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToNanoseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4606,8 +8295,23 @@ namespace Calcify.Math.Conversion.Time
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting a number of days to equivalent values in other time units, such as
+    /// centuries, decades, years, months, weeks, hours, minutes, seconds, milliseconds, microseconds, and nanoseconds.
+    /// </summary>
+    /// <remarks>All conversion methods assume standard time unit lengths and do not account for leap years or
+    /// calendar irregularities. Methods throw an ArgumentException if the input value is not a valid number
+    /// (NaN).</remarks>
     public static class Days
     {
+        /// <summary>
+        /// Converts a number of days to the equivalent number of centuries.
+        /// </summary>
+        /// <remarks>One century is considered to be 36,500 days.</remarks>
+        /// <param name="val">The number of days to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the number of centuries equivalent to the specified number of days.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToCenturies(double val)
         {
             if (double.IsNaN(val))
@@ -4615,6 +8319,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 36500;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing days to its equivalent in decades.
+        /// </summary>
+        /// <remarks>A decade is considered as 3,650 days (10 years of 365 days each). This method does
+        /// not account for leap years.</remarks>
+        /// <param name="val">The number of days to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the number of decades equivalent to the specified number of days.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDecades(double val)
         {
             if (double.IsNaN(val))
@@ -4622,6 +8335,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 3650;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing days to the equivalent number of years.
+        /// </summary>
+        /// <param name="val">The number of days to convert. Must not be NaN.</param>
+        /// <returns>A double value representing the equivalent number of years.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToYears(double val)
         {
             if (double.IsNaN(val))
@@ -4629,6 +8349,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 365;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing days to the equivalent number of months.
+        /// </summary>
+        /// <remarks>The conversion uses an average month length of 30.417 days. The result is an
+        /// approximation and may not reflect calendar month boundaries.</remarks>
+        /// <param name="val">The number of days to convert to months. Must be a valid numeric value.</param>
+        /// <returns>A double representing the approximate number of months corresponding to the specified number of days.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is not a valid number (NaN).</exception>
         public static double ToMonths(double val)
         {
             if (double.IsNaN(val))
@@ -4636,6 +8365,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 30.417;
             return result;
         }
+
+        /// <summary>
+        /// Converts a number of days to the equivalent number of weeks.
+        /// </summary>
+        /// <param name="val">The number of days to convert. Must be a valid numeric value.</param>
+        /// <returns>The number of weeks equivalent to the specified number of days.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is not a valid number (NaN).</exception>
         public static double ToWeeks(double val)
         {
             if (double.IsNaN(val))
@@ -4643,6 +8379,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 7;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing days to its equivalent in hours.
+        /// </summary>
+        /// <param name="val">The number of days to convert to hours. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the equivalent number of hours for the specified number of days.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToHours(double val)
         {
             if (double.IsNaN(val))
@@ -4650,6 +8393,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 24;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing days to the equivalent number of minutes.
+        /// </summary>
+        /// <param name="val">The number of days to convert to minutes. Must not be NaN.</param>
+        /// <returns>The equivalent number of minutes for the specified number of days.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMinutes(double val)
         {
             if (double.IsNaN(val))
@@ -4657,6 +8407,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 1440;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing days to its equivalent in seconds.
+        /// </summary>
+        /// <param name="val">The number of days to convert to seconds. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the total number of seconds equivalent to the specified number of days.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToSeconds(double val)
         {
             if (double.IsNaN(val))
@@ -4664,6 +8421,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 86400;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing days to its equivalent in milliseconds.
+        /// </summary>
+        /// <param name="val">The number of days to convert to milliseconds. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> value representing the specified number of days in milliseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMilliseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4671,6 +8435,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 86400000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing days to its equivalent in microseconds.
+        /// </summary>
+        /// <param name="val">The number of days to convert to microseconds. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of microseconds for the specified number of days.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMicroseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4678,6 +8449,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 86400000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing days to its equivalent in nanoseconds.
+        /// </summary>
+        /// <param name="val">The number of days to convert to nanoseconds. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the equivalent number of nanoseconds for the specified number of days.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToNanoseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4686,8 +8464,24 @@ namespace Calcify.Math.Conversion.Time
             return result;
         }
     }
+    /// <summary>
+    /// Provides static methods for converting time values between hours and other units, including centuries, decades,
+    /// years, months, weeks, days, minutes, seconds, milliseconds, microseconds, and nanoseconds.
+    /// </summary>
+    /// <remarks>All conversion methods assume fixed conversion factors and do not account for calendar
+    /// variations such as leap years or differing month lengths. Each method throws an ArgumentException if the input
+    /// value is not a valid number (NaN). These methods are intended for approximate calculations and should not be
+    /// used where precise calendar-based conversions are required.</remarks>
     public static class Hours
     {
+        /// <summary>
+        /// Converts a time value, specified in hours, to its equivalent in centuries.
+        /// </summary>
+        /// <remarks>One century is considered to be 876,000 hours. The conversion divides the input value
+        /// by this constant.</remarks>
+        /// <param name="val">The time value in hours to convert. Must not be NaN.</param>
+        /// <returns>A double representing the number of centuries equivalent to the specified number of hours.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToCenturies(double val)
         {
             if (double.IsNaN(val))
@@ -4695,6 +8489,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 876000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from hours to decades.
+        /// </summary>
+        /// <remarks>One decade is considered to be 87,600 hours. This method performs a direct division
+        /// without rounding.</remarks>
+        /// <param name="val">The time value, in hours, to convert to decades. Must not be NaN.</param>
+        /// <returns>The equivalent time in decades as a double-precision floating-point number.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDecades(double val)
         {
             if (double.IsNaN(val))
@@ -4702,6 +8505,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 87600;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from hours to years.
+        /// </summary>
+        /// <remarks>This method assumes a year consists of 8,760 hours (365 days). For leap years or more
+        /// precise calculations, consider adjusting the conversion factor.</remarks>
+        /// <param name="val">The time value, in hours, to convert to years. Must not be NaN.</param>
+        /// <returns>The equivalent time in years, calculated by dividing the input value by 8,760.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToYears(double val)
         {
             if (double.IsNaN(val))
@@ -4709,6 +8521,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 8760;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing days to the equivalent number of months using a fixed average month length.
+        /// </summary>
+        /// <remarks>This method uses 730.001 days as the average length of a month for conversion. The
+        /// result may not correspond to calendar months and is intended for approximate calculations.</remarks>
+        /// <param name="val">The number of days to convert to months. Must be a valid numeric value.</param>
+        /// <returns>A double representing the equivalent number of months for the specified number of days.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is not a valid number (NaN).</exception>
         public static double ToMonths(double val)
         {
             if (double.IsNaN(val))
@@ -4716,6 +8537,14 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 730.001;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value, specified in hours, to its equivalent in weeks.
+        /// </summary>
+        /// <remarks>One week is considered to be 168 hours.</remarks>
+        /// <param name="val">The time value in hours to convert. Must not be NaN.</param>
+        /// <returns>The number of weeks equivalent to the specified number of hours.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToWeeks(double val)
         {
             if (double.IsNaN(val))
@@ -4723,6 +8552,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 168;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from hours to days.
+        /// </summary>
+        /// <param name="val">The time value, in hours, to convert to days. Must not be NaN.</param>
+        /// <returns>The equivalent time in days, calculated as the input value divided by 24.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDays(double val)
         {
             if (double.IsNaN(val))
@@ -4730,6 +8566,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 24;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in hours to its equivalent in minutes.
+        /// </summary>
+        /// <param name="val">The number of hours to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the equivalent number of minutes for the specified number of hours.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMinutes(double val)
         {
             if (double.IsNaN(val))
@@ -4737,6 +8580,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 60;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing hours to its equivalent in seconds.
+        /// </summary>
+        /// <param name="val">The number of hours to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the equivalent number of seconds for the specified number of hours.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToSeconds(double val)
         {
             if (double.IsNaN(val))
@@ -4744,6 +8594,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 3600;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing hours to its equivalent in milliseconds.
+        /// </summary>
+        /// <param name="val">The number of hours to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the equivalent number of milliseconds for the specified number of hours.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMilliseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4751,6 +8608,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 3600000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in hours to its equivalent in microseconds.
+        /// </summary>
+        /// <param name="val">The number of hours to convert to microseconds. Must not be NaN.</param>
+        /// <returns>The equivalent value in microseconds as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMicroseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4758,6 +8622,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 3600000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value in hours to nanoseconds.
+        /// </summary>
+        /// <param name="val">The value, in hours, to convert to nanoseconds. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of nanoseconds for the specified value in hours.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToNanoseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4766,8 +8637,23 @@ namespace Calcify.Math.Conversion.Time
             return result;
         }
     }
+    /// <summary>
+    /// Provides static methods for converting time values expressed in minutes to various other units, including
+    /// centuries, decades, years, months, weeks, days, hours, seconds, milliseconds, microseconds, and nanoseconds.
+    /// </summary>
+    /// <remarks>All conversion methods assume fixed conversion factors and do not account for leap years,
+    /// calendar variations, or time zone differences. Each method throws an ArgumentException if the input value is not
+    /// a valid number (NaN). These methods are intended for straightforward time unit conversions and may not be
+    /// suitable for precise calendrical calculations.</remarks>
     public static class Minutes
     {
+        /// <summary>
+        /// Converts a time value, specified in minutes, to its equivalent in centuries.
+        /// </summary>
+        /// <remarks>One century is considered to be 52,560,000 minutes.</remarks>
+        /// <param name="val">The time value in minutes to convert. Must be a valid number.</param>
+        /// <returns>A double representing the number of centuries equivalent to the specified number of minutes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is not a valid number (NaN).</exception>
         public static double ToCenturies(double val)
         {
             if (double.IsNaN(val))
@@ -4775,6 +8661,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 52560000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value, specified in minutes, to its equivalent in decades.
+        /// </summary>
+        /// <remarks>One decade is considered to be 5,256,000 minutes. This method performs a simple
+        /// division and does not account for leap years or calendar variations.</remarks>
+        /// <param name="val">The time value in minutes to convert. Must not be NaN.</param>
+        /// <returns>A double representing the number of decades equivalent to the specified number of minutes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDecades(double val)
         {
             if (double.IsNaN(val))
@@ -4782,6 +8677,14 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 5256000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from minutes to years.
+        /// </summary>
+        /// <remarks>This method assumes a year consists of 525,600 minutes (365 days).</remarks>
+        /// <param name="val">The time value, in minutes, to convert to years. Must not be NaN.</param>
+        /// <returns>The equivalent time in years, calculated as the input value divided by 525,600.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToYears(double val)
         {
             if (double.IsNaN(val))
@@ -4789,6 +8692,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 525600;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from hours to months using a fixed conversion factor.
+        /// </summary>
+        /// <remarks>This method uses a fixed conversion factor of 43,800 hours per month. The result may
+        /// not reflect calendar month variations.</remarks>
+        /// <param name="val">The time value in hours to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A double representing the equivalent number of months for the specified number of hours.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMonths(double val)
         {
             if (double.IsNaN(val))
@@ -4796,6 +8708,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 43800;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from minutes to weeks.
+        /// </summary>
+        /// <remarks>One week is considered to be 10,080 minutes. The conversion divides the input value
+        /// by 10,080.</remarks>
+        /// <param name="val">The time value, in minutes, to convert to weeks. Must not be NaN.</param>
+        /// <returns>The equivalent time in weeks, represented as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToWeeks(double val)
         {
             if (double.IsNaN(val))
@@ -4803,6 +8724,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 10080;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from minutes to days.
+        /// </summary>
+        /// <param name="val">The time value, in minutes, to convert to days. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of days for the specified time value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDays(double val)
         {
             if (double.IsNaN(val))
@@ -4810,6 +8738,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 1440;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from minutes to hours.
+        /// </summary>
+        /// <param name="val">The time value, in minutes, to convert to hours. Must not be NaN.</param>
+        /// <returns>The equivalent time in hours as a double-precision floating-point number.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToHours(double val)
         {
             if (double.IsNaN(val))
@@ -4817,6 +8752,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 60;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in minutes to its equivalent in seconds.
+        /// </summary>
+        /// <param name="val">The number of minutes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in seconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToSeconds(double val)
         {
             if (double.IsNaN(val))
@@ -4824,6 +8766,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 60;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing minutes to its equivalent in milliseconds.
+        /// </summary>
+        /// <param name="val">The number of minutes to convert. Must be a valid numeric value; cannot be NaN.</param>
+        /// <returns>A double representing the equivalent number of milliseconds for the specified number of minutes.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMilliseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4831,6 +8780,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 60000;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from minutes to microseconds.
+        /// </summary>
+        /// <param name="val">The value, in minutes, to convert to microseconds. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of microseconds for the specified value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMicroseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4838,6 +8794,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 60000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in minutes to its equivalent in nanoseconds.
+        /// </summary>
+        /// <param name="val">The number of minutes to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent number of nanoseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToNanoseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4846,8 +8809,25 @@ namespace Calcify.Math.Conversion.Time
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting time values specified in seconds to various other time units, including
+    /// centuries, decades, years, months, weeks, days, hours, minutes, milliseconds, microseconds, and nanoseconds.
+    /// </summary>
+    /// <remarks>All conversion methods require the input value to be a valid double that is not <see
+    /// cref="double.NaN"/>. If an invalid value is provided, an <see cref="ArgumentException"/> is thrown. The
+    /// conversions use fixed values for the length of each time unit, which may not account for calendar variations
+    /// (such as leap years or differing month lengths). These methods are intended for approximate calculations and
+    /// should not be used where precise calendar accuracy is required.</remarks>
     public static class Seconds
     {
+        /// <summary>
+        /// Converts a time value, specified in seconds, to its equivalent in centuries.
+        /// </summary>
+        /// <remarks>One century is defined as 3,153,600,000 seconds.</remarks>
+        /// <param name="val">The time value in seconds to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the number of centuries equivalent to the specified time in seconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToCenturies(double val)
         {
             if (double.IsNaN(val))
@@ -4855,6 +8835,14 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 3153600000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from seconds to decades.
+        /// </summary>
+        /// <remarks>One decade is defined as 315,360,000 seconds (10 years of 365 days each).</remarks>
+        /// <param name="val">The time value, in seconds, to convert to decades. Must not be NaN.</param>
+        /// <returns>The equivalent time in decades, represented as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDecades(double val)
         {
             if (double.IsNaN(val))
@@ -4862,6 +8850,14 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 315360000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from seconds to years.
+        /// </summary>
+        /// <remarks>One year is considered to be 31,536,000 seconds (365 days).</remarks>
+        /// <param name="val">The time value, in seconds, to convert to years. Must not be NaN.</param>
+        /// <returns>The equivalent time in years as a double-precision floating-point number.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToYears(double val)
         {
             if (double.IsNaN(val))
@@ -4869,6 +8865,16 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 31536000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from seconds to months using a fixed average month length.
+        /// </summary>
+        /// <remarks>This method uses 2,628,000 seconds as the average length of a month, which may not
+        /// reflect calendar month variations. The result is a fractional value representing months.</remarks>
+        /// <param name="val">The time value in seconds to convert. Must not be NaN.</param>
+        /// <returns>The equivalent time in months, calculated by dividing the input value by 2,628,000 (the average number of
+        /// seconds in a month).</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMonths(double val)
         {
             if (double.IsNaN(val))
@@ -4876,6 +8882,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 2628000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from seconds to weeks.
+        /// </summary>
+        /// <param name="val">The time interval, in seconds, to convert to weeks. Must not be NaN.</param>
+        /// <returns>The equivalent time in weeks, represented as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToWeeks(double val)
         {
             if (double.IsNaN(val))
@@ -4883,6 +8896,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 604800;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from seconds to days.
+        /// </summary>
+        /// <param name="val">The time value, in seconds, to convert to days. Must not be NaN.</param>
+        /// <returns>The equivalent time in days, represented as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDays(double val)
         {
             if (double.IsNaN(val))
@@ -4890,6 +8910,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 86400;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from seconds to hours.
+        /// </summary>
+        /// <param name="val">The time value, in seconds, to convert. Must not be NaN.</param>
+        /// <returns>The equivalent time in hours, represented as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToHours(double val)
         {
             if (double.IsNaN(val))
@@ -4897,6 +8924,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 3600;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from seconds to minutes.
+        /// </summary>
+        /// <param name="val">The time value, in seconds, to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent time in minutes as a <see cref="double"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMinutes(double val)
         {
             if (double.IsNaN(val))
@@ -4904,6 +8938,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 60;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in seconds to its equivalent in milliseconds.
+        /// </summary>
+        /// <param name="val">The value in seconds to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent number of milliseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMilliseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4911,6 +8952,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from seconds to microseconds.
+        /// </summary>
+        /// <param name="val">The value in seconds to convert. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent value in microseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMicroseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4918,6 +8966,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in seconds to its equivalent in nanoseconds.
+        /// </summary>
+        /// <param name="val">The time interval in seconds to convert. Must not be NaN.</param>
+        /// <returns>A double representing the specified time interval in nanoseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToNanoseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4926,8 +8981,25 @@ namespace Calcify.Math.Conversion.Time
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting time values between milliseconds and other time units, including
+    /// nanoseconds, microseconds, seconds, minutes, hours, days, weeks, months, years, decades, and centuries.
+    /// </summary>
+    /// <remarks>All conversion methods require input values that are not <see cref="double.NaN"/> and will
+    /// throw an <see cref="ArgumentException"/> if a NaN value is provided. The conversions use fixed factors and do
+    /// not account for calendar variations, leap years, or time zone differences. These methods are intended for
+    /// general-purpose time unit conversions and may not be suitable for precise calendrical calculations.</remarks>
     public static class Milliseconds
     {
+        /// <summary>
+        /// Converts a time value, specified in nanoseconds, to its equivalent in centuries.
+        /// </summary>
+        /// <remarks>One century is considered to be 3,153,600,000,000 nanoseconds. The conversion is
+        /// performed using this constant factor.</remarks>
+        /// <param name="val">The time value in nanoseconds to convert. Must not be NaN.</param>
+        /// <returns>A double representing the number of centuries equivalent to the specified nanoseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToCenturies(double val)
         {
             if (double.IsNaN(val))
@@ -4935,6 +9007,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 3153600000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value, specified in nanoseconds, to its equivalent in decades.
+        /// </summary>
+        /// <remarks>One decade is defined as 315,360,000,000 nanoseconds. This method does not validate
+        /// whether the input is within a realistic range for time values.</remarks>
+        /// <param name="val">The time value in nanoseconds to convert. Must not be NaN.</param>
+        /// <returns>A double representing the number of decades equivalent to the specified nanoseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDecades(double val)
         {
             if (double.IsNaN(val))
@@ -4942,6 +9023,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 315360000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from milliseconds to years.
+        /// </summary>
+        /// <remarks>One year is considered to be 31,536,000,000 milliseconds. This method does not
+        /// account for leap years or calendar variations.</remarks>
+        /// <param name="val">The time value, in milliseconds, to convert to years. Must not be NaN.</param>
+        /// <returns>The equivalent time in years, represented as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToYears(double val)
         {
             if (double.IsNaN(val))
@@ -4949,6 +9039,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 31536000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from milliseconds to months.
+        /// </summary>
+        /// <remarks>This method assumes one month is equal to 2,628,000,000 milliseconds (approximately
+        /// 30.44 days).</remarks>
+        /// <param name="val">The time value, in milliseconds, to convert to months. Must not be NaN.</param>
+        /// <returns>The equivalent number of months represented by the specified time value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMonths(double val)
         {
             if (double.IsNaN(val))
@@ -4956,6 +9055,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 2628000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from milliseconds to weeks.
+        /// </summary>
+        /// <param name="val">The time value, in milliseconds, to convert to weeks. Must not be NaN.</param>
+        /// <returns>The equivalent number of weeks represented by the specified time value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToWeeks(double val)
         {
             if (double.IsNaN(val))
@@ -4963,6 +9069,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 604800000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from milliseconds to days.
+        /// </summary>
+        /// <param name="val">The time value, in milliseconds, to convert. Must not be NaN.</param>
+        /// <returns>The equivalent time in days, represented as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDays(double val)
         {
             if (double.IsNaN(val))
@@ -4970,6 +9083,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 86400000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from milliseconds to hours.
+        /// </summary>
+        /// <param name="val">The time value in milliseconds to convert. Must not be NaN.</param>
+        /// <returns>The equivalent time in hours as a double-precision floating-point number.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToHours(double val)
         {
             if (double.IsNaN(val))
@@ -4977,6 +9097,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 3600000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from milliseconds to minutes.
+        /// </summary>
+        /// <param name="val">The time value, in milliseconds, to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent time in minutes as a double-precision floating-point number.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMinutes(double val)
         {
             if (double.IsNaN(val))
@@ -4984,6 +9111,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 60000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from milliseconds to seconds.
+        /// </summary>
+        /// <param name="val">The value in milliseconds to convert. Must not be NaN.</param>
+        /// <returns>The equivalent value in seconds as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToSeconds(double val)
         {
             if (double.IsNaN(val))
@@ -4991,6 +9125,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in milliseconds to its equivalent in microseconds.
+        /// </summary>
+        /// <param name="val">The value in milliseconds to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in microseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMicroseconds(double val)
         {
             if (double.IsNaN(val))
@@ -4998,6 +9139,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val * 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in milliseconds to its equivalent in nanoseconds.
+        /// </summary>
+        /// <param name="val">The value in milliseconds to convert. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent number of nanoseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToNanoseconds(double val)
         {
             if (double.IsNaN(val))
@@ -5006,8 +9154,23 @@ namespace Calcify.Math.Conversion.Time
             return result;
         }
     }
+    /// <summary>
+    /// Provides static methods for converting time values between microseconds and other time units, including
+    /// nanoseconds, milliseconds, seconds, minutes, hours, days, weeks, months, years, decades, and centuries.
+    /// </summary>
+    /// <remarks>All conversion methods validate that the input value is not <see cref="double.NaN"/> and
+    /// throw an <see cref="ArgumentException"/> if this condition is not met. The conversions use fixed values for unit
+    /// lengths, which may not account for calendar variations or leap years. These methods are intended for
+    /// general-purpose time unit conversions and do not perform additional range or overflow checks.</remarks>
     public static class Microseconds
     {
+        /// <summary>
+        /// Converts a time value, specified in femtoseconds, to its equivalent in centuries.
+        /// </summary>
+        /// <remarks>One century is considered to be 3,153,600,000,000,000 femtoseconds.</remarks>
+        /// <param name="val">The time value in femtoseconds to convert. Must not be NaN.</param>
+        /// <returns>A double representing the number of centuries equivalent to the specified femtoseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToCenturies(double val)
         {
             if (double.IsNaN(val))
@@ -5015,6 +9178,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 3153600000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value, specified in femtoseconds, to its equivalent in decades.
+        /// </summary>
+        /// <remarks>One decade is defined as 315,360,000,000,000 femtoseconds. This method does not
+        /// validate the range of the input value beyond checking for NaN.</remarks>
+        /// <param name="val">The time value to convert, in femtoseconds. Must not be NaN.</param>
+        /// <returns>A double representing the number of decades equivalent to the specified femtoseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDecades(double val)
         {
             if (double.IsNaN(val))
@@ -5022,6 +9194,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 315360000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from femtoseconds to years.
+        /// </summary>
+        /// <remarks>One year is considered to be 31,536,000,000,000 femtoseconds. This method does not
+        /// perform range checking beyond NaN validation.</remarks>
+        /// <param name="val">The time interval to convert, specified in femtoseconds. Must not be NaN.</param>
+        /// <returns>The equivalent time in years as a double-precision floating-point value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToYears(double val)
         {
             if (double.IsNaN(val))
@@ -5029,6 +9210,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 31536000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from nanoseconds to months.
+        /// </summary>
+        /// <remarks>One month is considered to be 2,628,000,000,000 nanoseconds. This conversion uses a
+        /// fixed average month length and may not account for variations in calendar months.</remarks>
+        /// <param name="val">The time value, in nanoseconds, to convert. Must not be NaN.</param>
+        /// <returns>The equivalent time in months, represented as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMonths(double val)
         {
             if (double.IsNaN(val))
@@ -5036,6 +9226,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 2628000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from ticks to weeks.
+        /// </summary>
+        /// <remarks>One week is defined as 604,800,000,000 ticks. This method does not validate that the
+        /// input represents a whole number of weeks.</remarks>
+        /// <param name="val">The time value, in ticks, to convert to weeks. Must not be NaN.</param>
+        /// <returns>The equivalent number of weeks represented by the specified tick value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToWeeks(double val)
         {
             if (double.IsNaN(val))
@@ -5043,6 +9242,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 604800000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from 100-nanosecond intervals to days.
+        /// </summary>
+        /// <remarks>This method is useful for converting time values commonly used in Windows file times
+        /// or .NET ticks to a day-based representation.</remarks>
+        /// <param name="val">The time value, in 100-nanosecond intervals, to convert to days. Must not be NaN.</param>
+        /// <returns>The equivalent number of days represented by the specified time value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDays(double val)
         {
             if (double.IsNaN(val))
@@ -5050,6 +9258,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 86400000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from ticks to hours.
+        /// </summary>
+        /// <param name="val">The time value, in ticks, to convert to hours. Must not be NaN.</param>
+        /// <returns>A double representing the equivalent time in hours.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToHours(double val)
         {
             if (double.IsNaN(val))
@@ -5057,6 +9272,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 3600000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value representing microseconds to its equivalent in minutes.
+        /// </summary>
+        /// <param name="val">The value, in microseconds, to convert to minutes. Must not be NaN.</param>
+        /// <returns>A double representing the number of minutes equivalent to the specified microseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMinutes(double val)
         {
             if (double.IsNaN(val))
@@ -5064,6 +9286,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 60000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value from microseconds to seconds.
+        /// </summary>
+        /// <param name="val">The value in microseconds to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in seconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToSeconds(double val)
         {
             if (double.IsNaN(val))
@@ -5071,6 +9300,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts the specified value from microseconds to milliseconds.
+        /// </summary>
+        /// <param name="val">The value, in microseconds, to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent value in milliseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMilliseconds(double val)
         {
             if (double.IsNaN(val))
@@ -5078,6 +9314,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 1000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in microseconds to its equivalent in nanoseconds.
+        /// </summary>
+        /// <param name="val">The value in microseconds to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent value in nanoseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToNanoseconds(double val)
         {
             if (double.IsNaN(val))
@@ -5086,8 +9329,26 @@ namespace Calcify.Math.Conversion.Time
             return result;
         }
     }
+
+    /// <summary>
+    /// Provides static methods for converting time values between nanoseconds and other time units, such as
+    /// microseconds, milliseconds, seconds, minutes, hours, days, weeks, months, years, decades, and centuries.
+    /// </summary>
+    /// <remarks>This class offers utility methods for time conversions commonly needed when working with
+    /// high-precision time intervals. All methods perform direct conversions based on fixed unit definitions and do not
+    /// validate whether the input values represent meaningful or typical time spans. Each method throws an
+    /// ArgumentException if the input value is NaN. The class is thread-safe and intended for use in scenarios
+    /// requiring precise time unit conversions.</remarks>
     public static class Nanoseconds
     {
+        /// <summary>
+        /// Converts a time value, specified in ticks, to its equivalent number of centuries.
+        /// </summary>
+        /// <remarks>One century is defined as 3,153,600,000,000,000,000 ticks. This method does not
+        /// validate whether the input represents a meaningful time span; it performs a direct conversion.</remarks>
+        /// <param name="val">The time value in ticks to convert. Must not be NaN.</param>
+        /// <returns>The number of centuries represented by the specified time value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToCenturies(double val)
         {
             if (double.IsNaN(val))
@@ -5095,6 +9356,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 3153600000000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value, specified in femtoseconds, to its equivalent in decades.
+        /// </summary>
+        /// <remarks>One decade is defined as 315,360,000,000,000,000 femtoseconds. This method does not
+        /// validate for negative or infinite values.</remarks>
+        /// <param name="val">The time value in femtoseconds to convert. Must not be NaN.</param>
+        /// <returns>A double representing the number of decades equivalent to the specified femtoseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDecades(double val)
         {
             if (double.IsNaN(val))
@@ -5102,6 +9372,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 315360000000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from femtoseconds to years.
+        /// </summary>
+        /// <remarks>One year is considered to be 31,536,000,000,000,000 femtoseconds. This method does
+        /// not perform range checking beyond NaN validation.</remarks>
+        /// <param name="val">The time interval to convert, specified in femtoseconds. Must not be NaN.</param>
+        /// <returns>The equivalent time in years as a double-precision floating-point value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToYears(double val)
         {
             if (double.IsNaN(val))
@@ -5109,6 +9388,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 31536000000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value, specified in picoseconds, to the equivalent number of months.
+        /// </summary>
+        /// <remarks>One month is considered to be 2,628,000,000,000,000 picoseconds. The conversion may
+        /// result in a fractional value if the input does not represent an exact number of months.</remarks>
+        /// <param name="val">The time value in picoseconds to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The number of months equivalent to the specified time value. The result may be fractional.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMonths(double val)
         {
             if (double.IsNaN(val))
@@ -5116,6 +9404,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 2628000000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from ticks to weeks.
+        /// </summary>
+        /// <remarks>One week is defined as 604,800,000,000,000 ticks. This method does not validate that
+        /// the input is within a typical range for time values.</remarks>
+        /// <param name="val">The time value, in ticks, to convert to weeks. Must not be NaN.</param>
+        /// <returns>The equivalent number of weeks represented by the specified tick value.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToWeeks(double val)
         {
             if (double.IsNaN(val))
@@ -5123,6 +9420,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 604800000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time interval specified in ticks to its equivalent value in days.
+        /// </summary>
+        /// <remarks>One day is defined as 86,400,000,000,000 ticks. This method does not validate whether
+        /// the input represents a valid time interval; it simply performs the conversion.</remarks>
+        /// <param name="val">The time interval, in ticks, to convert to days. Must not be NaN.</param>
+        /// <returns>The number of days that corresponds to the specified number of ticks.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToDays(double val)
         {
             if (double.IsNaN(val))
@@ -5130,6 +9436,15 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 86400000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from ticks to hours.
+        /// </summary>
+        /// <remarks>One tick represents 100 nanoseconds. Use this method to convert tick-based time
+        /// values to hours for calculations or display.</remarks>
+        /// <param name="val">The time value, in ticks, to convert to hours. Must not be NaN.</param>
+        /// <returns>The equivalent time in hours, represented as a double.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToHours(double val)
         {
             if (double.IsNaN(val))
@@ -5137,6 +9452,16 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 3600000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a time value from 100-nanosecond units to minutes.
+        /// </summary>
+        /// <remarks>This method is useful for converting time values represented in .NET ticks (where one
+        /// tick equals 100 nanoseconds) to minutes. The conversion is performed by dividing the input value by
+        /// 60,000,000,000.</remarks>
+        /// <param name="val">The time value to convert, specified in 100-nanosecond units. Must not be NaN.</param>
+        /// <returns>The equivalent time in minutes as a double-precision floating-point number.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
         public static double ToMinutes(double val)
         {
             if (double.IsNaN(val))
@@ -5144,6 +9469,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 60000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in nanoseconds to its equivalent in seconds.
+        /// </summary>
+        /// <param name="val">The time interval in nanoseconds to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>A <see cref="double"/> representing the equivalent time in seconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToSeconds(double val)
         {
             if (double.IsNaN(val))
@@ -5151,6 +9483,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 1000000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in nanoseconds to its equivalent in milliseconds.
+        /// </summary>
+        /// <param name="val">The value in nanoseconds to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in milliseconds as a <see cref="double"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMilliseconds(double val)
         {
             if (double.IsNaN(val))
@@ -5158,6 +9497,13 @@ namespace Calcify.Math.Conversion.Time
             double result = val / 1000000;
             return result;
         }
+
+        /// <summary>
+        /// Converts a value in nanoseconds to microseconds.
+        /// </summary>
+        /// <param name="val">The value in nanoseconds to convert. Must not be <see cref="double.NaN"/>.</param>
+        /// <returns>The equivalent value in microseconds.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
         public static double ToMicroseconds(double val)
         {
             if (double.IsNaN(val))
@@ -5169,7 +9515,13 @@ namespace Calcify.Math.Conversion.Time
 }
 namespace Calcify.Math
 {
-
+    /// <summary>
+    /// Provides mathematical utility methods for calculating factorials and combinations.
+    /// </summary>
+    /// <remarks>The static methods in the Functions class support common combinatorial calculations, such as
+    /// computing the factorial of a non-negative number and determining the number of possible combinations for a given
+    /// set size. All methods validate input parameters and throw exceptions for invalid arguments. These methods are
+    /// thread-safe as they do not maintain any internal state.</remarks>
     class Functions
     {
         /// <summary>
@@ -5212,6 +9564,14 @@ namespace Calcify.Math
         }
     }
 
+    /// <summary>
+    /// Provides static methods for performing mathematical calculations, including conversion between Unix timestamps
+    /// and DateTime values, and evaluating mathematical expressions represented as strings.
+    /// </summary>
+    /// <remarks>The Calculator class includes utility methods for converting Unix timestamps to and from
+    /// DateTime, generating regular expressions for parsing mathematical expressions, and evaluating string-based math
+    /// tasks that support brackets, exponentials, factorials, and standard arithmetic operations. All methods are
+    /// static and can be used without instantiating the class.</remarks>
     class Calculator
     {
         /// <summary>
@@ -5320,7 +9680,8 @@ namespace Calcify.Math
 
             // Factorial
             MatchCollection FactorialMatches = givenRegex["Factorial"].Matches(task);
-            foreach (Match match in FactorialMatches) {
+            foreach (Match match in FactorialMatches)
+            {
                 string factSubTask = match.Value;
                 double factResult = double.Parse(factSubTask.Substring(0, factSubTask.Length - 1), CultureInfo.InvariantCulture);
                 factResult = Functions.Factorial(factResult);

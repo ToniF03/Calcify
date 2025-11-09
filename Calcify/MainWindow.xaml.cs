@@ -797,7 +797,7 @@ namespace Calcify
                         text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(System.Math.PI, Properties.Settings.Default.Digits)), 1);
                         break;
                     case "phi":
-                        text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(System.Math., Properties.Settings.Default.Digits)), 1);
+                        text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(Constants.Phi, Properties.Settings.Default.Digits)), 1);
                         break;
                     case "e":
                         text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(System.Math.E, Properties.Settings.Default.Digits)), 1);
