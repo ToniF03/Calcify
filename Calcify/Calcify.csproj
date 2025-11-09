@@ -112,6 +112,7 @@
     <Compile Include="Classes\Math\Conversion\DataSize\Gigabyte.cs" />
     <Compile Include="Classes\Math\Conversion\DataSize\Kilobyte.cs" />
     <Compile Include="Classes\Math\Conversion\DataSize\Megabyte.cs" />
+    <Compile Include="Classes\Math\Conversion\DataSize\Petabyte.cs" />
     <Compile Include="Classes\Math\Conversion\DataSize\Terabyte.cs" />
     <Compile Include="Classes\Math\Conversion\Enum.cs" />
     <Compile Include="Classes\Math\Units\Patterns.cs" />
