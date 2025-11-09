@@ -14,6 +14,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -22,6 +23,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Xml;
+using static Calcify.SyntaxFile;
 
 namespace Calcify
 {
@@ -37,21 +39,21 @@ namespace Calcify
         string MassPattern = Math.Units.Patterns.MassPattern;
         string TemperaturePattern = Math.Units.Patterns.TemperaturePattern;
         string TimePattern = Math.Units.Patterns.TimePattern;
-        string ConstantsPattern = @"(π|\b(pi|e)\b)";
+        string ConstantsPattern = @"(π|\b(p(h)?i|e)\b)";
         #endregion
         #region Regex
         Regex prevRegex = new Regex(@"\b(previous|prev|answer|ans)\b");
 
         Regex sqrtRegex = new Regex(@"\b(?<func>sqrt)\((?<variable1>(-)?\d+(\.\d+)?)\)(( )?|$)");
 
-        Regex dateTimeKeyWordsRegex = new Regex(@"\b(?i)(now|time|yesterday|date|today|tomorrow)(?-i)\b");
+        Regex dateTimeKeyWordsRegex = new Regex(@"\b(?i)(((now|time)(\.(hour|minute|second))?)|(yesterday|date|today|tomorrow)(\.(day|month|year|weekday|dayofyear|weekofyear))?)(?-i)\b");
         Regex dateTimeRegex = new Regex(@"^(\d{2}(\d{2})?\/\d{1,2}\/\d{1,2}( \d{1,2}:\d{1,2}(:\d{1,2})?)?|\d{1,2}:\d{1,2}(:\d{1,2})?)$");
         Regex PermutationRegex = new Regex(@"(?<n>\d+)C(?<r>\d+)");
         Regex calculatorRegex = new Regex(@"^((\d+(\.\d+)?)|\||(\+|\-|\*|\/|\^)(?!\+|\*|\/|\^|\!)|(|\(|\)|\!))*$");
-        Regex directRegex = new Regex(@"^-?((\d{1,3},)*\d{3}|\d+)(\.\d+)?( (" + Math.Units.Patterns.allUnitPatterns + "))?$");
+        Regex directRegex = new Regex(@"^(-?((\d{1,3},)*\d{3}|\d+)(\.\d+)?( (" + Math.Units.Patterns.allUnitPatterns + "))?|\\d{4}\\/\\d{2}\\/\\d{2}( \\d{2}:\\d{2}:\\d{2})?|\\d{2}:\\d{2}(:\\d{2})?)$");
         Regex constantsRegex;
         Regex sumAvgRegex;
-        Regex inlineCalculationRegex = new Regex(@"\{(?<subtask>[^{}]*)\}", RegexOptions.RightToLeft);
+        Regex inlineCalculationRegex = new Regex(@"(?<=\{)(?<subtask>[^{}]*)(?=\})", RegexOptions.RightToLeft);
         public Regex currencyRegex;
 
         Regex allUnitRegex;
@@ -300,6 +302,8 @@ namespace Calcify
             contextAboutButton.Click += contextAboutButton_Click;
             contextSettingsButton.Click += SettingsButton_Click;
             contextExitButton.Click += CloseButton_Click;
+
+            titleLabel.MouseLeftButtonDown += TitleLabel_MouseLeftButtonDown;
             #endregion
             #region Input Bindings
             CtrlS.InputGestures.Add(new KeyGesture(Key.S, ModifierKeys.Control));
@@ -372,6 +376,30 @@ namespace Calcify
 
         }
 
+        /// <summary>
+        /// Allow dragging the window when the user clicks (and drags) on the title label.
+        /// Also support double-click to maximize/restore (common titlebar behavior).
+        /// Tooltip continues to show on hover because we did not suppress it.
+        /// </summary>
+        private void TitleLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            // Double-click: toggle maximize/restore
+            if (e.ClickCount == 2)
+            {
+                this.WindowState = this.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+                return;
+            }
+
+            // Single click + move: start window drag
+            try
+            {
+                this.DragMove();
+            }
+            catch (InvalidOperationException)
+            {
+            }
+        }
+
         private void mainEditor_TextChanged(object sender, EventArgs e)
         {
             TextDocument newDocument = new TextDocument();
@@ -383,8 +411,9 @@ namespace Calcify
                 DocumentLine line = mainEditor.Document.GetLineByNumber(i);
                 result = Calculate(mainEditor.Document.GetText(line.Offset, line.Length)).Trim();
                 Match m = directRegex.Match(result);
-                if (directRegex.Match(result).Success)
-                    newDocument.Text = newDocument.Text + result + '\n';
+                if (directRegex.Match(result).Success || new Regex(@"^[^\d]*$").IsMatch(result))
+                    newDocument.Text = newDocument.Text + result;
+                newDocument.Text += "\n";
             }
             resultEditor.Document = newDocument;
         }
@@ -646,6 +675,7 @@ namespace Calcify
         private string Calculate(string input, bool acceptPrevious = true)
         {
             string originalInput = input;
+            bool dateCalculation = false;
 
             // Comment line
             if (input.StartsWith("#"))
@@ -665,7 +695,7 @@ namespace Calcify
 
             while (inlineCalculationRegex.IsMatch(input))
             {
-                string subtask = inlineCalculationRegex.Match(input).Groups["subtask"].Value;
+                string subtask = inlineCalculationRegex.Match(input).Value;
                 string inlineResult = Calculate(subtask, acceptPrevious);
                 input = input.Replace("{" + subtask + "}", inlineResult);
             }
@@ -681,7 +711,13 @@ namespace Calcify
             input = ReplaceOneVariableFunctions(input);
 
             // Replace DateTime variables
-            input = DateTimeCalculation(input);
+            string substep = DateTimeCalculation(input);
+            if (substep != input)
+            {
+                input = substep;
+                dateCalculation = true;
+            }
+
 
             if (acceptPrevious)
                 foreach (Match match in sumAvgRegex.Matches(input))
@@ -711,7 +747,7 @@ namespace Calcify
             input = CurrencyConversion(input);
 
             // Execute Calculation
-            if (calculatorRegex.IsMatch(input))
+            if (calculatorRegex.IsMatch(input) && !dateCalculation)
                 input = parseCalculation(input);
 
             return input;
@@ -754,10 +790,19 @@ namespace Calcify
         {
             foreach (Match match in constantsRegex.Matches(text))
             {
-                if (match.Value == "pi" || match.Value == "π")
-                    text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(System.Math.PI, Properties.Settings.Default.Digits)), 1);
-                else if (match.Value == "e")
-                    text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(System.Math.E, Properties.Settings.Default.Digits)), 1);
+                switch (match.Value)
+                {
+                    case "pi":
+                    case "π":
+                        text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(System.Math.PI, Properties.Settings.Default.Digits)), 1);
+                        break;
+                    case "phi":
+                        text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(System.Math., Properties.Settings.Default.Digits)), 1);
+                        break;
+                    case "e":
+                        text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(System.Math.E, Properties.Settings.Default.Digits)), 1);
+                        break;
+                }
             }
             return text;
         }
@@ -927,7 +972,9 @@ namespace Calcify
                         break;
                     case "today.weekofyear":
                     case "date.weekofyear":
-                        timeString = dateTime.Month.ToString("00", CultureInfo.InvariantCulture);
+                        System.Globalization.Calendar Calendar = CultureInfo.InvariantCulture.Calendar;
+                        int weekNumber = Calendar.GetWeekOfYear(DateTime.Now, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+                        timeString = weekNumber.ToString();
                         break;
 
                     case "yesterday":
@@ -1413,6 +1460,12 @@ namespace Calcify
             allUnitsExt.Add(e, display);
         }
 
+        /// <summary>
+        /// Initializes the unit dictionaries and conversion delegates for supported measurement types.
+        /// </summary>
+        /// <remarks>This method sets up internal mappings between unit types, their string
+        /// representations, and conversion functions. It should be called before performing any unit conversions to
+        /// ensure all supported units and their aliases are recognized.</remarks>
         private void setUpDictionaries()
         {
             // Temperatures
@@ -1500,14 +1553,20 @@ namespace Calcify
 
         }
 
+        /// <summary>
+        /// Updates the syntax highlighting rules for various domain-specific patterns, including currency, data size
+        /// formats, time keywords, frequency, and other measurement units.
+        /// </summary>
+        /// <remarks>This method refreshes the highlighting configuration by adding comments, units,
+        /// functions, and constants to the underlying syntax engine. It should be called whenever the relevant patterns
+        /// or highlighting rules need to be reapplied, such as after changes to pattern definitions or initialization
+        /// of the syntax engine.</remarks>
         private void UpdateSyntaxHighlighting()
         {
             darkSyntax.AddComment("Currency");
             darkSyntax.AddUnits(CurrencyPattern);
             darkSyntax.AddComment("Data Size Formats");
             darkSyntax.AddUnits(DataSizePattern);
-            darkSyntax.AddComment("Time Keywords");
-            darkSyntax.AddFunction(@"((yester|to)?day|tomorrow)");
             darkSyntax.AddComment("Frequency");
             darkSyntax.AddUnits(FrequencyPattern);
             darkSyntax.AddComment("Length");
@@ -1520,8 +1579,21 @@ namespace Calcify
             darkSyntax.AddUnits(AnglePattern);
             darkSyntax.AddComment("Time");
             darkSyntax.AddUnits(TimePattern);
+            darkSyntax.AddComment("Time Keywords");
+            darkSyntax.AddFunction(@"(((yester|to)?day|tomorrow)(\.(day(ofyear)?|week(day|ofyear)?|month|year))?|now(\.(hour|minute|second))?)");
             darkSyntax.AddComment("Constants");
             darkSyntax.AddConstants(ConstantsPattern);
+            darkSyntax.AddComment("Keywords");
+            darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
+            darkSyntax.AddComment("Functions");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|root|(?=\\d)C(?=\\d)))");
+            darkSyntax.AddComment("Brackets and signs");
+            darkSyntax.AddFunction("\\(|\\{|\\)|\\}|,|!");
+            darkSyntax.AddComment("Operators");
+            darkSyntax.AddOperator("(\\+|\\-|\\*|\\/|\\||\\^)");
+            darkSyntax.AddComment("Numbers");
+            darkSyntax.AddNumbers("(-?((\\d{1,3},)*\\d{3}|\\d+)(\\.\\d+)?)");
+
         }
         #endregion
 
@@ -1720,7 +1792,6 @@ namespace Calcify
 //  - REFACTORING CODE
 //  - 'About' change date
 
-//  - now syntax highlighting
 //  - functions like
 //    - Modulo operator (%)
 //    - floor()
@@ -1822,7 +1893,6 @@ namespace Calcify
 //  - editor > ctrl + , settings
 //  - editor > F1 help
 
-//  - change file ending to .calc
 //  - accept inches, bytes, gallons, cups, speed (kmh, mh, ...), data speed (mbps, gbps, ...), tmrw, nmi (nautical miles) (1 nmi = 1852 m), carat (1 ct = 0.2 g), turn (turn, revolution) (1 turn = 360 degrees), THz, pressure, energy, Power, area, volumes (look supported-units.md) as keyword
 //  - basic calculation 1024 * x does not work
 //  - fix syntax color (days)
@@ -1842,8 +1912,10 @@ namespace Calcify
 
 
 // Done:
-//  - Toggle theme button toolbar
-//  - Optimized data value conversion
-//  - Added Permutations and Combinations functions
-//  - time parts (today.year, today.month, today.day, today.dayOfWeek, now.hour, now.minute, now.second)
+//  - added theme toggle button 
+//  - optimized data value conversion
+//  - added Permutations and Combinations functions
+//  - added time parts (today.year, today.month, today.day, today.dayOfWeek, now.hour, now.minute, now.second)
 //  - added inline tasks
+//  - fixed now syntax highlighting
+//  - changed the way syntax files are generated to make it less static and more flexible

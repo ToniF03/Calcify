@@ -43,7 +43,6 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30"/>
                 <ColumnDefinition Width="30"/>
-                <ColumnDefinition Width="30"/>
                 <ColumnDefinition />
                 <ColumnDefinition Width="50"/>
                 <ColumnDefinition Width="50"/>
@@ -76,51 +75,33 @@
                 </Button.Content>
             </Button>
 
-            <!-- Information button -->
-            <Button x:Name="Info" Grid.Column="2" WindowChrome.IsHitTestVisibleInChrome="True" IsEnabled="False" Opacity="0" ToolTipService.ShowDuration="120000" Height="{Binding RelativeSource={RelativeSource Self}, Path=Width}" >
-                <Button.Style>
-                    <Style TargetType="Button" BasedOn="{StaticResource TransparentButton}">
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="True">
-                                <Trigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="(Button.Opacity)" From="0" To="1" Duration="0:0:0.1125" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.EnterActions>
-                                <Trigger.ExitActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="(Button.Opacity)" From="1" To="0" Duration="0:0:0.1125" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.ExitActions>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-                <Button.Content>
-                    <Label FontSize="16" Margin="2, 2, 0, 0" Content="&#xf167;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-                </Button.Content>
-            </Button>
-
             <!-- Label with the title -->
-            <Label x:Name="titleLabel" Content="Calcify" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="3" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="60, 0, 0, 0" WindowChrome.IsHitTestVisibleInChrome="True" ToolTipService.ShowDuration="120000"/>
+            <Label x:Name="titleLabel"
+                   Content="Calcify"
+                   HorizontalContentAlignment="Center"
+                   VerticalContentAlignment="Center"
+                   Grid.Column="2"
+                   FontSize="15"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Stretch"
+                   Margin="90,0,0,0"
+                    IsHitTestVisible="True"
+                    WindowChrome.IsHitTestVisibleInChrome="True"
+                   ToolTipService.ShowDuration="120000"/>
             <!-- MinimizeButton -->
-            <Button x:Name="MinimizeButton" Grid.Column="4" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" >
+            <Button x:Name="MinimizeButton" Grid.Column="3" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" >
                 <Button.Content>
                     <Label FontSize="12" Content="&#xe949;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
                 </Button.Content>
             </Button>
             <!-- Maximize Button -->
-            <Button x:Name="MaximizeButton" Grid.Column="5" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" >
+            <Button x:Name="MaximizeButton" Grid.Column="4" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" >
                 <Button.Content>
                     <Label x:Name="MaximizeButtonText" FontSize="12" Content="&#xe922;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
                 </Button.Content>
             </Button>
             <!-- Close Button -->
-            <Button x:Name="closeButton" Grid.Column="6" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeCloseButton}" >
+            <Button x:Name="closeButton" Grid.Column="5" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeCloseButton}" >
                 <Button.Content>
                     <Label FontSize="14" Content="&#xe947;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                 </Button.Content>

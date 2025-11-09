@@ -51,8 +51,6 @@
             _content += "<Color name=\"Comment\" foreground=\"#9B9B9B\" />\n\t";
             _content += "<RuleSet>\n\t\t";
             _content += "<Span color=\"Comment\" begin=\"#\" />\n\t\t";
-            AddComment("Keywords");
-            _content += "<Rule foreground=\"#" + (_theme == Theme.Dark ? "569CD6" : "2B91AF") + "\">(\\brand(int)?\\b|\\(|\\)|,|!|\\bround\\b|\\bsqrt\\b|\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|avg|sum|to)\\b|\\d+C\\d+)</Rule>\n\t\t";
         }
 
         /// <summary>
@@ -101,7 +99,7 @@
         /// <param name="Rule">The rule text to be added. Cannot be null.</param>
         public void AddNumbers(string Rule)
         {
-            _content += $"<Rule foreground=\"#" + (_theme == Theme.Dark ? "B5CEA8" : "2B91AF") + "\">{Rule}</Rule>\n\t\t";
+            _content += $"<Rule foreground=\"#{(_theme == Theme.Dark ? "B5CEA8" : "2B91AF")}\">{Rule}</Rule>\n\t\t";
         }
 
         /// <summary>
@@ -113,7 +111,7 @@
         /// <param name="Rule">The rule to be added. This should be a valid string representing the rule to include in the content.</param>
         public void AddFunction(string Rule)
         {
-            _content += $"<Rule foreground=\"#" + (_theme == Theme.Dark ? "569CD6" : "0000FF") + "\">{Rule}</Rule>\n\t\t";
+            _content += $"<Rule foreground=\"#{(_theme == Theme.Dark ? "569CD6" : "0000FF")}\">{Rule}</Rule>\n\t\t";
         }
 
         /// <summary>
