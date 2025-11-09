@@ -100,6 +100,15 @@
     </Compile>
     <Compile Include="Classes\ExchangeRateLoader.cs" />
     <Compile Include="Classes\Math\Constants.cs" />
+    <Compile Include="Classes\Math\Conversion\Angle\AngularMinute.cs" />
+    <Compile Include="Classes\Math\Conversion\Angle\AngularSecond.cs" />
+    <Compile Include="Classes\Math\Conversion\Angle\Degree.cs" />
+    <Compile Include="Classes\Math\Conversion\Angle\Gradian.cs" />
+    <Compile Include="Classes\Math\Conversion\Angle\Milliradian.cs" />
+    <Compile Include="Classes\Math\Conversion\Angle\Radian.cs" />
+    <Compile Include="Classes\Math\Conversion\Converter.cs" />
+    <Compile Include="Classes\Math\Conversion\DataSize\Bit.cs" />
+    <Compile Include="Classes\Math\Conversion\DataSize\Byte.cs" />
     <Compile Include="Classes\Math\Conversion\Enum.cs" />
     <Compile Include="Classes\Math\Units\Patterns.cs" />
     <Compile Include="Classes\RegistryWatcher.cs" />
