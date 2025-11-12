@@ -120,6 +120,7 @@
     <Compile Include="Classes\Math\Conversion\Frequency\Hertz.cs" />
     <Compile Include="Classes\Math\Conversion\Frequency\Kilohertz.cs" />
     <Compile Include="Classes\Math\Conversion\Frequency\Megahertz.cs" />
+    <Compile Include="Classes\Math\Conversion\Length\Micrometer.cs" />
     <Compile Include="Classes\Math\Conversion\Length\Nanometer.cs" />
     <Compile Include="Classes\Math\Units\Patterns.cs" />
     <Compile Include="Classes\RegistryWatcher.cs" />
