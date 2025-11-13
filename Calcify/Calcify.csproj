@@ -99,6 +99,7 @@
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\ExchangeRateLoader.cs" />
+    <Compile Include="Classes\Math\Calculator.cs" />
     <Compile Include="Classes\Math\Constants.cs" />
     <Compile Include="Classes\Math\Conversion\Angle\AngularMinute.cs" />
     <Compile Include="Classes\Math\Conversion\Angle\AngularSecond.cs" />
@@ -196,7 +197,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\Math.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
