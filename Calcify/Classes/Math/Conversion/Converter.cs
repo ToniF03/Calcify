@@ -740,23 +740,23 @@ namespace Calcify.Math.Conversion
             else if (currentUnit == MassUnit.Kilogram)
             {
                 if (targetUnit == MassUnit.Ton)
-                    result = Math.Conversion.Mass.Kilograms.ToTons(val);
+                    result = Math.Conversion.Mass.Kilogram.ToTons(val);
                 else if (targetUnit == MassUnit.Gram)
-                    result = Math.Conversion.Mass.Kilograms.ToGrams(val);
+                    result = Math.Conversion.Mass.Kilogram.ToGrams(val);
                 else if (targetUnit == MassUnit.Milligram)
-                    result = Math.Conversion.Mass.Kilograms.ToMilligrams(val);
+                    result = Math.Conversion.Mass.Kilogram.ToMilligrams(val);
                 else if (targetUnit == MassUnit.Microgram)
-                    result = Math.Conversion.Mass.Kilograms.ToMicrograms(val);
+                    result = Math.Conversion.Mass.Kilogram.ToMicrograms(val);
                 else if (targetUnit == MassUnit.LongTon)
-                    result = Math.Conversion.Mass.Kilograms.ToLongTons(val);
+                    result = Math.Conversion.Mass.Kilogram.ToLongTons(val);
                 else if (targetUnit == MassUnit.ShortTon)
-                    result = Math.Conversion.Mass.Kilograms.ToShortTons(val);
+                    result = Math.Conversion.Mass.Kilogram.ToShortTons(val);
                 else if (targetUnit == MassUnit.Stone)
-                    result = Math.Conversion.Mass.Kilograms.ToStones(val);
+                    result = Math.Conversion.Mass.Kilogram.ToStones(val);
                 else if (targetUnit == MassUnit.Pounds)
-                    result = Math.Conversion.Mass.Kilograms.ToPounds(val);
+                    result = Math.Conversion.Mass.Kilogram.ToPounds(val);
                 else if (targetUnit == MassUnit.Ounce)
-                    result = Math.Conversion.Mass.Kilograms.ToOunces(val);
+                    result = Math.Conversion.Mass.Kilogram.ToOunces(val);
             }
             else if (currentUnit == MassUnit.Gram)
             {
