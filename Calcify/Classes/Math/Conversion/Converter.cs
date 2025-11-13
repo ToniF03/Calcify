@@ -761,23 +761,23 @@ namespace Calcify.Math.Conversion
             else if (currentUnit == MassUnit.Gram)
             {
                 if (targetUnit == MassUnit.Ton)
-                    result = Math.Conversion.Mass.Grams.ToTons(val);
+                    result = Math.Conversion.Mass.Gram.ToTons(val);
                 else if (targetUnit == MassUnit.Kilogram)
-                    result = Math.Conversion.Mass.Grams.ToKilograms(val);
+                    result = Math.Conversion.Mass.Gram.ToKilograms(val);
                 else if (targetUnit == MassUnit.Milligram)
-                    result = Math.Conversion.Mass.Grams.ToMilligrams(val);
+                    result = Math.Conversion.Mass.Gram.ToMilligrams(val);
                 else if (targetUnit == MassUnit.Microgram)
-                    result = Math.Conversion.Mass.Grams.ToMicrograms(val);
+                    result = Math.Conversion.Mass.Gram.ToMicrograms(val);
                 else if (targetUnit == MassUnit.LongTon)
-                    result = Math.Conversion.Mass.Grams.ToLongTons(val);
+                    result = Math.Conversion.Mass.Gram.ToLongTons(val);
                 else if (targetUnit == MassUnit.ShortTon)
-                    result = Math.Conversion.Mass.Grams.ToShortTons(val);
+                    result = Math.Conversion.Mass.Gram.ToShortTons(val);
                 else if (targetUnit == MassUnit.Stone)
-                    result = Math.Conversion.Mass.Grams.ToStones(val);
+                    result = Math.Conversion.Mass.Gram.ToStones(val);
                 else if (targetUnit == MassUnit.Pounds)
-                    result = Math.Conversion.Mass.Grams.ToPounds(val);
+                    result = Math.Conversion.Mass.Gram.ToPounds(val);
                 else if (targetUnit == MassUnit.Ounce)
-                    result = Math.Conversion.Mass.Grams.ToOunces(val);
+                    result = Math.Conversion.Mass.Gram.ToOunces(val);
             }
             else if (currentUnit == MassUnit.Milligram)
             {
