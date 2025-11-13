@@ -156,6 +156,7 @@
     <Compile Include="Classes\Math\Conversion\Time\Milliseconds.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Minutes.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Months.cs" />
+    <Compile Include="Classes\Math\Conversion\Time\Nanoseconds.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Seconds.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Weeks.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Years.cs" />
