@@ -1,4 +1,4 @@
-﻿namespace Calcify.Classes.Math.Conversion.Length
+﻿namespace Calcify.Math.Conversion.Length
 {
     /// <summary>
     /// Provides static methods for converting lengths and distances between yards and various other units of

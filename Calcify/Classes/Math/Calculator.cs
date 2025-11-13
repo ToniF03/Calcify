@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Calcify.Classes.Math
+namespace Calcify.Math
 {
     /// <summary>
     /// Provides static methods for performing mathematical calculations, including conversion between Unix timestamps

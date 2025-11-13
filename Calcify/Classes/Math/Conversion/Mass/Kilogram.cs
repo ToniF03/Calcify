@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Calcify.Classes.Math.Conversion.Mass
+namespace Calcify.Math.Conversion.Mass
 {
     /// <summary>
     /// Provides static methods for converting mass values from kilograms to various other units of measurement,

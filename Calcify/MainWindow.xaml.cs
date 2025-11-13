@@ -1,4 +1,5 @@
-﻿using Calcify.Math;
+﻿using Calcify.Classes.Math;
+using Calcify.Math;
 using Calcify.Math.Conversion;
 using Calcify.Tools;
 using ICSharpCode.AvalonEdit.Document;

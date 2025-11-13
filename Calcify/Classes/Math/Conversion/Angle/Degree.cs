@@ -1,4 +1,4 @@
-﻿namespace Calcify.Classes.Math.Conversion.Angle
+﻿namespace Calcify.Math.Conversion.Angle
 {
     /// <summary>
     /// Provides static methods for converting angles measured in degrees to other units, including gradians,

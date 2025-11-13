@@ -1,4 +1,4 @@
-﻿namespace Calcify.Classes.Math.Conversion.Length
+﻿namespace Calcify.Math.Conversion.Length
 {
     /// <summary>
     /// Provides static methods for converting distances measured in miles to various other units of length, including

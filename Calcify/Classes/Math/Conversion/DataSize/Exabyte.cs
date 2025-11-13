@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Calcify.Classes.Math.Conversion.DataSize
+namespace Calcify.Math.Conversion.DataSize
 {
     /// <summary>
     /// Provides static methods for converting between various digital storage units, including terabytes, petabytes,

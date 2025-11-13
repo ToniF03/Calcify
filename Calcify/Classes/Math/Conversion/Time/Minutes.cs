@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Calcify.Classes.Math.Conversion.Time
+namespace Calcify.Math.Conversion.Time
 {
     /// <summary>
     /// Provides static methods for converting time values expressed in minutes to various other units, including

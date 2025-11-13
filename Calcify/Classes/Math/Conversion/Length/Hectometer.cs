@@ -1,4 +1,4 @@
-﻿namespace Calcify.Classes.Math.Conversion.Length
+﻿namespace Calcify.Math.Conversion.Length
 {
     /// <summary>
     /// Provides static methods for converting between various metric and imperial length and area units, including

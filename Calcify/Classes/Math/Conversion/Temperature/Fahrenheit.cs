@@ -1,4 +1,4 @@
-﻿namespace Calcify.Classes.Math.Conversion.Temperature
+﻿namespace Calcify.Math.Conversion.Temperature
 {
     /// <summary>
     /// Provides static methods for converting temperatures from degrees Fahrenheit to other temperature scales,

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Calcify.Classes.Math.Conversion.Mass
+namespace Calcify.Math.Conversion.Mass
 {
     /// <summary>
     /// Provides static methods for converting mass values between micrograms and other units of measurement, including

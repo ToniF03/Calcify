@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Calcify.Classes.Math.Conversion.Mass
+namespace Calcify.Math.Conversion.Mass
 {
     /// <summary>
     /// Provides static methods for converting mass and weight values between pounds and other common units, including

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Calcify.Classes.Math.Conversion.Mass
+namespace Calcify.Math.Conversion.Mass
 {
     /// <summary>
     /// Provides static methods for converting between various units of mass, including stones, kilograms, tons, carats,

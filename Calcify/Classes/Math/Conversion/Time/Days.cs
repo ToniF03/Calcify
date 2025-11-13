@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Calcify.Classes.Math.Conversion.Time
+namespace Calcify.Math.Conversion.Time
 {
     /// <summary>
     /// Provides static methods for converting a number of days to equivalent values in other time units, such as

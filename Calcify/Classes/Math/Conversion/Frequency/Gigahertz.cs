@@ -1,4 +1,4 @@
-﻿namespace Calcify.Classes.Math.Conversion.Frequency
+﻿namespace Calcify.Math.Conversion.Frequency
 {
     /// <summary>
     /// Provides static methods for converting frequency values between gigahertz (GHz), megahertz (MHz), kilohertz

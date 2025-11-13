@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Calcify.Classes.Math.Conversion.Time
+namespace Calcify.Math.Conversion.Time
 {
     /// <summary>
     /// Provides static methods for converting between centuries, millennia, years, and other time units using fixed

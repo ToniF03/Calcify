@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Calcify.Classes.Math.Conversion.Time
+namespace Calcify.Math.Conversion.Time
 {
     /// <summary>
     /// Provides static methods for converting time durations expressed in months or years to other units such as

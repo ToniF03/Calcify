@@ -1,4 +1,4 @@
-﻿namespace Calcify.Classes.Math.Conversion.Angle
+﻿namespace Calcify.Math.Conversion.Angle
 {
     /// <summary>
     /// Provides static methods for converting angular seconds to other units of angular measurement, including degrees,
