@@ -7,145 +7,6 @@ using System.Text.RegularExpressions;
 namespace Calcify.Math.Conversion.Mass
 {
     /// <summary>
-    /// Provides static methods for converting mass values between milligrams and other metric and imperial units.
-    /// </summary>
-    /// <remarks>This class includes conversion methods for common mass units such as kilograms, grams,
-    /// micrograms, pounds, ounces, stones, metric tons, long tons, and short tons. All methods validate input values to
-    /// ensure they are not NaN, and will throw an exception if invalid input is provided. The class is thread-safe and
-    /// intended for use in scenarios where precise mass unit conversions are required.</remarks>
-    public static class Milligrams
-    {
-        /// <summary>
-        /// Converts a value from nanograms to metric tons.
-        /// </summary>
-        /// <param name="val">The value in nanograms to convert. Must not be <see cref="double.NaN"/>.</param>
-        /// <returns>The equivalent value in metric tons.</returns>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
-        public static double ToTons(double val)
-        {
-            if (double.IsNaN(val))
-                throw new ArgumentException();
-            double result = val / 1000000000;
-            return result;
-        }
-
-        /// <summary>
-        /// Converts a mass value from milligrams to kilograms.
-        /// </summary>
-        /// <param name="val">The mass value in milligrams to convert. Must not be NaN.</param>
-        /// <returns>The equivalent mass in kilograms as a double-precision floating-point number.</returns>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
-        public static double ToKilograms(double val)
-        {
-            if (double.IsNaN(val))
-                throw new ArgumentException();
-            double result = val / 1000000;
-            return result;
-        }
-
-        /// <summary>
-        /// Converts a value in milligrams to grams.
-        /// </summary>
-        /// <param name="val">The value in milligrams to convert. Must not be NaN.</param>
-        /// <returns>The equivalent value in grams.</returns>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
-        public static double ToGrams(double val)
-        {
-            if (double.IsNaN(val))
-                throw new ArgumentException();
-            double result = val / 1000;
-            return result;
-        }
-
-        /// <summary>
-        /// Converts the specified value in milligrams to micrograms.
-        /// </summary>
-        /// <param name="val">The value in milligrams to convert. Must not be <see cref="double.NaN"/>.</param>
-        /// <returns>The equivalent value in micrograms.</returns>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is <see cref="double.NaN"/>.</exception>
-        public static double ToMicrograms(double val)
-        {
-            if (double.IsNaN(val))
-                throw new ArgumentException();
-            double result = val * 1000;
-            return result;
-        }
-
-        /// <summary>
-        /// Converts a value in nanograms to long tons.
-        /// </summary>
-        /// <param name="val">The mass value in nanograms to convert. Must not be NaN.</param>
-        /// <returns>The equivalent mass in long tons.</returns>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
-        public static double ToLongTons(double val)
-        {
-            if (double.IsNaN(val))
-                throw new ArgumentException();
-            double result = val * 0.00000000098421;
-            return result;
-        }
-
-        /// <summary>
-        /// Converts a value in nanograms to short tons.
-        /// </summary>
-        /// <remarks>A short ton is equal to 2,000 pounds. This method uses a fixed conversion factor for
-        /// nanograms to short tons.</remarks>
-        /// <param name="val">The mass value in nanograms to convert. Must not be NaN.</param>
-        /// <returns>The equivalent mass in short tons.</returns>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
-        public static double ToShortTons(double val)
-        {
-            if (double.IsNaN(val))
-                throw new ArgumentException();
-            double result = val * 0.0000000011023;
-            return result;
-        }
-
-        /// <summary>
-        /// Converts a mass value from micrograms to stones.
-        /// </summary>
-        /// <remarks>One stone is equal to 6,350,293.18 micrograms. This method does not validate the
-        /// range of the input value beyond checking for NaN.</remarks>
-        /// <param name="val">The mass value in micrograms to convert. Must not be NaN.</param>
-        /// <returns>The equivalent mass in stones.</returns>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
-        public static double ToStones(double val)
-        {
-            if (double.IsNaN(val))
-                throw new ArgumentException();
-            double result = val * 0.00000015747;
-            return result;
-        }
-
-        /// <summary>
-        /// Converts a value in milligrams to its equivalent weight in pounds.
-        /// </summary>
-        /// <param name="val">The weight in milligrams to convert. Must not be NaN.</param>
-        /// <returns>The equivalent weight in pounds as a double.</returns>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
-        public static double ToPounds(double val)
-        {
-            if (double.IsNaN(val))
-                throw new ArgumentException();
-            double result = val * 0.0000022046;
-            return result;
-        }
-        /// <summary>
-        /// Converts a value in grams to its equivalent in ounces.
-        /// </summary>
-        /// <param name="val">The value in grams to convert. Must not be NaN.</param>
-        /// <returns>The equivalent value in ounces.</returns>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="val"/> is NaN.</exception>
-        public static double ToOunces(double val)
-        {
-            if (double.IsNaN(val))
-                throw new ArgumentException();
-            double result = val * 0.000035274;
-            return result;
-        }
-    }
-
-    /// <summary>
     /// Provides static methods for converting mass values between micrograms and other units of measurement, including
     /// tons, kilograms, grams, milligrams, stones, pounds, and ounces.
     /// </summary>
@@ -153,7 +14,7 @@ namespace Calcify.Math.Conversion.Mass
     /// throw an <see cref="ArgumentException"/> if this condition is not met. The class is intended for use in
     /// scenarios where precise mass unit conversions are required, and does not perform range or overflow checks beyond
     /// NaN validation.</remarks>
-    public static class Micrograms
+    public static class Microgram
     {
         /// <summary>
         /// Converts the specified value from units to trillions (tons).
@@ -298,7 +159,7 @@ namespace Calcify.Math.Conversion.Mass
     /// ArgumentException if invalid. The class uses fixed conversion factors for each unit, which may be subject to
     /// floating-point precision limitations. Methods are thread-safe and intended for general-purpose unit conversions
     /// in scientific, engineering, or everyday contexts.</remarks>
-    public static class LongTons
+    public static class LongTon
     {
 
         /// <summary>
@@ -443,7 +304,7 @@ namespace Calcify.Math.Conversion.Mass
     /// <remarks>All conversion methods use fixed conversion factors based on standard definitions for each
     /// unit. Input values must not be NaN; otherwise, an ArgumentException is thrown. This class is thread-safe and
     /// intended for utility use in applications requiring mass or weight conversions.</remarks>
-    public static class ShortTons
+    public static class ShortTon
     {
         /// <summary>
         /// Converts a value in kilograms to its equivalent in tons.
@@ -588,7 +449,7 @@ namespace Calcify.Math.Conversion.Mass
     /// an exception if a value is NaN. This class is intended for use in scenarios where precise mass unit conversions
     /// are required, such as scientific calculations or weight measurement applications. All methods are thread-safe
     /// and can be used concurrently.</remarks>
-    public static class Stones
+    public static class Stone
     {
         /// <summary>
         /// Converts a value in kilograms to metric tons.
@@ -730,7 +591,7 @@ namespace Calcify.Math.Conversion.Mass
     /// <remarks>All conversion methods validate that input values are numeric and will throw an exception if
     /// a non-numeric value (NaN) is provided. This class is thread-safe and intended for use in scenarios where
     /// accurate unit conversion between pounds and other mass or weight units is required.</remarks>
-    public static class Pounds
+    public static class Pound
     {
         /// <summary>
         /// Converts a mass value from pounds to metric tons.
@@ -872,7 +733,7 @@ namespace Calcify.Math.Conversion.Mass
     /// a non-numeric value (NaN) is provided. This class is intended for use in scenarios where precise unit
     /// conversions are required, such as scientific calculations or data processing. Methods do not check for negative
     /// values unless specified; callers should ensure input values are appropriate for their use case.</remarks>
-    public static class Ounces
+    public static class Ounce
     {
         /// <summary>
         /// Converts a weight value from grams to tons.

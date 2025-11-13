@@ -782,149 +782,149 @@ namespace Calcify.Math.Conversion
             else if (currentUnit == MassUnit.Milligram)
             {
                 if (targetUnit == MassUnit.Ton)
-                    result = Math.Conversion.Mass.Milligrams.ToTons(val);
+                    result = Math.Conversion.Mass.Milligram.ToTons(val);
                 else if (targetUnit == MassUnit.Kilogram)
-                    result = Math.Conversion.Mass.Milligrams.ToKilograms(val);
+                    result = Math.Conversion.Mass.Milligram.ToKilograms(val);
                 else if (targetUnit == MassUnit.Gram)
-                    result = Math.Conversion.Mass.Milligrams.ToGrams(val);
+                    result = Math.Conversion.Mass.Milligram.ToGrams(val);
                 else if (targetUnit == MassUnit.Microgram)
-                    result = Math.Conversion.Mass.Milligrams.ToMicrograms(val);
+                    result = Math.Conversion.Mass.Milligram.ToMicrograms(val);
                 else if (targetUnit == MassUnit.LongTon)
-                    result = Math.Conversion.Mass.Milligrams.ToLongTons(val);
+                    result = Math.Conversion.Mass.Milligram.ToLongTons(val);
                 else if (targetUnit == MassUnit.ShortTon)
-                    result = Math.Conversion.Mass.Milligrams.ToShortTons(val);
+                    result = Math.Conversion.Mass.Milligram.ToShortTons(val);
                 else if (targetUnit == MassUnit.Stone)
-                    result = Math.Conversion.Mass.Milligrams.ToStones(val);
+                    result = Math.Conversion.Mass.Milligram.ToStones(val);
                 else if (targetUnit == MassUnit.Pounds)
-                    result = Math.Conversion.Mass.Milligrams.ToPounds(val);
+                    result = Math.Conversion.Mass.Milligram.ToPounds(val);
                 else if (targetUnit == MassUnit.Ounce)
-                    result = Math.Conversion.Mass.Milligrams.ToOunces(val);
+                    result = Math.Conversion.Mass.Milligram.ToOunces(val);
             }
             else if (currentUnit == MassUnit.Microgram)
             {
                 if (targetUnit == MassUnit.Ton)
-                    result = Math.Conversion.Mass.Micrograms.ToTons(val);
+                    result = Math.Conversion.Mass.Microgram.ToTons(val);
                 else if (targetUnit == MassUnit.Kilogram)
-                    result = Math.Conversion.Mass.Micrograms.ToKilograms(val);
+                    result = Math.Conversion.Mass.Microgram.ToKilograms(val);
                 else if (targetUnit == MassUnit.Gram)
-                    result = Math.Conversion.Mass.Micrograms.ToGrams(val);
+                    result = Math.Conversion.Mass.Microgram.ToGrams(val);
                 else if (targetUnit == MassUnit.Milligram)
-                    result = Math.Conversion.Mass.Micrograms.ToMilligrams(val);
+                    result = Math.Conversion.Mass.Microgram.ToMilligrams(val);
                 else if (targetUnit == MassUnit.LongTon)
-                    result = Math.Conversion.Mass.Micrograms.ToLongTons(val);
+                    result = Math.Conversion.Mass.Microgram.ToLongTons(val);
                 else if (targetUnit == MassUnit.ShortTon)
-                    result = Math.Conversion.Mass.Micrograms.ToShortTons(val);
+                    result = Math.Conversion.Mass.Microgram.ToShortTons(val);
                 else if (targetUnit == MassUnit.Stone)
-                    result = Math.Conversion.Mass.Micrograms.ToStones(val);
+                    result = Math.Conversion.Mass.Microgram.ToStones(val);
                 else if (targetUnit == MassUnit.Pounds)
-                    result = Math.Conversion.Mass.Micrograms.ToPounds(val);
+                    result = Math.Conversion.Mass.Microgram.ToPounds(val);
                 else if (targetUnit == MassUnit.Ounce)
-                    result = Math.Conversion.Mass.Micrograms.ToOunces(val);
+                    result = Math.Conversion.Mass.Microgram.ToOunces(val);
             }
             else if (currentUnit == MassUnit.LongTon)
             {
                 if (targetUnit == MassUnit.Ton)
-                    result = Math.Conversion.Mass.LongTons.ToTons(val);
+                    result = Math.Conversion.Mass.LongTon.ToTons(val);
                 else if (targetUnit == MassUnit.Kilogram)
-                    result = Math.Conversion.Mass.LongTons.ToKilograms(val);
+                    result = Math.Conversion.Mass.LongTon.ToKilograms(val);
                 else if (targetUnit == MassUnit.Gram)
-                    result = Math.Conversion.Mass.LongTons.ToGrams(val);
+                    result = Math.Conversion.Mass.LongTon.ToGrams(val);
                 else if (targetUnit == MassUnit.Milligram)
-                    result = Math.Conversion.Mass.LongTons.ToMilligrams(val);
+                    result = Math.Conversion.Mass.LongTon.ToMilligrams(val);
                 else if (targetUnit == MassUnit.Microgram)
-                    result = Math.Conversion.Mass.LongTons.ToMicrograms(val);
+                    result = Math.Conversion.Mass.LongTon.ToMicrograms(val);
                 else if (targetUnit == MassUnit.ShortTon)
-                    result = Math.Conversion.Mass.LongTons.ToShortTons(val);
+                    result = Math.Conversion.Mass.LongTon.ToShortTons(val);
                 else if (targetUnit == MassUnit.Stone)
-                    result = Math.Conversion.Mass.LongTons.ToStones(val);
+                    result = Math.Conversion.Mass.LongTon.ToStones(val);
                 else if (targetUnit == MassUnit.Pounds)
-                    result = Math.Conversion.Mass.LongTons.ToPounds(val);
+                    result = Math.Conversion.Mass.LongTon.ToPounds(val);
                 else if (targetUnit == MassUnit.Ounce)
-                    result = Math.Conversion.Mass.LongTons.ToOunces(val);
+                    result = Math.Conversion.Mass.LongTon.ToOunces(val);
             }
             else if (currentUnit == MassUnit.ShortTon)
             {
                 if (targetUnit == MassUnit.Ton)
-                    result = Math.Conversion.Mass.ShortTons.ToTons(val);
+                    result = Math.Conversion.Mass.ShortTon.ToTons(val);
                 else if (targetUnit == MassUnit.Kilogram)
-                    result = Math.Conversion.Mass.ShortTons.ToKilograms(val);
+                    result = Math.Conversion.Mass.ShortTon.ToKilograms(val);
                 else if (targetUnit == MassUnit.Gram)
-                    result = Math.Conversion.Mass.ShortTons.ToGrams(val);
+                    result = Math.Conversion.Mass.ShortTon.ToGrams(val);
                 else if (targetUnit == MassUnit.Milligram)
-                    result = Math.Conversion.Mass.ShortTons.ToMilligrams(val);
+                    result = Math.Conversion.Mass.ShortTon.ToMilligrams(val);
                 else if (targetUnit == MassUnit.Microgram)
-                    result = Math.Conversion.Mass.ShortTons.ToMicrograms(val);
+                    result = Math.Conversion.Mass.ShortTon.ToMicrograms(val);
                 else if (targetUnit == MassUnit.LongTon)
-                    result = Math.Conversion.Mass.ShortTons.ToLongTons(val);
+                    result = Math.Conversion.Mass.ShortTon.ToLongTons(val);
                 else if (targetUnit == MassUnit.Stone)
-                    result = Math.Conversion.Mass.ShortTons.ToStones(val);
+                    result = Math.Conversion.Mass.ShortTon.ToStones(val);
                 else if (targetUnit == MassUnit.Pounds)
-                    result = Math.Conversion.Mass.ShortTons.ToPounds(val);
+                    result = Math.Conversion.Mass.ShortTon.ToPounds(val);
                 else if (targetUnit == MassUnit.Ounce)
-                    result = Math.Conversion.Mass.ShortTons.ToOunces(val);
+                    result = Math.Conversion.Mass.ShortTon.ToOunces(val);
             }
             else if (currentUnit == MassUnit.Stone)
             {
                 if (targetUnit == MassUnit.Ton)
-                    result = Math.Conversion.Mass.Stones.ToTons(val);
+                    result = Math.Conversion.Mass.Stone.ToTons(val);
                 else if (targetUnit == MassUnit.Kilogram)
-                    result = Math.Conversion.Mass.Stones.ToKilograms(val);
+                    result = Math.Conversion.Mass.Stone.ToKilograms(val);
                 else if (targetUnit == MassUnit.Gram)
-                    result = Math.Conversion.Mass.Stones.ToGrams(val);
+                    result = Math.Conversion.Mass.Stone.ToGrams(val);
                 else if (targetUnit == MassUnit.Milligram)
-                    result = Math.Conversion.Mass.Stones.ToMilligrams(val);
+                    result = Math.Conversion.Mass.Stone.ToMilligrams(val);
                 else if (targetUnit == MassUnit.Microgram)
-                    result = Math.Conversion.Mass.Stones.ToMicrograms(val);
+                    result = Math.Conversion.Mass.Stone.ToMicrograms(val);
                 else if (targetUnit == MassUnit.LongTon)
-                    result = Math.Conversion.Mass.Stones.ToLongTons(val);
+                    result = Math.Conversion.Mass.Stone.ToLongTons(val);
                 else if (targetUnit == MassUnit.ShortTon)
-                    result = Math.Conversion.Mass.Stones.ToShortTons(val);
+                    result = Math.Conversion.Mass.Stone.ToShortTons(val);
                 else if (targetUnit == MassUnit.Pounds)
-                    result = Math.Conversion.Mass.Stones.ToPounds(val);
+                    result = Math.Conversion.Mass.Stone.ToPounds(val);
                 else if (targetUnit == MassUnit.Ounce)
-                    result = Math.Conversion.Mass.Stones.ToOunces(val);
+                    result = Math.Conversion.Mass.Stone.ToOunces(val);
             }
             else if (currentUnit == MassUnit.Pounds)
             {
                 if (targetUnit == MassUnit.Ton)
-                    result = Math.Conversion.Mass.Pounds.ToTons(val);
+                    result = Math.Conversion.Mass.Pound.ToTons(val);
                 else if (targetUnit == MassUnit.Kilogram)
-                    result = Math.Conversion.Mass.Pounds.ToKilograms(val);
+                    result = Math.Conversion.Mass.Pound.ToKilograms(val);
                 else if (targetUnit == MassUnit.Gram)
-                    result = Math.Conversion.Mass.Pounds.ToGrams(val);
+                    result = Math.Conversion.Mass.Pound.ToGrams(val);
                 else if (targetUnit == MassUnit.Milligram)
-                    result = Math.Conversion.Mass.Pounds.ToMilligrams(val);
+                    result = Math.Conversion.Mass.Pound.ToMilligrams(val);
                 else if (targetUnit == MassUnit.Microgram)
-                    result = Math.Conversion.Mass.Pounds.ToMicrograms(val);
+                    result = Math.Conversion.Mass.Pound.ToMicrograms(val);
                 else if (targetUnit == MassUnit.LongTon)
-                    result = Math.Conversion.Mass.Pounds.ToLongTons(val);
+                    result = Math.Conversion.Mass.Pound.ToLongTons(val);
                 else if (targetUnit == MassUnit.ShortTon)
-                    result = Math.Conversion.Mass.Pounds.ToShortTons(val);
+                    result = Math.Conversion.Mass.Pound.ToShortTons(val);
                 else if (targetUnit == MassUnit.Stone)
-                    result = Math.Conversion.Mass.Pounds.ToStones(val);
+                    result = Math.Conversion.Mass.Pound.ToStones(val);
                 else if (targetUnit == MassUnit.Ounce)
-                    result = Math.Conversion.Mass.Pounds.ToOunces(val);
+                    result = Math.Conversion.Mass.Pound.ToOunces(val);
             }
             else if (currentUnit == MassUnit.Ounce)
             {
                 if (targetUnit == MassUnit.Ton)
-                    result = Math.Conversion.Mass.Ounces.ToTons(val);
+                    result = Math.Conversion.Mass.Ounce.ToTons(val);
                 else if (targetUnit == MassUnit.Kilogram)
-                    result = Math.Conversion.Mass.Ounces.ToKilograms(val);
+                    result = Math.Conversion.Mass.Ounce.ToKilograms(val);
                 else if (targetUnit == MassUnit.Gram)
-                    result = Math.Conversion.Mass.Ounces.ToGrams(val);
+                    result = Math.Conversion.Mass.Ounce.ToGrams(val);
                 else if (targetUnit == MassUnit.Milligram)
-                    result = Math.Conversion.Mass.Ounces.ToMilligrams(val);
+                    result = Math.Conversion.Mass.Ounce.ToMilligrams(val);
                 else if (targetUnit == MassUnit.Microgram)
-                    result = Math.Conversion.Mass.Ounces.ToMicrograms(val);
+                    result = Math.Conversion.Mass.Ounce.ToMicrograms(val);
                 else if (targetUnit == MassUnit.LongTon)
-                    result = Math.Conversion.Mass.Ounces.ToLongTons(val);
+                    result = Math.Conversion.Mass.Ounce.ToLongTons(val);
                 else if (targetUnit == MassUnit.ShortTon)
-                    result = Math.Conversion.Mass.Ounces.ToShortTons(val);
+                    result = Math.Conversion.Mass.Ounce.ToShortTons(val);
                 else if (targetUnit == MassUnit.Stone)
-                    result = Math.Conversion.Mass.Ounces.ToStones(val);
+                    result = Math.Conversion.Mass.Ounce.ToStones(val);
                 else if (targetUnit == MassUnit.Pounds)
-                    result = Math.Conversion.Mass.Ounces.ToPounds(val);
+                    result = Math.Conversion.Mass.Ounce.ToPounds(val);
             }
 
             return result;
