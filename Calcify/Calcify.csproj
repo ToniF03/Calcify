@@ -135,6 +135,7 @@
     <Compile Include="Classes\Math\Conversion\Length\Yard.cs" />
     <Compile Include="Classes\Math\Conversion\Mass\Gram.cs" />
     <Compile Include="Classes\Math\Conversion\Mass\Kilogram.cs" />
+    <Compile Include="Classes\Math\Conversion\Mass\Microgram.cs" />
     <Compile Include="Classes\Math\Conversion\Mass\Milligram.cs" />
     <Compile Include="Classes\Math\Conversion\Mass\Tons.cs" />
     <Compile Include="Classes\Math\Units\Patterns.cs" />
