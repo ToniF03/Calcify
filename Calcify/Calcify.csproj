@@ -138,6 +138,7 @@
     <Compile Include="Classes\Math\Conversion\Mass\LongTon.cs" />
     <Compile Include="Classes\Math\Conversion\Mass\Microgram.cs" />
     <Compile Include="Classes\Math\Conversion\Mass\Milligram.cs" />
+    <Compile Include="Classes\Math\Conversion\Mass\ShortTon.cs" />
     <Compile Include="Classes\Math\Conversion\Mass\Tons.cs" />
     <Compile Include="Classes\Math\Units\Patterns.cs" />
     <Compile Include="Classes\RegistryWatcher.cs" />
