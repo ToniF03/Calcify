@@ -154,6 +154,7 @@
     <Compile Include="Classes\Math\Conversion\Time\Hours.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Minutes.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Months.cs" />
+    <Compile Include="Classes\Math\Conversion\Time\Seconds.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Weeks.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Years.cs" />
     <Compile Include="Classes\Math\Units\Patterns.cs" />
