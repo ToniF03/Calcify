@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -35,11 +36,12 @@ namespace Calcify
             LicenseDisplay.TextArea.Caret.CaretBrush = System.Windows.Media.Brushes.Transparent;
 
             // License overview buttons open the license overview animation
-            CalcifyLicenseButton.Click += LicenseButton_Click;
-            JsonLicenseButton.Click += LicenseButton_Click;
-            AvalonEditLicenseButton.Click += LicenseButton_Click;
-            RobotoFontLicenseButton.Click += LicenseButton_Click;
-            OctokitLicenseButton.Click += LicenseButton_Click;
+            CalcifyLicenseButton.Click += CalcifyLicenseButton_Click;
+            JsonLicenseButton.Click += CalcifyLicenseButton_Click;
+            AvalonEditLicenseButton.Click += CalcifyLicenseButton_Click;
+            RobotoFontLicenseButton.Click += CalcifyLicenseButton_Click;
+            OctokitLicenseButton.Click += CalcifyLicenseButton_Click;
+            LicenseButton.Click += LicenseButton_Click;
 
             // Back button handler for navigation
             BackButton.Click += BackButton_Click;
@@ -176,21 +178,28 @@ namespace Calcify
             switch (selectedLicense)
             {
                 case License.ToniF03_Calcify_LICENSE:
-                    resourceName = "Calcify License";
+                    resourceName = assembly.GetManifestResourceNames()
+                                   .Single(str => str.EndsWith("ToniF03_Calcify_LICENSE.md"));
                     break;
                 case License.Newtonsoft_Json_LICENSE:
-                    resourceName = "Newtonsoft.Json License";
+                    resourceName = assembly.GetManifestResourceNames()
+                                   .Single(str => str.EndsWith("Newtonsoft_Json_LICENSE.md"));
                     break;
                 case License.ICSharpCode_AvalonEdit_LICENSE:
-                    resourceName = "AvalonEdit License";
+                    resourceName = assembly.GetManifestResourceNames()
+                                   .Single(str => str.EndsWith("ICSharpCode_AvalonEdit_LICENSE.md"));
                     break;
                 case License.ChristanRobertson_Roboto_LICENSE:
-                    resourceName = "Roboto Font License";
+                    resourceName = assembly.GetManifestResourceNames()
+                                   .Single(str => str.EndsWith("ChristanRobertson_Roboto_LICENSE.md"));
                     break;
                 case License.GITHUB_Octokit_LICENSE:
-                    resourceName = "Octokit License";
+                    resourceName = assembly.GetManifestResourceNames()
+                                   .Single(str => str.EndsWith("GITHUB_Octokit_LICENSE.md"));
                     break;
             }
+
+
 
             // Read embedded resource stream. If resourceName is invalid this will throw.
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))

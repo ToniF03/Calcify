@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ToniF03")]
 [assembly: AssemblyProduct("Calcify")]
-[assembly: AssemblyCopyright("Copyright © ToniF03 2022")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
