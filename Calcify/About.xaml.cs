@@ -189,10 +189,6 @@ namespace Calcify
                     resourceName = assembly.GetManifestResourceNames()
                                    .Single(str => str.EndsWith("ChristanRobertson_Roboto_LICENSE.md"));
                     break;
-                case License.GITHUB_Octokit_LICENSE:
-                    resourceName = assembly.GetManifestResourceNames()
-                                   .Single(str => str.EndsWith("GITHUB_Octokit_LICENSE.md"));
-                    break;
             }
 
 
