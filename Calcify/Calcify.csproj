@@ -133,6 +133,7 @@
     <Compile Include="Classes\Math\Conversion\Length\Millimeter.cs" />
     <Compile Include="Classes\Math\Conversion\Length\Nanometer.cs" />
     <Compile Include="Classes\Math\Conversion\Length\Yard.cs" />
+    <Compile Include="Classes\Math\Conversion\Mass\Kilogram.cs" />
     <Compile Include="Classes\Math\Conversion\Mass\Tons.cs" />
     <Compile Include="Classes\Math\Units\Patterns.cs" />
     <Compile Include="Classes\RegistryWatcher.cs" />
