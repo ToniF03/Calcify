@@ -1,3 +1,6 @@
 [submodule "docs"]
 	path = docs
 	url = https://github.com/ToniF03/calcify-docs.git
+[submodule "Calcify/Classes/Math"]
+	path = Calcify/Classes/Math
+	url = https://github.com/ToniF03/Advanced-Math-C-.git
