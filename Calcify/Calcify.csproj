@@ -152,6 +152,7 @@
     <Compile Include="Classes\Math\Conversion\Time\Days.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Decades.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Hours.cs" />
+    <Compile Include="Classes\Math\Conversion\Time\Milliseconds.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Minutes.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Months.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Seconds.cs" />
