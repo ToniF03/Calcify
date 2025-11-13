@@ -143,6 +143,7 @@
     <Compile Include="Classes\Math\Conversion\Mass\ShortTon.cs" />
     <Compile Include="Classes\Math\Conversion\Mass\Stone.cs" />
     <Compile Include="Classes\Math\Conversion\Mass\Tons.cs" />
+    <Compile Include="Classes\Math\Conversion\Temperature\Celsius.cs" />
     <Compile Include="Classes\Math\Conversion\Temperature\Kelvin.cs" />
     <Compile Include="Classes\Math\Conversion\Temperature\Rankine.cs" />
     <Compile Include="Classes\Math\Conversion\Temperature\Reaumur.cs" />
