@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Calcify.Classes.Math.Conversion.Length
+﻿namespace Calcify.Classes.Math.Conversion.Length
 {
     /// <summary>
     /// Provides static methods for converting length values from nanometers (and picometers) to various metric and
