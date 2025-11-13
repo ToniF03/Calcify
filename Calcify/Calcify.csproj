@@ -160,6 +160,7 @@
     <Compile Include="Classes\Math\Conversion\Time\Seconds.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Weeks.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Years.cs" />
+    <Compile Include="Classes\Math\Functions.cs" />
     <Compile Include="Classes\Math\Units\Patterns.cs" />
     <Compile Include="Classes\RegistryWatcher.cs" />
     <Compile Include="Settings.xaml.cs">
