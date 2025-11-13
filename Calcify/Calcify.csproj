@@ -149,6 +149,7 @@
     <Compile Include="Classes\Math\Conversion\Temperature\Rankine.cs" />
     <Compile Include="Classes\Math\Conversion\Temperature\Reaumur.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Centuries.cs" />
+    <Compile Include="Classes\Math\Conversion\Time\Days.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Decades.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Months.cs" />
     <Compile Include="Classes\Math\Conversion\Time\Weeks.cs" />
