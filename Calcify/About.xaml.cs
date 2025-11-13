@@ -40,7 +40,6 @@ namespace Calcify
             JsonLicenseButton.Click += CalcifyLicenseButton_Click;
             AvalonEditLicenseButton.Click += CalcifyLicenseButton_Click;
             RobotoFontLicenseButton.Click += CalcifyLicenseButton_Click;
-            OctokitLicenseButton.Click += CalcifyLicenseButton_Click;
             LicenseButton.Click += LicenseButton_Click;
 
             // Back button handler for navigation
@@ -147,9 +146,6 @@ namespace Calcify
                 case "RobotoFontLicenseButton":
                     selectedLicense = License.ChristanRobertson_Roboto_LICENSE;
                     break;
-                case "OctokitLicenseButton":
-                    selectedLicense = License.GITHUB_Octokit_LICENSE;
-                    break;
                 default:
                     selectedLicense = License.None;
                     break;
@@ -248,8 +244,7 @@ namespace Calcify
             ICSharpCode_AvalonEdit_LICENSE,
             Newtonsoft_Json_LICENSE,
             ToniF03_Calcify_LICENSE,
-            ChristanRobertson_Roboto_LICENSE,
-            GITHUB_Octokit_LICENSE
+            ChristanRobertson_Roboto_LICENSE
         }
     }
 }

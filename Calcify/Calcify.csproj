@@ -227,7 +227,6 @@
     <EmbeddedResource Include="Licenses\ToniF03_Calcify_LICENSE.md" />
     <EmbeddedResource Include="Licenses\Newtonsoft_Json_LICENSE.md" />
     <EmbeddedResource Include="Licenses\ChristanRobertson_Roboto_LICENSE.md" />
-    <EmbeddedResource Include="Licenses\GITHUB_Octokit_LICENSE.md" />
     <Content Include="rc.res" />
     <Resource Include="Resources\Calcify.png" />
   </ItemGroup>

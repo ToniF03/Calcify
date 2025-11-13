@@ -218,25 +218,6 @@
                                 </StackPanel>
                             </Grid>
                         </Button>
-                        <Button x:Name="OctokitLicenseButton" Style="{StaticResource ItemButton}" Margin="0, 5, 0, 0" >
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition />
-                                    <ColumnDefinition Width="20" />
-                                </Grid.ColumnDefinitions>
-                                <Glyphs UnicodeString="&#xE76C;" FontRenderingEmSize="20" VerticalAlignment="Center" Grid.Column="1" />
-                                <StackPanel >
-                                    <StackPanel Orientation="Horizontal" >
-                                        <Label Content="Octokit - License" Style="{StaticResource lightLabel}" />
-                                        <Label Content="Github" FontSize="10" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="10, 0">
-                                        <Glyphs UnicodeString="&#xF000;" FontRenderingEmSize="10" VerticalAlignment="Center" />
-                                        <Label Content="MIT Licens" FontSize="10" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                </StackPanel>
-                            </Grid>
-                        </Button>
                     </StackPanel>
                 </ScrollViewer>
             </Grid>
