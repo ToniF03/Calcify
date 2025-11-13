@@ -123,6 +123,7 @@
     <Compile Include="Classes\Math\Conversion\Length\Centimeter.cs" />
     <Compile Include="Classes\Math\Conversion\Length\Decameter.cs" />
     <Compile Include="Classes\Math\Conversion\Length\Decimeter.cs" />
+    <Compile Include="Classes\Math\Conversion\Length\Feet.cs" />
     <Compile Include="Classes\Math\Conversion\Length\Hectometer.cs" />
     <Compile Include="Classes\Math\Conversion\Length\Kilometer.cs" />
     <Compile Include="Classes\Math\Conversion\Length\Meter.cs" />
