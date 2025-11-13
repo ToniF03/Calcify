@@ -46,7 +46,7 @@ namespace Update
 
         public async Task GetCurrentRelease()
         {
-            if (Properties.Settings.Default.LastChecked == DateTime.Today)
+            if (Properties.Settings.Default.LastChecked != DateTime.Today)
             {
                 HttpClient client = new HttpClient();
                 client.BaseAddress = new Uri("https://api.github.com");
@@ -59,9 +59,11 @@ namespace Update
                 string s = releases["assets"].First["browser_download_url"].ToString();
                 foreach (JToken token in releases["assets"])
                 {
-                    if (token["name"].Contains("portable") && token["name"].ToString().EndsWith(".zip"))
+                    Console.WriteLine(token["name"].ToString());
+                    if (token["name"].ToString().Contains("portable") && token["name"].ToString().EndsWith(".zip"))
                     {
                         s = token["browser_download_url"].ToString();
+                        break;
                     }
                 }
 
@@ -73,6 +75,12 @@ namespace Update
                     Properties.Settings.Default.Save();
                     prog.IsIndeterminate = false;
                     wc.DownloadFileAsync(new Uri(releases["assets"].First["browser_download_url"].ToString()), Path.GetTempPath() + "\\Calcify-update.zip");
+                }
+                else
+                {
+                    Properties.Settings.Default.LastChecked = DateTime.Today;
+                    Properties.Settings.Default.Save();
+                    this.Close();
                 }
                 Properties.Settings.Default.LastChecked = DateTime.Today;
                 Properties.Settings.Default.Save();
