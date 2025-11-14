@@ -67,7 +67,7 @@ namespace Calcify
             ExchangeRateLoader.LoadExchangeRate(out mainWindow.CurrencyPattern, out mainWindow.currencyRegex, out mainWindow.currencyDict);
 
             if (openFile)
-                mainWindow.openFile(filePath);
+                mainWindow.OpenFile(filePath);
         }
     }
 }

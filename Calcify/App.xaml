@@ -100,6 +100,13 @@
                 </Setter>
             </Style>
 
+            <Style TargetType="avalonEdit:LineNumberMargin">
+                <Setter Property="Margin" Value="0, 0, 10, 0" />
+            </Style>
+            <Style TargetType="avalonEdit:TextArea">
+                <Setter Property="BorderThickness" Value="0" />
+            </Style>
+
             <Style TargetType="ContextMenu" >
                 <Setter Property="Template" >
                     <Setter.Value>
@@ -118,7 +125,7 @@
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
-                                </Border.Style>                                
+                                </Border.Style>
                                 <ItemsPresenter Margin="0, 4" />
                             </Border>
                         </ControlTemplate>

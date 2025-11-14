@@ -2,7 +2,9 @@
 using Calcify.Math;
 using Calcify.Math.Conversion;
 using Calcify.Tools;
+using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using Microsoft.Win32;
@@ -27,32 +29,32 @@ namespace Calcify
     {
         #region Variables
         #region Pattern
-        string AnglePattern = Math.Units.Patterns.AnglePattern;
+        readonly string AnglePattern = Math.Units.Patterns.AnglePattern;
         public string CurrencyPattern = @"\b(EUR|AED|AFN|ALL|AMD|ANG|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BGN|BHD|BIF|BMD|BND|BOB|BRL|BSD|BTC|BTN|BWP|BYN|BYR|BZD|CAD|CDF|CHF|CLF|CLP|CNY|COP|CRC|CUC|CUP|CVE|CZK|DJF|DKK|DOP|DZD|EGP|ERN|ETB|EUR|FJD|FKP|GBP|GEL|GGP|GHS|GIP|GMD|GNF|GTQ|GYD|HKD|HNL|HRK|HTG|HUF|IDR|ILS|IMP|INR|IQD|IRR|ISK|JEP|JMD|JOD|JPY|KES|KGS|KHR|KMF|KPW|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LSL|LTL|LVL|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|MRO|MUR|MVR|MWK|MXN|MYR|MZN|NAD|NGN|NIO|NOK|NPR|NZD|OMR|PAB|PEN|PGK|PHP|PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLL|SOS|SRD|STD|SVC|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TWD|TZS|UAH|UGX|USD|UYU|UZS|VEF|VND|VUV|WST|XAF|XAG|XAU|XCD|XDR|XOF|XPF|YER|ZAR|ZMK|ZMW|ZWL)\b";
-        string DataSizePattern = Math.Units.Patterns.DataSizePattern;
-        string FrequencyPattern = Math.Units.Patterns.FrequencyPattern;
-        string LengthPattern = Math.Units.Patterns.LengthPattern;
-        string MassPattern = Math.Units.Patterns.MassPattern;
-        string TemperaturePattern = Math.Units.Patterns.TemperaturePattern;
-        string TimePattern = Math.Units.Patterns.TimePattern;
-        string ConstantsPattern = @"(π|\b(p(h)?i|e)\b)";
+        readonly string DataSizePattern = Math.Units.Patterns.DataSizePattern;
+        readonly string FrequencyPattern = Math.Units.Patterns.FrequencyPattern;
+        readonly string LengthPattern = Math.Units.Patterns.LengthPattern;
+        readonly string MassPattern = Math.Units.Patterns.MassPattern;
+        readonly string TemperaturePattern = Math.Units.Patterns.TemperaturePattern;
+        readonly string TimePattern = Math.Units.Patterns.TimePattern;
+        readonly string ConstantsPattern = @"(π|\b(p(h)?i|e)\b)";
         #endregion
         #region Regex
-        Regex prevRegex = new Regex(@"\b(previous|prev|answer|ans)\b");
+        readonly Regex prevRegex = new Regex(@"\b(previous|prev|answer|ans)\b");
 
-        Regex sqrtRegex = new Regex(@"\b(?<func>sqrt)\((?<variable1>(-)?\d+(\.\d+)?)\)(( )?|$)");
+        readonly Regex sqrtRegex = new Regex(@"\b(?<func>sqrt)\((?<variable1>(-)?\d+(\.\d+)?)\)(( )?|$)");
 
-        Regex dateTimeKeyWordsRegex = new Regex(@"\b(?i)(((now|time)(\.(hour|minute|second))?)|(yesterday|date|today|tomorrow)(\.(day|month|year|weekday|dayofyear|weekofyear))?)(?-i)\b");
-        Regex dateTimeRegex = new Regex(@"^(\d{2}(\d{2})?\/\d{1,2}\/\d{1,2}( \d{1,2}:\d{1,2}(:\d{1,2})?)?|\d{1,2}:\d{1,2}(:\d{1,2})?)$");
-        Regex PermutationRegex = new Regex(@"(?<n>\d+)C(?<r>\d+)");
-        Regex calculatorRegex = new Regex(@"^((\d+(\.\d+)?)|\||(\+|\-|\*|\/|\^)(?!\+|\*|\/|\^|\!)|(|\(|\)|\!))*$");
-        Regex directRegex = new Regex(@"^(-?((\d{1,3},)*\d{3}|\d+)(\.\d+)?( (" + Math.Units.Patterns.allUnitPatterns + "))?|\\d{4}\\/\\d{2}\\/\\d{2}( \\d{2}:\\d{2}:\\d{2})?|\\d{2}:\\d{2}(:\\d{2})?)$");
-        Regex constantsRegex;
-        Regex sumAvgRegex;
-        Regex inlineCalculationRegex = new Regex(@"(?<=\{)(?<subtask>[^{}]*)(?=\})", RegexOptions.RightToLeft);
+        readonly Regex dateTimeKeyWordsRegex = new Regex(@"\b(?i)(((now|time)(\.(hour|minute|second))?)|(yesterday|date|today|tomorrow)(\.(day|month|year|weekday|dayofyear|weekofyear))?)(?-i)\b");
+        readonly Regex dateTimeRegex = new Regex(@"^(\d{2}(\d{2})?\/\d{1,2}\/\d{1,2}( \d{1,2}:\d{1,2}(:\d{1,2})?)?|\d{1,2}:\d{1,2}(:\d{1,2})?)$");
+        readonly Regex PermutationRegex = new Regex(@"(?<n>\d+)C(?<r>\d+)");
+        readonly Regex calculatorRegex = new Regex(@"^((\d+(\.\d+)?)|\||(\+|\-|\*|\/|\^)(?!\+|\*|\/|\^|\!)|(|\(|\)|\!))*$");
+        readonly Regex directRegex = new Regex(@"^(-?((\d{1,3},)*\d{3}|\d+)(\.\d+)?( (" + Math.Units.Patterns.allUnitPatterns + "))?|\\d{4}\\/\\d{2}\\/\\d{2}( \\d{2}:\\d{2}:\\d{2})?|\\d{2}:\\d{2}(:\\d{2})?)$");
+        readonly Regex constantsRegex;
+        readonly Regex sumAvgRegex;
+        readonly Regex inlineCalculationRegex = new Regex(@"(?<=\{)(?<subtask>[^{}]*)(?=\})", RegexOptions.RightToLeft);
         public Regex currencyRegex;
 
-        Regex allUnitRegex;
+        readonly Regex allUnitRegex;
         #endregion
         #region Document Informations
         public string documentPath = "";
@@ -70,31 +72,31 @@ namespace Calcify
         public static RoutedCommand Esc = new RoutedCommand();
         #endregion
         #region Dictionaries
-        Dictionary<string, double> variable = new Dictionary<string, double>();
-        Dictionary<string, AngleUnit> angleDict = new Dictionary<string, AngleUnit>();
-        Dictionary<string, DataSizeUnit> dataSizeDict = new Dictionary<string, DataSizeUnit>();
-        Dictionary<string, FrequencyUnit> frequencyDict = new Dictionary<string, FrequencyUnit>();
-        Dictionary<string, LengthUnit> lengthDict = new Dictionary<string, LengthUnit>();
-        Dictionary<string, MassUnit> massDict = new Dictionary<string, MassUnit>();
-        Dictionary<string, TemperatureUnit> temperatureDict = new Dictionary<string, TemperatureUnit>();
-        Dictionary<string, TimeUnit> timeDict = new Dictionary<string, TimeUnit>();
-        Dictionary<AngleUnit, string> angleExt = new Dictionary<AngleUnit, string>();
-        Dictionary<DataSizeUnit, string> dataSizeExt = new Dictionary<DataSizeUnit, string>();
-        Dictionary<FrequencyUnit, string> frequencyExt = new Dictionary<FrequencyUnit, string>();
-        Dictionary<LengthUnit, string> lengthExt = new Dictionary<LengthUnit, string>();
-        Dictionary<MassUnit, string> massExt = new Dictionary<MassUnit, string>();
-        Dictionary<TemperatureUnit, string> temperatureExt = new Dictionary<TemperatureUnit, string>();
-        Dictionary<TimeUnit, string> timeExt = new Dictionary<TimeUnit, string>();
+        readonly Dictionary<string, double> variable = new Dictionary<string, double>();
+        readonly Dictionary<string, AngleUnit> angleDict = new Dictionary<string, AngleUnit>();
+        readonly Dictionary<string, DataSizeUnit> dataSizeDict = new Dictionary<string, DataSizeUnit>();
+        readonly Dictionary<string, FrequencyUnit> frequencyDict = new Dictionary<string, FrequencyUnit>();
+        readonly Dictionary<string, LengthUnit> lengthDict = new Dictionary<string, LengthUnit>();
+        readonly Dictionary<string, MassUnit> massDict = new Dictionary<string, MassUnit>();
+        readonly Dictionary<string, TemperatureUnit> temperatureDict = new Dictionary<string, TemperatureUnit>();
+        readonly Dictionary<string, TimeUnit> timeDict = new Dictionary<string, TimeUnit>();
+        readonly Dictionary<AngleUnit, string> angleExt = new Dictionary<AngleUnit, string>();
+        readonly Dictionary<DataSizeUnit, string> dataSizeExt = new Dictionary<DataSizeUnit, string>();
+        readonly Dictionary<FrequencyUnit, string> frequencyExt = new Dictionary<FrequencyUnit, string>();
+        readonly Dictionary<LengthUnit, string> lengthExt = new Dictionary<LengthUnit, string>();
+        readonly Dictionary<MassUnit, string> massExt = new Dictionary<MassUnit, string>();
+        readonly Dictionary<TemperatureUnit, string> temperatureExt = new Dictionary<TemperatureUnit, string>();
+        readonly Dictionary<TimeUnit, string> timeExt = new Dictionary<TimeUnit, string>();
 
-        Dictionary<string, Enum> allUnitsDict = new Dictionary<string, Enum>();
-        Dictionary<Enum, string> allUnitsExt = new Dictionary<Enum, string>();
+        readonly Dictionary<string, Enum> allUnitsDict = new Dictionary<string, Enum>();
+        readonly Dictionary<Enum, string> allUnitsExt = new Dictionary<Enum, string>();
         #endregion
         private string oldTotalValue = "";
         private string windowTitle = "";
         private bool unsavedChanges = false;
-        private RegistryWatcher watcher = null;
-        private SyntaxFile lightSyntax = new SyntaxFile(SyntaxFile.Theme.Light);
-        private SyntaxFile darkSyntax = new SyntaxFile(SyntaxFile.Theme.Dark);
+        private readonly RegistryWatcher watcher = null;
+        private readonly SyntaxFile lightSyntax = new SyntaxFile(SyntaxFile.Theme.Light);
+        private readonly SyntaxFile darkSyntax = new SyntaxFile(SyntaxFile.Theme.Dark);
 
         public int returnState = -1;
         public About aboutWindow = null;
@@ -116,8 +118,10 @@ namespace Calcify
         {
             if (settingsWindow == null)
             {
-                settingsWindow = new Settings();
-                settingsWindow._MainWindow = this;
+                settingsWindow = new Settings()
+                {
+                    _MainWindow = this
+                };
                 settingsWindow.Show();
             }
             else settingsWindow.Focus();
@@ -214,7 +218,7 @@ namespace Calcify
                 {
                     if (documentPath != "")
                     {
-                        saveFile(documentPath);
+                        SaveFile(documentPath);
                         App.Current.Shutdown();
                     }
                     else
@@ -222,7 +226,7 @@ namespace Calcify
                         SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
                         if (saveFileDialog.ShowDialog() == true)
                         {
-                            saveFile(saveFileDialog.FileName);
+                            SaveFile(saveFileDialog.FileName);
                             App.Current.Shutdown();
                         }
                     }
@@ -259,7 +263,7 @@ namespace Calcify
                 Properties.Settings.Default.DarkMode = int.Parse(watcher.Value) != 1;
             }
 
-            setUpDictionaries();
+            SetUpDictionaries();
             UpdateSyntaxHighlighting();
 
             #region Event Handler
@@ -270,7 +274,7 @@ namespace Calcify
             this.DragLeave += Window_DragEvent;
             this.Drop += Window_DragEvent;
 
-            mainEditor.TextChanged += mainEditor_TextChanged;
+            mainEditor.TextChanged += MainEditor_TextChanged;
             mainEditor.TextArea.Caret.PositionChanged += Caret_PositionChanged;
 
             MinimizeButton.Click += MinimizeButton_Click;
@@ -291,11 +295,11 @@ namespace Calcify
 
             MenuButton.Click += Menu_Click;
 
-            contextNewFileButton.Click += contextNewFileButton_Click;
-            contextOpenButton.Click += contextOpenButton_Click;
-            contextSaveButton.Click += contextSaveButton_Click;
-            contextSaveAsButton.Click += contextSaveButton_Click;
-            contextAboutButton.Click += contextAboutButton_Click;
+            contextNewFileButton.Click += ContextNewFileButton_Click;
+            contextOpenButton.Click += ContextOpenButton_Click;
+            contextSaveButton.Click += ContextSaveButton_Click;
+            contextSaveAsButton.Click += ContextSaveButton_Click;
+            contextAboutButton.Click += ContextAboutButton_Click;
             contextSettingsButton.Click += SettingsButton_Click;
             contextExitButton.Click += CloseButton_Click;
 
@@ -342,6 +346,8 @@ namespace Calcify
                     mainEditor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
                 }
             }
+
+            UpdateTextBoxLineNumbers();
 
             themeButtonLabel.Content = Properties.Settings.Default.DarkMode ? "\uE708" : "\uE706";
         }
@@ -396,19 +402,17 @@ namespace Calcify
             }
         }
 
-        private void mainEditor_TextChanged(object sender, EventArgs e)
+        private void MainEditor_TextChanged(object sender, EventArgs e)
         {
             TextDocument newDocument = new TextDocument();
             unsavedChanges = documentText != mainEditor.Text;
 
             for (int i = 1; i <= mainEditor.LineCount; i++)
             {
-                string result = "";
                 DocumentLine line = mainEditor.Document.GetLineByNumber(i);
-                result = Calculate(mainEditor.Document.GetText(line.Offset, line.Length)).Trim();
-                Match m = directRegex.Match(result);
+                string result = Calculate(mainEditor.Document.GetText(line.Offset, line.Length)).Trim();
                 if (directRegex.Match(result).Success || new Regex(@"^[^\d]*$").IsMatch(result))
-                    newDocument.Text = newDocument.Text + result;
+                    newDocument.Text += result;
                 newDocument.Text += "\n";
             }
             resultEditor.Document = newDocument;
@@ -438,7 +442,7 @@ namespace Calcify
         /// Open a file
         /// </summary>
         /// <param name="path"></param>
-        public void openFile(string path)
+        public void OpenFile(string path)
         {
             bool actionAllowed = false;
             if (unsavedChanges)
@@ -477,7 +481,7 @@ namespace Calcify
                     // create a new file.
                     if (documentPath != "")
                     {
-                        saveFile(documentPath);
+                        SaveFile(documentPath);
                         actionAllowed = true;
                     }
                     else
@@ -485,7 +489,7 @@ namespace Calcify
                         SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
                         if (saveFileDialog.ShowDialog() == true)
                         {
-                            saveFile(saveFileDialog.FileName);
+                            SaveFile(saveFileDialog.FileName);
                             actionAllowed = true;
                         }
                     }
@@ -544,7 +548,7 @@ namespace Calcify
         /// Save the file to a given path
         /// </summary>
         /// <param name="path"></param>
-        public void saveFile(string path)
+        public void SaveFile(string path)
         {
             // Save file with given meta tags
             string dAuthor = documentAuthor != "" ? documentAuthor : Properties.Settings.Default.UserName;
@@ -744,7 +748,7 @@ namespace Calcify
 
             // Execute Calculation
             if (calculatorRegex.IsMatch(input) && !dateCalculation)
-                input = parseCalculation(input);
+                input = ParseCalculation(input);
 
             return input;
         }
@@ -859,14 +863,10 @@ namespace Calcify
 
                 // Swap if min is greater than max
                 if (minNumber > maxNumber && function != "round")
-                {
-                    double temp = minNumber;
-                    minNumber = maxNumber;
-                    maxNumber = temp;
-                }
+                    (maxNumber, minNumber) = (minNumber, maxNumber);
 
 
-                double generatedNumber = 0;
+                double generatedNumber;
                 switch (function)
                 {
                     // Calculate difference
@@ -1044,8 +1044,7 @@ namespace Calcify
                 // Try parse left as DateTime (date or time-only)
                 bool leftIsDateTime = DateTime.TryParse(leftRaw, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime leftDt);
                 // Try parse right as time-of-day (HH:mm[:ss])
-                TimeSpan rightSpan = TimeSpan.Zero;
-                bool rightIsTimeOfDay = TimeSpan.TryParse(rightRaw, CultureInfo.InvariantCulture, out rightSpan);
+                bool rightIsTimeOfDay = TimeSpan.TryParse(rightRaw, CultureInfo.InvariantCulture, out TimeSpan rightSpan);
                 if (!rightIsTimeOfDay)
                 {
                     // Try parse as "N h/min/s"
@@ -1183,245 +1182,13 @@ namespace Calcify
         /// is returned.</param>
         /// <returns>A string containing the formatted result of the calculation, rounded to the configured number of digits.
         /// Returns an empty string if the input is invalid or cannot be evaluated.</returns>
-        private string parseCalculation(string input)
+        private string ParseCalculation(string input)
         {
             double value = Calculator.CalculateString(input);
             if (!double.IsNaN(value))
                 return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits));
             else
                 return "";
-        }
-
-        private string CalculateSum(int CurrentLineNumber, TextDocument newDoc, out int summedLineCount, string targetUnitString = "")
-        {
-            double value = 0;
-            string previousLine = "";
-            bool firstLineEncountered = false;
-            int lineCount = 0;
-
-            if (CurrentLineNumber != 1)
-            {
-                while (newDoc.GetText(newDoc.GetLineByNumber(CurrentLineNumber - 1)) == "" && CurrentLineNumber - 1 != 1)
-                    CurrentLineNumber--;
-                for (int i = CurrentLineNumber - 1; i > 0; i--)
-                {
-                    previousLine = newDoc.GetText(newDoc.GetLineByNumber(i));
-                    if (previousLine == "" && firstLineEncountered)
-                        break;
-                    else if (new Regex(@"^-?\d+(\.\d+)?$").IsMatch(previousLine) && (targetUnitString == "" || targetUnitString == "digits"))
-                    {
-                        double exVal = double.Parse(new Regex(@"^-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
-                        firstLineEncountered = true;
-                        lineCount++;
-                        if (targetUnitString == "")
-                            targetUnitString = "digits";
-                        value += exVal;
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)? " + CurrencyPattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(CurrencyPattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        if (targetUnitString == "")
-                        {
-                            targetUnitString = new Regex(CurrencyPattern + "$").Match(previousLine).Value;
-                            string exVal = new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value;
-                            value = double.Parse(exVal, CultureInfo.InvariantCulture);
-                        }
-                        else
-                        {
-                            string currentUnit = new Regex(CurrencyPattern + @"$").Match(previousLine).Value;
-                            if (currentUnit == targetUnitString)
-                            {
-                                string exVal = new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value;
-                                value = value + double.Parse(exVal, CultureInfo.InvariantCulture);
-                            }
-                            else
-                            {
-                                string extractedString = new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value;
-                                double exVal = double.Parse(extractedString, CultureInfo.InvariantCulture);
-                                exVal = exVal / currencyDict[currentUnit];
-                                if (targetUnitString != "EUR")
-                                    exVal = exVal * currencyDict[targetUnitString];
-                                exVal = System.Math.Round(exVal, 2);
-                                value = value + exVal;
-                            }
-                        }
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)? " + MassPattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(MassPattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        string currentUnitString = new Regex(MassPattern + "$").Match(previousLine).Value.ToLower();
-                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value);
-                        MassUnit currentUnit = MassUnit.None;
-                        MassUnit targetUnit = MassUnit.None;
-                        if (targetUnitString == "")
-                        {
-                            targetUnitString = currentUnitString;
-                            value += exVal;
-                        }
-                        else
-                        {
-                            targetUnit = massDict[targetUnitString];
-                            targetUnitString = massExt[targetUnit];
-                            currentUnit = massDict[currentUnitString];
-                            if (currentUnit != targetUnit)
-                                exVal = Converter.MassConverter(exVal, currentUnit, targetUnit);
-                            if (targetUnit == MassUnit.Pounds)
-                                targetUnitString = exVal == 1 || exVal == -1 ? "lb" : "lbs";
-                            value += exVal;
-
-                        }
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)? " + TemperaturePattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(TemperaturePattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        string currentUnitString = new Regex(TemperaturePattern + "$").Match(previousLine).Value;
-                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
-                        TemperatureUnit currentUnit = TemperatureUnit.None;
-                        TemperatureUnit targetUnit = TemperatureUnit.None;
-                        if (targetUnitString == "")
-                        {
-                            targetUnitString = currentUnitString;
-                            value = exVal;
-                        }
-                        else
-                        {
-                            currentUnit = temperatureDict[currentUnitString];
-                            targetUnit = temperatureDict[targetUnitString];
-                            targetUnitString = temperatureExt[targetUnit];
-                            if (currentUnit != targetUnit)
-                                exVal = Converter.TemperatureConverter(exVal, currentUnit, targetUnit);
-                            value += exVal;
-                        }
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)? " + DataSizePattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(DataSizePattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        string currentUnitString = new Regex(DataSizePattern + "$").Match(previousLine).Value;
-                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
-                        DataSizeUnit currentUnit = DataSizeUnit.None;
-                        DataSizeUnit targetUnit = DataSizeUnit.None;
-                        if (currentUnitString != "b" && currentUnitString != "B")
-                            currentUnitString = currentUnitString.ToLower();
-                        if (targetUnitString != "b" && targetUnitString != "B")
-                            targetUnitString = targetUnitString.ToLower();
-                        if (targetUnitString == "")
-                        {
-                            targetUnitString = currentUnitString;
-                            value += exVal;
-                            targetUnit = dataSizeDict[targetUnitString];
-                            targetUnitString = dataSizeExt[targetUnit];
-                        }
-                        else
-                        {
-                            targetUnit = dataSizeDict[targetUnitString];
-                            targetUnitString = dataSizeExt[targetUnit];
-                            currentUnit = dataSizeDict[currentUnitString];
-                            if (targetUnit != currentUnit)
-                                exVal = Converter.DataSizeConverter(exVal, currentUnit, targetUnit);
-                            value += exVal;
-                        }
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)? " + TimePattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(TimePattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        string currentUnitString = new Regex(TimePattern + "$").Match(previousLine).Value;
-                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
-                        TimeUnit currentUnit = TimeUnit.None;
-                        TimeUnit targetUnit = TimeUnit.None;
-                        if (targetUnitString == "")
-                        {
-                            targetUnitString = currentUnitString;
-                            value += exVal;
-                        }
-                        else
-                        {
-                            targetUnit = timeDict[targetUnitString];
-                            targetUnitString = timeExt[targetUnit];
-                            currentUnit = timeDict[currentUnitString];
-                            if (targetUnit != currentUnit)
-                                exVal = Converter.TimeConverter(exVal, currentUnit, targetUnit);
-                            value += exVal;
-                        }
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)? " + FrequencyPattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(FrequencyPattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
-                        string currentUnitString = new Regex(FrequencyPattern).Match(new Regex(@"^\-?\d+(\.\d+)? " + FrequencyPattern).Match(previousLine).Value).Value.ToLower().Trim();
-                        if (targetUnitString == "")
-                            targetUnitString = currentUnitString;
-                        FrequencyUnit targetUnit = FrequencyUnit.None;
-                        FrequencyUnit currentUnit = FrequencyUnit.None;
-                        targetUnitString = targetUnitString.ToLower();
-                        targetUnit = frequencyDict[targetUnitString];
-                        targetUnitString = frequencyExt[targetUnit];
-                        currentUnit = frequencyDict[currentUnitString];
-                        if (targetUnit != currentUnit)
-                            exVal = Converter.FrequencyConverter(exVal, currentUnit, targetUnit);
-                        value += exVal;
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)?" + AnglePattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(AnglePattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
-                        string currentUnitString = new Regex(AnglePattern).Match(previousLine).Value.ToLower().Trim();
-                        if (targetUnitString == "")
-                            targetUnitString = currentUnitString;
-                        AngleUnit targetUnit = AngleUnit.None;
-                        AngleUnit currentUnit = AngleUnit.None;
-                        targetUnit = angleDict[targetUnitString];
-                        targetUnitString = angleExt[targetUnit];
-                        currentUnit = angleDict[currentUnitString];
-                        if (currentUnit != targetUnit)
-                            exVal = Converter.AngleConverter(exVal, currentUnit, targetUnit);
-                        value += exVal;
-                    }
-                    else if (new Regex(@"^\-?\d+(\.\d+)? " + LengthPattern + "$").IsMatch(previousLine) && (targetUnitString == "" || new Regex(LengthPattern).IsMatch(targetUnitString)))
-                    {
-                        lineCount++;
-                        firstLineEncountered = true;
-                        string currentUnitString = new Regex(LengthPattern + "$").Match(previousLine).Value;
-                        double exVal = double.Parse(new Regex(@"^\-?\d+(\.\d+)?").Match(previousLine).Value, CultureInfo.InvariantCulture);
-                        targetUnitString = targetUnitString == "" ? currentUnitString : targetUnitString;
-                        LengthUnit currentUnit = LengthUnit.None;
-                        LengthUnit targetUnit = LengthUnit.None;
-                        targetUnit = lengthDict[targetUnitString];
-                        targetUnitString = lengthExt[targetUnit];
-                        currentUnit = lengthDict[currentUnitString];
-                        if (targetUnit != currentUnit)
-                            exVal = Converter.LengthConverter(exVal, currentUnit, targetUnit);
-                        value += exVal;
-                    }
-                    else
-                        break;
-                }
-
-                summedLineCount = lineCount;
-                if (targetUnitString != "digits")
-                {
-                    if (System.Math.Round(value, Properties.Settings.Default.Digits) != 0)
-                        return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)) + " " + targetUnitString;
-                    else
-                        return ToNumberString(value) + " " + targetUnitString;
-                }
-                else
-                {
-                    if (System.Math.Round(value, Properties.Settings.Default.Digits) != 0)
-                        return ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits));
-                    else
-                        return ToNumberString(value);
-                }
-            }
-            else
-                summedLineCount = 0;
-            return "";
         }
 
         /// <summary>
@@ -1462,7 +1229,7 @@ namespace Calcify
         /// <remarks>This method sets up internal mappings between unit types, their string
         /// representations, and conversion functions. It should be called before performing any unit conversions to
         /// ensure all supported units and their aliases are recognized.</remarks>
-        private void setUpDictionaries()
+        private void SetUpDictionaries()
         {
             // Temperatures
             AddUnit(TemperatureUnit.Kelvin, "K", "K");
@@ -1593,8 +1360,9 @@ namespace Calcify
         }
         #endregion
 
+        #region Events
         #region ContextMenu
-        private void contextNewFileButton_Click(object sender, RoutedEventArgs e)
+        private void ContextNewFileButton_Click(object sender, RoutedEventArgs e)
         {
             if (unsavedChanges)
             {
@@ -1619,7 +1387,7 @@ namespace Calcify
                 {
                     if (documentPath != "")
                     {
-                        saveFile(documentPath);
+                        SaveFile(documentPath);
                         NewDocument();
                     }
                     else
@@ -1627,7 +1395,7 @@ namespace Calcify
                         SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
                         if (saveFileDialog.ShowDialog() == true)
                         {
-                            saveFile(saveFileDialog.FileName);
+                            SaveFile(saveFileDialog.FileName);
                             NewDocument();
                         }
                     }
@@ -1640,31 +1408,35 @@ namespace Calcify
             }
         }
 
-        private void contextOpenButton_Click(object sender, RoutedEventArgs e)
+        private void ContextOpenButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
             if (openFileDialog.ShowDialog() == true)
-                openFile(openFileDialog.FileName);
+                OpenFile(openFileDialog.FileName);
         }
 
-        private void contextSaveButton_Click(object sender, RoutedEventArgs e)
+        private void ContextSaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (documentPath == "" || ((Button)sender).Name == "contextSaveAsButton")
+            string senderName;
+            senderName = sender.GetType().Name == "MenuItem" ? ((MenuItem)sender).Name : ((Button)sender).Name;
+            if (documentPath == "" || senderName == "contextSaveAsButton")
             {
                 SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.Calcify|All Files (*.*)|*.*", FileName = "" };
                 if (saveFileDialog.ShowDialog() == true)
-                    saveFile(saveFileDialog.FileName);
+                    SaveFile(saveFileDialog.FileName);
             }
             else
-                saveFile(documentPath);
+                SaveFile(documentPath);
         }
 
-        private void contextAboutButton_Click(object sender, RoutedEventArgs e)
+        private void ContextAboutButton_Click(object sender, RoutedEventArgs e)
         {
             if (aboutWindow == null)
             {
-                aboutWindow = new About();
-                aboutWindow._mainWindow = this;
+                aboutWindow = new About
+                {
+                    _mainWindow = this
+                };
                 if (this.WindowState != WindowState.Maximized)
                 {
                     aboutWindow.Top = this.Top + (this.Height / 2) - 125;
@@ -1684,7 +1456,7 @@ namespace Calcify
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 if (files[0].ToLower().EndsWith(".calcify"))
-                    openFile(files[0]);
+                    OpenFile(files[0]);
                 DropPanel.IsEnabled = false;
                 DropPanel.IsHitTestVisible = false;
                 EditorContainer.Effect = new BlurEffect { Radius = 0 };
@@ -1722,7 +1494,7 @@ namespace Calcify
                 {
                     if (documentPath != "")
                     {
-                        saveFile(documentPath);
+                        SaveFile(documentPath);
                         NewDocument();
                     }
                     else
@@ -1730,7 +1502,7 @@ namespace Calcify
                         SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
                         if (saveFileDialog.ShowDialog() == true)
                         {
-                            saveFile(saveFileDialog.FileName);
+                            SaveFile(saveFileDialog.FileName);
                             NewDocument();
                         }
                     }
@@ -1747,14 +1519,14 @@ namespace Calcify
         {
             OpenFileDialog openFileDialog = new OpenFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
             if (openFileDialog.ShowDialog() == true)
-                openFile(openFileDialog.FileName);
+                OpenFile(openFileDialog.FileName);
         }
 
         private void CtrlShiftS_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = documentPath != "" ? Path.GetFileNameWithoutExtension(documentPath) : "" };
             if (saveFileDialog.ShowDialog() == true)
-                saveFile(saveFileDialog.FileName);
+                SaveFile(saveFileDialog.FileName);
         }
 
         private void CtrlS_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -1763,10 +1535,10 @@ namespace Calcify
             {
                 SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
                 if (saveFileDialog.ShowDialog() == true)
-                    saveFile(saveFileDialog.FileName);
+                    SaveFile(saveFileDialog.FileName);
             }
             else
-                saveFile(documentPath);
+                SaveFile(documentPath);
         }
 
         private void Esc_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -1779,13 +1551,32 @@ namespace Calcify
             }
         }
         #endregion
+
+        public void UpdateTextBoxLineNumbers()
+        {
+            if (Properties.Settings.Default.ShowLineNumbers)
+            {
+                // Remove the dotted line margin added by AvalonEdit
+                if (mainEditor.TextArea != null)
+                {
+                    var dottedLineMargin = mainEditor.TextArea.LeftMargins
+                        .OfType<UIElement>()
+                        .FirstOrDefault(m => DottedLineMargin.IsDottedLineMargin(m));
+
+                    if (dottedLineMargin != null)
+                    {
+                        mainEditor.TextArea.LeftMargins.Remove(dottedLineMargin);
+                    }
+                }
+            }
+        }
+        #endregion
     }
 }
 
 
 // TODO:
 //
-//  - REFACTORING CODE
 //  - 'About' change date
 
 //  - functions like
@@ -1846,13 +1637,15 @@ namespace Calcify
 //  - implement variables
 //  - calculations within functions
 
+
+
+
 //  - Recent Files List
 //  - toolbar
 //  - zoom with ctrl + mouse wheel
 //  - zoom with ctrl + '+' / '-'
 //  - zoom reset with ctrl + '0'
 //  - Auto Completion
-//  - Line Numbers
 
 //  - right click context menu
 //    - Undo - Undo last action
@@ -1915,3 +1708,5 @@ namespace Calcify
 //  - added inline tasks
 //  - fixed now syntax highlighting
 //  - changed the way syntax files are generated to make it less static and more flexible
+//  - refactored all code files to improve readability and maintainability
+//  - added optional line numbers

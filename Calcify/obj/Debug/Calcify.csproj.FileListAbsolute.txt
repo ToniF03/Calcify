@@ -138,6 +138,14 @@ D:\Documents\Projects\C#\Calcify-nightly-build\Calcify\obj\Debug\Calcify.Propert
 D:\Documents\Projects\C#\Calcify-nightly-build\Calcify\obj\Debug\Calcify.csproj.GenerateResource.cache
 D:\Documents\Projects\C#\Calcify-nightly-build\Calcify\obj\Debug\Calcify.csproj.CoreCompileInputs.cache
 D:\Documents\Projects\C#\Calcify-nightly-build\Calcify\obj\Debug\Calcify.csproj.CopyComplete
+C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\app.ico
+C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\Calcify.exe.config
+C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\Calcify.exe
+C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\Calcify.pdb
+C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\ICSharpCode.AvalonEdit.dll
+C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\Newtonsoft.Json.dll
+C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\ICSharpCode.AvalonEdit.xml
+C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\Newtonsoft.Json.xml
 C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify.csproj.AssemblyReference.cache
 C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\About.g.cs
 C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\DialogWindow.g.cs
@@ -147,16 +155,6 @@ C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\App.g.cs
 C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify_Content.g.cs
 C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify_MarkupCompile.cache
 C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify_MarkupCompile.lref
-C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify.exe
-C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify.pdb
-C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\app.ico
-C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\Calcify.exe.config
-C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\Calcify.exe
-C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\Calcify.pdb
-C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\ICSharpCode.AvalonEdit.dll
-C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\Newtonsoft.Json.dll
-C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\ICSharpCode.AvalonEdit.xml
-C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\bin\Debug\Newtonsoft.Json.xml
 C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\App.baml
 C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\About.baml
 C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\DialogWindow.baml
@@ -167,3 +165,5 @@ C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify.Properties
 C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify.csproj.GenerateResource.cache
 C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify.csproj.CoreCompileInputs.cache
 C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify.csproj.Up2Date
+C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify.exe
+C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify.pdb

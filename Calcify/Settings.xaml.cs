@@ -26,15 +26,29 @@ namespace Calcify
         {
             InitializeComponent();
             closeButton.Click += CloseButton_Click;
-            LessDecimalsButton.Click += LessDecimalsButton_Click;
-            MoreDecimalsButton.Click += MoreDecimalsButton_Click;
-            DecimalPlacesTextBox.PreviewTextInput += DecimalPlacesTextBox_PreviewTextInput;
+            LessDecimalsButton.Click += DecimalsButton_Click;
+            MoreDecimalsButton.Click += DecimalsButton_Click;
+
+            DecimalPlacesTextBox.PreviewTextInput += (sender, e) =>
+            {
+                if (!new Regex(@"\d+").IsMatch(e.Text))
+                    e.Handled = true;
+            };
+
             DecimalPlacesTextBox.TextChanged += DecimalPlacesTextBox_TextChanged;
             DarkModeRadioButton.Checked += DarkModeRadioButtons_CheckedChanged;
             LightModeRadioButton.Checked += DarkModeRadioButtons_CheckedChanged;
             SystemDefinedDarkModeRadioButton.Checked += DarkModeRadioButtons_CheckedChanged;
             DocumentAutorName.TextChanged += DocumentAutorName_TextChanged;
-            this.Loaded += Settings_Loaded;           
+            ShowLineNumbersCheckBox.Checked += ShowLineNumbersCheckBox_Checked;
+            ShowLineNumbersCheckBox.Unchecked += ShowLineNumbersCheckBox_Checked;
+            this.Loaded += Settings_Loaded;
+        }
+
+        private void ShowLineNumbersCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.ShowLineNumbers = (bool)ShowLineNumbersCheckBox.IsChecked;
+            _MainWindow.UpdateTextBoxLineNumbers();
         }
 
         private void Settings_Loaded(object sender, RoutedEventArgs e)
@@ -50,6 +64,7 @@ namespace Calcify
             }
             DocumentAutorName.Text = Properties.Settings.Default.UserName;
             DecimalPlacesTextBox.Text = Properties.Settings.Default.Digits.ToString();
+            ShowLineNumbersCheckBox.IsChecked = Properties.Settings.Default.ShowLineNumbers;
         }
 
         private void DocumentAutorName_TextChanged(object sender, TextChangedEventArgs e)
@@ -61,8 +76,11 @@ namespace Calcify
 
         private void DecimalPlacesTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Properties.Settings.Default.Digits = int.Parse(DecimalPlacesTextBox.Text);
-            Properties.Settings.Default.Save();
+            if (DecimalPlacesTextBox.Text != "")
+            {
+                Properties.Settings.Default.Digits = int.Parse(DecimalPlacesTextBox.Text);
+                Properties.Settings.Default.Save();
+            }
         }
 
         private void DarkModeRadioButtons_CheckedChanged(object sender, RoutedEventArgs e)
@@ -77,28 +95,21 @@ namespace Calcify
             Properties.Settings.Default.Save();
         }
 
-        private void DecimalPlacesTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            if (!new Regex(@"\d+").IsMatch(e.Text))
-                e.Handled = true;
-        }
-
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
             _MainWindow.settingsWindow = null;
         }
 
-        private void LessDecimalsButton_Click(object sender, RoutedEventArgs e)
+        private void DecimalsButton_Click(object sender, RoutedEventArgs e)
         {
-            if (Properties.Settings.Default.Digits - 1 != 0)
-                DecimalPlacesTextBox.Text = (Properties.Settings.Default.Digits - 1).ToString();
-            Properties.Settings.Default.Save();
-        }
-
-        private void MoreDecimalsButton_Click(object sender, RoutedEventArgs e)
-        {
-            DecimalPlacesTextBox.Text = (Properties.Settings.Default.Digits + 1).ToString();
+            if (((Button)sender).Name == "LessDecimalsButton")
+            {
+                if (Properties.Settings.Default.Digits - 1 != 0)
+                    DecimalPlacesTextBox.Text = (Properties.Settings.Default.Digits - 1).ToString();
+            }
+            else
+                DecimalPlacesTextBox.Text = (Properties.Settings.Default.Digits + 1).ToString();
             Properties.Settings.Default.Save();
         }
     }

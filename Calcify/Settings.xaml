@@ -43,6 +43,7 @@
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
                 <Label Content="Color sheme:" HorizontalAlignment="Right" Margin="0, 0, 5, 0" Grid.Row="0" Grid.Column="0" />
                 <StackPanel Grid.Row="0" Grid.Column="1" Margin="5, 6" >
@@ -59,9 +60,12 @@
                 <Button x:Name="MoreDecimalsButton" Height="25" Width="20" Style="{StaticResource ChromeButton}" Grid.Column="1" Grid.Row="1" Margin="5" HorizontalAlignment="Right" >
                     <Label Content="&#xE76C;" FontFamily="Segoe MDL2 Assets" FontSize="12" IsHitTestVisible="False" VerticalAlignment="Center" HorizontalAlignment="Center" />
                 </Button>
-                
+
                 <Label Content="Document Autor:" HorizontalAlignment="Right" Margin="0, 5, 5, 0" Grid.Row="2" Grid.Column="0" />
                 <TextBox x:Name="DocumentAutorName" Height="22.5" Margin="25, 5" Grid.Row="2" Grid.Column="1" />
+
+                <Label Content="Show Line Numbers:" HorizontalAlignment="Right" Margin="0, 5, 5, 0" Grid.Row="3" Grid.Column="0" />
+                <CheckBox x:Name="ShowLineNumbersCheckBox" Margin="5, 6" VerticalAlignment="Center" Grid.Row="3" Grid.Column="1" />
             </Grid>
         </ScrollViewer>
     </Grid>

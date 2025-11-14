@@ -56,6 +56,27 @@
                         <MenuItem x:Name="contextNewFileButton" Header="New File"/>
                         <MenuItem x:Name="contextOpenButton" Header="Open"/>
                         <MenuItem x:Name="contextSaveButton" Header="Save"/>
+                        <MenuItem x:Name="test" Header="Recent Files">
+                            <MenuItem.Style>
+                                <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                    <Style.Triggers>
+                                        <!-- Open submenu immediately when the mouse is over the parent -->
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="IsSubmenuOpen" Value="True" />
+                                        </Trigger>
+                                        <!-- Close submenu when the mouse leaves -->
+                                        <Trigger Property="IsMouseOver" Value="False">
+                                            <Setter Property="IsSubmenuOpen" Value="False" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </MenuItem.Style>
+                            
+                            <MenuItem Header="C:\Projects\example1.txt" Tag="C:\Projects\example1.txt" />
+                            <MenuItem Header="C:\Projects\example2.txt" Tag="C:\Projects\example2.txt" />
+                            <Separator />
+                            <MenuItem Header="Clear Recent" />
+                        </MenuItem>
                         <MenuItem x:Name="contextSaveAsButton" Header="Save as..."/>
                         <MenuItem x:Name="contextAboutButton" Header="About"/>
                         <MenuItem x:Name="contextSettingsButton" Header="Settings"/>
@@ -127,7 +148,9 @@
                                        WordWrap="False"
                                        ScrollViewer.VerticalScrollBarVisibility="Visible" 
                                        VerticalScrollBarVisibility="Hidden"
-                                       HorizontalScrollBarVisibility="Hidden" />
+                                       HorizontalScrollBarVisibility="Hidden"
+                                       ShowLineNumbers="{Binding Source={x:Static properties:Settings.Default}, Path=ShowLineNumbers}">
+                </avalonEdit:TextEditor>
 
                 <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
@@ -143,7 +166,8 @@
                                 HorizontalContentAlignment="Right" 
                                 FontSize="13"
                                 HorizontalScrollBarVisibility="Hidden" 
-                                VerticalScrollBarVisibility="Disabled" />
+                                VerticalScrollBarVisibility="Disabled" >
+                </avalonEdit:TextEditor>
 
             </Grid>
         </ScrollViewer>
