@@ -27,6 +27,8 @@
         <CommandBinding Command="{x:Static local:MainWindow.CtrlN}" Executed="CtrlN_Executed" />
         <!-- Close pop up -->
         <CommandBinding Command="{x:Static local:MainWindow.Esc}" Executed="Esc_Executed" />
+        <!-- Reset Zoom -->
+        <CommandBinding Command="{x:Static local:MainWindow.Ctrl0}" Executed="Ctrl0_Executed" />
     </Window.CommandBindings>
 
     <!-- Defining the main grid -->
@@ -35,6 +37,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
             <RowDefinition />
+            <RowDefinition Height="30" />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
 
@@ -71,7 +74,7 @@
                                     </Style.Triggers>
                                 </Style>
                             </MenuItem.Style>
-                            
+
                             <MenuItem Header="C:\Projects\example1.txt" Tag="C:\Projects\example1.txt" />
                             <MenuItem Header="C:\Projects\example2.txt" Tag="C:\Projects\example2.txt" />
                             <Separator />
@@ -174,6 +177,24 @@
 
         <!-- Lower Tool Bar -->
         <Grid Grid.Row="2" Style="{StaticResource modernHeaderFooter}" >
+            <ComboBox x:Name="ZoomComboBox" Width="75" Height="23" HorizontalAlignment="Left" Margin="5, 0" Text="100%" IsTextSearchEnabled="False" IsEditable="True">
+                <ComboBox.Style>
+                    <Style TargetType="ComboBox">
+                        <Style.Setters>
+                            <Setter Property="Background" Value="Transparent" />
+                        </Style.Setters>
+                    </Style>
+                </ComboBox.Style>
+                <ComboBoxItem Content="50 %" />
+                <ComboBoxItem Content="75 %" />
+                <ComboBoxItem Content="100 %" IsSelected="True" />
+                <ComboBoxItem Content="150 %" />
+                <ComboBoxItem Content="200 %" />
+                <ComboBoxItem Content="300 %" />
+            </ComboBox>
+        </Grid>
+
+        <Grid Grid.Row="3" Style="{StaticResource modernHeaderFooter}" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30" />
                 <ColumnDefinition />

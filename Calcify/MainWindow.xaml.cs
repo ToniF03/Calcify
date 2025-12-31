@@ -67,6 +67,7 @@ namespace Calcify
         public static RoutedCommand CtrlS = new RoutedCommand();
         public static RoutedCommand CtrlShiftS = new RoutedCommand();
         public static RoutedCommand CtrlO = new RoutedCommand();
+        public static RoutedCommand Ctrl0 = new RoutedCommand();
         public static RoutedCommand CtrlN = new RoutedCommand();
         public static RoutedCommand Esc = new RoutedCommand();
         #endregion
@@ -303,12 +304,18 @@ namespace Calcify
             contextExitButton.Click += CloseButton_Click;
 
             titleLabel.MouseLeftButtonDown += TitleLabel_MouseLeftButtonDown;
+
+            ZoomComboBox.KeyDown += ZoomCombo_KeyDown;
+            ZoomComboBox.SelectionChanged += ZoomCombo_SelectionChanged;
+            ZoomComboBox.LostFocus += ZoomCombo_LostFocus;
             #endregion
             #region Input Bindings
             CtrlS.InputGestures.Add(new KeyGesture(Key.S, ModifierKeys.Control));
             CtrlShiftS.InputGestures.Add(new KeyGesture(Key.S, ModifierKeys.Control | ModifierKeys.Shift));
             CtrlO.InputGestures.Add(new KeyGesture(Key.O, ModifierKeys.Control));
             CtrlN.InputGestures.Add(new KeyGesture(Key.N, ModifierKeys.Control));
+            Ctrl0.InputGestures.Add(new KeyGesture(Key.D0, ModifierKeys.Control));
+            Ctrl0.InputGestures.Add(new KeyGesture(Key.NumPad0, ModifierKeys.Control));
             Esc.InputGestures.Add(new KeyGesture(Key.Escape));
             #endregion
             #region RegexSettings 
@@ -322,6 +329,10 @@ namespace Calcify
             this.MaxWidth = SystemParameters.MaximizedPrimaryScreenWidth;
             DropPanel.Visibility = Visibility.Visible;
             resultEditor.TextArea.Caret.CaretBrush = Brushes.Transparent;
+
+            ZoomComboBox.Text = (Properties.Settings.Default.EditorZoom * 100).ToString(CultureInfo.InvariantCulture) + "%";
+            mainEditor.LayoutTransform = new ScaleTransform(Properties.Settings.Default.EditorZoom, Properties.Settings.Default.EditorZoom);
+            resultEditor.LayoutTransform = new ScaleTransform(Properties.Settings.Default.EditorZoom, Properties.Settings.Default.EditorZoom);
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -1357,6 +1368,33 @@ namespace Calcify
             darkSyntax.AddNumbers("(-?((\\d{1,3},)*\\d{3}|\\d+)(\\.\\d+)?)");
 
         }
+
+        /// <summary>
+        /// Parses a zoom value from the specified text and applies it to the editor controls if valid.
+        /// </summary>
+        /// <remarks>If the parsed zoom value is outside the supported range (25% to 400%), it will be
+        /// clamped to the nearest valid value. The method updates the editor zoom setting and applies the zoom to the
+        /// relevant editor controls.</remarks>
+        /// <param name="text">A string containing the zoom value to apply. The value should be a number between 25 and 400, optionally
+        /// followed by a percent sign (e.g., "150%" or "100").</param>
+        private void ApplyZoomFromString(string text)
+        {
+            Regex parserRegex = new Regex(@"^(?<value>\d{1,3})(?<percent> ?\%?)$");
+            Match m = parserRegex.Match(text);
+            if (m.Success)
+            {
+                if (!double.TryParse(m.Groups["value"].Value.ToString(), out double scale)) return;
+                string[] items = ZoomComboBox.Items.Cast<object>().Select(s => s.ToString().Split(new[] { ' ' }, 2)[1]).Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
+                scale /= 100;
+                scale = System.Math.Max(0.25, System.Math.Min(4.0, scale));
+                Properties.Settings.Default.EditorZoom = scale;
+                Properties.Settings.Default.Save();
+                mainEditor.LayoutTransform = new ScaleTransform(scale, scale);
+                resultEditor.LayoutTransform = new ScaleTransform(scale, scale);
+                ZoomComboBox.Text = (scale * 100).ToString("F0", CultureInfo.InvariantCulture) + " %";
+                ZoomComboBox.SelectedIndex = Array.FindIndex(items, i => i == ZoomComboBox.Text);
+            }
+        }
         #endregion
 
         #region Events
@@ -1467,7 +1505,62 @@ namespace Calcify
             EditorContainer.Effect = new BlurEffect { Radius = (dragEnter ? 10 : 0) };
         }
         #endregion
+
+        /// <summary>
+        /// Handles the KeyDown event for the zoom combo box, applying the zoom level when the Enter key is pressed.
+        /// </summary>
+        /// <remarks>This method allows users to type a custom zoom value and apply it by pressing Enter.
+        /// The event is marked as handled to prevent further processing of the key press.</remarks>
+        /// <param name="sender">The source of the event, typically the zoom combo box control.</param>
+        /// <param name="e">A KeyEventArgs that contains the event data, including information about the key pressed.</param>
+        private void ZoomCombo_KeyDown(object sender, KeyEventArgs e)
+        {
+            // accept typed value on Enter
+            if (e.Key == Key.Enter)
+            {
+                ApplyZoomFromString(ZoomComboBox.Text);
+                e.Handled = true;
+            }
+        }
+
+        /// <summary>
+        /// Handles the SelectionChanged event for the zoom level combo box, updating the zoom level based on the user's
+        /// selection.
+        /// </summary>
+        /// <remarks>This method is intended to be used as an event handler for the SelectionChanged event
+        /// of a combo box that controls document zoom. If the selected item is valid, the zoom level is updated
+        /// accordingly.</remarks>
+        /// <param name="sender">The source of the event, typically the zoom level combo box control.</param>
+        /// <param name="e">An object that contains information about the selection change event.</param>
+        private void ZoomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ZoomComboBox.SelectedItem != null)
+            {
+                ApplyZoomFromString(ZoomComboBox.SelectedItem.ToString().Split(new[] { ' ' }, 2)[1]);
+            }
+        }
+
+        /// <summary>
+        /// Handles the LostFocus event for the zoom combo box, applying the zoom level specified by the user's input.
+        /// </summary>
+        /// <param name="sender">The source of the event, typically the zoom combo box control.</param>
+        /// <param name="e">The event data associated with the LostFocus event.</param>
+        private void ZoomCombo_LostFocus(object sender, RoutedEventArgs e)
+        {
+            ApplyZoomFromString(ZoomComboBox.Text);
+        }
+
         #region Hotkeys
+
+        /// <summary>
+        /// Handles the execution of the Ctrl+N command, prompting the user to save unsaved changes before creating a
+        /// new document.
+        /// </summary>
+        /// <remarks>If there are unsaved changes, the method displays a dialog to allow the user to save,
+        /// discard, or cancel before proceeding. If no changes are pending, a new document is created
+        /// immediately.</remarks>
+        /// <param name="sender">The source of the command event, typically the control that initiated the command.</param>
+        /// <param name="e">The event data associated with the command execution.</param>
         private void CtrlN_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (unsavedChanges)
@@ -1512,6 +1605,11 @@ namespace Calcify
             {
                 NewDocument();
             }
+        }
+
+        private void Ctrl0_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ApplyZoomFromString("100%");
         }
 
         private void CtrlO_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -1641,9 +1739,11 @@ namespace Calcify
 
 //  - Recent Files List
 //  - toolbar
+
 //  - zoom with ctrl + mouse wheel
 //  - zoom with ctrl + '+' / '-'
 //  - zoom reset with ctrl + '0'
+
 //  - Auto Completion
 
 //  - right click context menu

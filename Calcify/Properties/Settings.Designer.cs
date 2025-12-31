@@ -106,5 +106,17 @@ namespace Calcify.Properties {
                 this["ShowLineNumbers"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public double EditorZoom {
+            get {
+                return ((double)(this["EditorZoom"]));
+            }
+            set {
+                this["EditorZoom"] = value;
+            }
+        }
     }
 }
