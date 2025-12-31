@@ -8,7 +8,9 @@
     <Application.Resources>
         <ResourceDictionary>
             <SolidColorBrush x:Key="DarkModernWindowBackgroundbrush" Color="#2C2C2C" />
+            <SolidColorBrush x:Key="DarkModernWindowBackgroundHighlightbrush" Color="#303030" />
             <SolidColorBrush x:Key="LightModernWindowBackgroundbrush" Color="#F8F8F8" />
+            <SolidColorBrush x:Key="LightModernWindowBackgroundHighlightbrush" Color="#F0F0F0" />
             <SolidColorBrush x:Key="DarkModernForegroundbrush" Color="#FFFFFF" />
             <SolidColorBrush x:Key="LightModernForegroundbrush" Color="#000000" />
             <SolidColorBrush x:Key="DarkModernWindowHeaderFooterBackgroundbrush" Color="#262626" />
@@ -107,11 +109,246 @@
                 <Setter Property="BorderThickness" Value="0" />
             </Style>
 
+            <!-- VS-like ComboBox -->
+            <Style x:Key="VsComboBox" TargetType="ComboBox">
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
+                <Setter Property="OverridesDefaultStyle" Value="True"/>
+                <Setter Property="MinHeight" Value="24"/>
+                <Setter Property="Padding" Value="6,2"/>
+                <Setter Property="Foreground" Value="{DynamicResource LightModernForegroundbrush}"/>
+                <Setter Property="Background" Value="{DynamicResource LightModernWindowBackgroundbrush}"/>
+                <Setter Property="BorderBrush" Value="#FFBFC4C9"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+                <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ComboBox">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="24"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Border + content -->
+                                <Border x:Name="Bd"
+                  Grid.ColumnSpan="2"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="2"
+                  SnapsToDevicePixels="True"/>
+
+                                <!-- Toggle surface (covers whole control) -->
+                                <ToggleButton x:Name="DropDownToggle"
+                                              Grid.ColumnSpan="2"
+                                              Focusable="False"
+                                              Background="Transparent"
+                                              BorderBrush="{x:Null}"
+                                              BorderThickness="0"
+                                              ClickMode="Press"
+                                              Grid.Column="1"
+                                              IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                    <ToggleButton.Template>
+                                        <ControlTemplate TargetType="ToggleButton">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </ToggleButton.Template>
+                                    <Grid>
+
+                                        <!-- Content (non-editable) -->
+                                        <ContentPresenter x:Name="ContentSite"
+                                                          Margin="{TemplateBinding Padding}"
+                                                          VerticalAlignment="Center"
+                                                          HorizontalAlignment="Left"
+                                                          RecognizesAccessKey="True"
+                                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                          Content="{TemplateBinding SelectionBoxItem}"
+                                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                          ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                                          />
+
+                                        <!-- Arrow -->
+                                            <Path x:Name="Arrow"
+                                                Width="10" Height="6"
+                                                Stretch="Uniform"
+                                                Fill="Transparent"
+                                                Stroke="#FF6B6B6B"
+                                                StrokeThickness="1.5"
+                                                StrokeEndLineCap="Round"
+                                                StrokeLineJoin="Round"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Data="M 1 2 L 5 6 L 9 2"/>
+                                    </Grid>
+                                </ToggleButton>
+
+                                <TextBox x:Name="PART_EditableTextBox"
+                                         Margin="{TemplateBinding Padding}"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         Visibility="Hidden"
+                                         IsReadOnly="{TemplateBinding IsReadOnly}"/>
+
+                                <!-- Popup -->
+                                <Popup x:Name="PART_Popup"
+                                       AllowsTransparency="True"
+                                       Focusable="False"
+                                       IsOpen="{TemplateBinding IsDropDownOpen}"
+                                       Placement="Bottom"
+                                       PopupAnimation="Slide">
+                                    <Grid MaxHeight="300"
+                                          SnapsToDevicePixels="True">
+                                        <Border x:Name="PopupBorder"
+                                                Background="{DynamicResource LightModernWindowBackgroundbrush}"
+                                                BorderBrush="#FFBFC4C9"
+                                                BorderThickness="1"
+                                                CornerRadius="3">
+                                            <ScrollViewer Margin="1"
+                                                          SnapsToDevicePixels="True">
+                                                <StackPanel IsItemsHost="True" 
+                                                            KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                            </ScrollViewer>
+                                        </Border>
+                                    </Grid>
+                                </Popup>
+                            </Grid>
+
+                            <ControlTemplate.Triggers>
+                                <!-- Dark mode -->
+                                <DataTrigger Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource DarkModernWindowBackgroundbrush}"/>
+                                    <Setter TargetName="Bd" Property="BorderBrush" Value="#FF3A3A3A"/>
+                                    <Setter TargetName="PopupBorder" Property="Background" Value="{DynamicResource DarkModernWindowBackgroundbrush}"/>
+                                    <Setter TargetName="PopupBorder" Property="BorderBrush" Value="#FF4A4A4A"/>
+                                    <Setter TargetName="Arrow" Property="Stroke" Value="#FFCFCFCF"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource DarkModernForegroundbrush}"/>
+                                </DataTrigger>
+
+                                <!-- Hover -->
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource LightModernWindowBackgroundHighlightbrush}" />
+                                </Trigger>
+
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True"/>
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource DarkModernWindowBackgroundHighlightbrush}" />
+                                </MultiDataTrigger>
+
+                                <!-- Editable mode -->
+                                <Trigger Property="IsEditable" Value="True">
+                                    <Setter Property="IsTabStop" Value="False"/>
+                                    <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                                    <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                    <Setter TargetName="PART_EditableTextBox" Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+
+                <!-- Item container to keep padding/foreground consistent -->
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style TargetType="ComboBoxItem">
+                            <Setter Property="Padding" Value="8,4"/>
+                            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ComboBox}}"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ComboBoxItem">
+                                        <Border x:Name="ItemBorder"
+                                                Background="{TemplateBinding Background}"
+                                                CornerRadius="3"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsHighlighted" Value="True">
+                                                <Setter TargetName="ItemBorder" Property="Background" Value="#1A007ACC"/>
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="ItemBorder" Property="Background" Value="#33007ACC"/>
+                                            </Trigger>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter Property="Foreground" Value="#FF8A8A8A"/>
+                                            </Trigger>
+                                            <DataTrigger Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True">
+                                                <Setter Property="Foreground" Value="{DynamicResource DarkModernForegroundbrush}"/>
+                                                <Setter TargetName="ItemBorder" Property="Background" Value="Transparent"/>
+                                            </DataTrigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True"/>
+                                                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsHighlighted}" Value="True"/>
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter TargetName="ItemBorder" Property="Background" Value="#22000000"/>
+                                            </MultiDataTrigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True"/>
+                                                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsSelected}" Value="True"/>
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter TargetName="ItemBorder" Property="Background" Value="#33000000"/>
+                                            </MultiDataTrigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="ComboBoxItem">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ComboBoxItem">
+                            <Border CornerRadius="3">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Style.Triggers>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="False" />
+                                                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Background" Value="#33FFFFFF" />
+                                            </MultiDataTrigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True" />
+                                                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Background" Value="#33000000" />
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <ContentPresenter ContentSource="Content" Margin="5,3" />
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <Style TargetType="ContextMenu" >
                 <Setter Property="Template" >
                     <Setter.Value>
                         <ControlTemplate >
-                            <Border BorderThickness="0.5" CornerRadius="4" >
+                            <Border BorderThickness="0.33" CornerRadius="2" >
                                 <Border.Style>
                                     <Style TargetType="Border" >
                                         <Style.Triggers>
@@ -126,7 +363,7 @@
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
-                                <ItemsPresenter Margin="0, 4" />
+                                <ItemsPresenter Margin="0.33, 0.33, 0.33, 0.66" />
                             </Border>
                         </ControlTemplate>
                     </Setter.Value>

@@ -177,14 +177,19 @@
 
         <!-- Lower Tool Bar -->
         <Grid Grid.Row="2" Style="{StaticResource modernHeaderFooter}" >
-            <ComboBox x:Name="ZoomComboBox" Width="75" Height="23" HorizontalAlignment="Left" Margin="5, 0" Text="100%" IsTextSearchEnabled="False" IsEditable="True">
-                <ComboBox.Style>
-                    <Style TargetType="ComboBox">
-                        <Style.Setters>
-                            <Setter Property="Background" Value="Transparent" />
-                        </Style.Setters>
-                    </Style>
-                </ComboBox.Style>
+            <ComboBox x:Name="ZoomComboBox" Style="{StaticResource VsComboBox}" Width="75" Height="23" HorizontalAlignment="Left" Margin="5, 0" Text="100%" IsTextSearchEnabled="False" IsEditable="True">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="Black"/>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+
                 <ComboBoxItem Content="50 %" />
                 <ComboBoxItem Content="75 %" />
                 <ComboBoxItem Content="100 %" IsSelected="True" />
