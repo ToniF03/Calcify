@@ -89,3 +89,5 @@ Backup*/
 _UpgradeReport_Files/
 UpgradeLog*.xml
 UpgradeLog*.htm
+/Calcify/obj/Debug/App.g.cs
+/Calcify/obj/Debug/**
