@@ -29,6 +29,7 @@
         <CommandBinding Command="{x:Static local:MainWindow.Esc}" Executed="Esc_Executed" />
         <!-- Reset Zoom -->
         <CommandBinding Command="{x:Static local:MainWindow.Ctrl0}" Executed="Ctrl0_Executed" />
+        <CommandBinding Command="{x:Static local:MainWindow.F1}" Executed="F1_Executed" />
     </Window.CommandBindings>
 
     <!-- Defining the main grid -->

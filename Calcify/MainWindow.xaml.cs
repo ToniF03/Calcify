@@ -10,6 +10,7 @@ using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -70,6 +71,7 @@ namespace Calcify
         public static RoutedCommand Ctrl0 = new RoutedCommand();
         public static RoutedCommand CtrlN = new RoutedCommand();
         public static RoutedCommand Esc = new RoutedCommand();
+        public static RoutedCommand F1 = new RoutedCommand();
         #endregion
         #region Dictionaries
         readonly Dictionary<string, double> variable = new Dictionary<string, double>();
@@ -317,6 +319,7 @@ namespace Calcify
             Ctrl0.InputGestures.Add(new KeyGesture(Key.D0, ModifierKeys.Control));
             Ctrl0.InputGestures.Add(new KeyGesture(Key.NumPad0, ModifierKeys.Control));
             Esc.InputGestures.Add(new KeyGesture(Key.Escape));
+            F1.InputGestures.Add(new KeyGesture(Key.F1));
             #endregion
             #region RegexSettings 
             constantsRegex = new Regex(ConstantsPattern);
@@ -1646,6 +1649,11 @@ namespace Calcify
                 DropPanel.IsHitTestVisible = false;
                 EditorContainer.Effect = new BlurEffect { Radius = 0 };
             }
+        }
+
+        private void F1_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Process.Start("https://github.com/ToniF03/calcify-docs/blob/main/README.md");
         }
         #endregion
 
