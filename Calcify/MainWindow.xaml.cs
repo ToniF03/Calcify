@@ -2,7 +2,6 @@
 using Calcify.Math;
 using Calcify.Math.Conversion;
 using Calcify.Tools;
-using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Highlighting;
@@ -48,7 +47,7 @@ namespace Calcify
         readonly Regex dateTimeKeyWordsRegex = new Regex(@"\b(?i)(((now|time)(\.(hour|minute|second))?)|(yesterday|date|today|tomorrow)(\.(day|month|year|weekday|dayofyear|weekofyear))?)(?-i)\b");
         readonly Regex PermutationRegex = new Regex(@"(?<n>\d+)C(?<r>\d+)");
         readonly Regex calculatorRegex = new Regex(@"^((\d+(\.\d+)?)|\||(\+|\-|\*|\/|\^)(?!\+|\*|\/|\^|\!)|(|\(|\)|\!))*$");
-        readonly Regex directRegex = new Regex(@"^(-?((\d{1,3},)*\d{3}|\d+)(\.\d+)?( (" + Math.Units.Patterns.allUnitPatterns + "))?|\\d{4}\\/\\d{2}\\/\\d{2}( \\d{2}:\\d{2}:\\d{2})?|\\d{2}:\\d{2}(:\\d{2})?)$");
+        readonly Regex directRegex;
         readonly Regex constantsRegex;
         readonly Regex sumAvgRegex;
         readonly Regex inlineCalculationRegex = new Regex(@"(?<=\{)(?<subtask>[^{}]*)(?=\})", RegexOptions.RightToLeft);
@@ -326,6 +325,7 @@ namespace Calcify
             sumAvgRegex = new Regex(@"\b(avg|sum)\b");
             currencyRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + CurrencyPattern + ") (in(to)?|to|as) (?<targetUnit>" + CurrencyPattern + ")$");
             allUnitRegex = new Regex(@"(?<result>(?<value>-?((\d{1,3},)*\d{3}|\d+)(\.\d+)?) (?<srcUnit>(" + Math.Units.Patterns.allUnitPatterns + "))) (in(to)?|to) (?<targetUnit>(" + Math.Units.Patterns.allUnitPatterns + "))");
+            directRegex = new Regex(@"^(-?((\d{1,3},)*\d{3}|\d+)(\.\d+)?( (" + Math.Units.Patterns.allUnitPatterns + "|" + CurrencyPattern + "))?|\\d{4}\\/\\d{2}\\/\\d{2}( \\d{2}:\\d{2}:\\d{2})?|\\d{2}:\\d{2}(:\\d{2})?)$");
             #endregion
 
             this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
@@ -701,6 +701,8 @@ namespace Calcify
             // Remove double spaces
             while (input.Contains("  "))
                 input = input.Replace("  ", " ");
+
+            input = input.Trim();
 
             // Find and replace 'prev', 'previous', 'ans', 'answer', 'last' with the parser keyword for the last result
             if (acceptPrevious)
@@ -1212,8 +1214,10 @@ namespace Calcify
         private string ToNumberString(double val)
         {
             string valString = val.ToString("N10", CultureInfo.InvariantCulture);
-            while (valString.Contains(".") && (valString.EndsWith("0") || valString.EndsWith(".")))
-                valString = valString.Substring(0, valString.Length - 1);
+            if (valString.Contains(".")) valString = valString.TrimEnd('0');
+            if (valString.EndsWith(".")) valString = valString.Substring(0, valString.Length - 1);
+            //while (valString.Contains(".") && (valString.EndsWith("0") || valString.EndsWith(".")))
+            //    valString = valString.Substring(0, valString.Length - 1);
             return valString;
         }
 
