@@ -36,6 +36,7 @@ namespace Calcify
             };
 
             DecimalPlacesTextBox.TextChanged += DecimalPlacesTextBox_TextChanged;
+            DecimalPlacesTextBox.LostFocus += DecimalPlacesTextBox_LostFocus;
             DarkModeRadioButton.Checked += DarkModeRadioButtons_CheckedChanged;
             LightModeRadioButton.Checked += DarkModeRadioButtons_CheckedChanged;
             SystemDefinedDarkModeRadioButton.Checked += DarkModeRadioButtons_CheckedChanged;
@@ -76,11 +77,22 @@ namespace Calcify
 
         private void DecimalPlacesTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (DecimalPlacesTextBox.Text != "")
+            if (DecimalPlacesTextBox.Text == "")
+                return;
+
+            if (int.TryParse(DecimalPlacesTextBox.Text, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out int digits) && digits > 0)
             {
-                Properties.Settings.Default.Digits = int.Parse(DecimalPlacesTextBox.Text);
+                Properties.Settings.Default.Digits = digits;
                 Properties.Settings.Default.Save();
             }
+            else
+                DecimalPlacesTextBox.Text = Properties.Settings.Default.Digits.ToString();
+        }
+
+        private void DecimalPlacesTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (DecimalPlacesTextBox.Text == "")
+                DecimalPlacesTextBox.Text = Properties.Settings.Default.Digits.ToString();
         }
 
         private void DarkModeRadioButtons_CheckedChanged(object sender, RoutedEventArgs e)

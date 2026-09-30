@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -49,7 +50,7 @@ namespace Calcify.Classes
                 JObject exchangerate = JObject.Parse(File.ReadAllText(filePath));
                 foreach (JProperty child in exchangerate["rates"].Children())
                 {
-                    newCurrencyDict.Add(child.Name, double.Parse(child.Value.ToString()));
+                    newCurrencyDict.Add(child.Name, double.Parse(child.Value.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture));
                 }
                 currencyDict = newCurrencyDict;
                 currencyPattern = "(EUR|" + string.Join("|", currencyDict.Keys) + ")";
@@ -65,26 +66,23 @@ namespace Calcify.Classes
         /// <returns>Returns success as bool.</returns>
         public static bool DownloadExchangeRate()
         {
-            InternetConnectionState_e flags = 0;
-            bool isConnected = InternetGetConnectedState(ref flags, 0);
-            if (isConnected)
+            try
             {
-                try
-                {
-                    string downloadedContent;
-                    WebClient webClient = new WebClient();
-                    downloadedContent = webClient.DownloadString(exchangeRateLink);
-                    File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "exchangerate.json"), downloadedContent);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
+                InternetConnectionState_e flags = 0;
+                if (!InternetGetConnectedState(ref flags, 0))
                     return false;
+
+                using (WebClient webClient = new WebClient())
+                {
+                    string downloadedContent = webClient.DownloadString(exchangeRateLink);
+                    File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "exchangerate.json"), downloadedContent);
                 }
+                return true;
             }
-            else
+            catch
+            {
                 return false;
+            }
         }
     }
 }

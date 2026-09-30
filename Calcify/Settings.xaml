@@ -25,7 +25,7 @@
                 <ColumnDefinition />
                 <ColumnDefinition Width="50" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="1" x:Name="closeButton" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeCloseButton}" >
+            <Button Grid.Column="1" x:Name="closeButton" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeCloseButton}" AutomationProperties.Name="Close settings" ToolTip="Close settings">
                 <Button.Content>
                     <Label FontSize="15" Content="&#xe947;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                 </Button.Content>
@@ -45,26 +45,26 @@
                     <RowDefinition />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <Label Content="Color sheme:" HorizontalAlignment="Right" Margin="0, 0, 5, 0" Grid.Row="0" Grid.Column="0" />
+                <Label Content="Color scheme:" Target="{Binding ElementName=DarkModeRadioButton}" HorizontalAlignment="Right" Margin="0, 0, 5, 0" Grid.Row="0" Grid.Column="0" />
                 <StackPanel Grid.Row="0" Grid.Column="1" Margin="5, 6" >
                     <RadioButton x:Name="DarkModeRadioButton" Content="Dark" GroupName="ColorSheme" />
                     <RadioButton x:Name="LightModeRadioButton" Content="Light" GroupName="ColorSheme" Margin="0, 5" />
                     <RadioButton x:Name="SystemDefinedDarkModeRadioButton" Content="System defined" GroupName="ColorSheme" />
                 </StackPanel>
 
-                <Label Content="Decimal places:" HorizontalAlignment="Right" Margin="0, 5, 5, 0" Grid.Row="1" Grid.Column="0" />
-                <Button x:Name="LessDecimalsButton" Height="25" Width="20" Style="{StaticResource ChromeButton}" Grid.Column="1" Grid.Row="1" Margin="5" HorizontalAlignment="Left" >
+                <Label x:Name="DecimalPlacesLabel" Content="Decimal places:" Target="{Binding ElementName=DecimalPlacesTextBox}" HorizontalAlignment="Right" Margin="0, 5, 5, 0" Grid.Row="1" Grid.Column="0" />
+                <Button x:Name="LessDecimalsButton" AutomationProperties.Name="Decrease decimal places" ToolTip="Decrease decimal places" Height="25" Width="20" Style="{StaticResource ChromeButton}" Grid.Column="1" Grid.Row="1" Margin="5" HorizontalAlignment="Left" >
                     <Label Content="&#xE76B;" FontFamily="Segoe MDL2 Assets" FontSize="12" IsHitTestVisible="False" VerticalAlignment="Center" HorizontalAlignment="Center" />
                 </Button>
                 <TextBox x:Name="DecimalPlacesTextBox" Height="22.5" Grid.Row="1" Grid.Column="1" Margin="25, 5" />
-                <Button x:Name="MoreDecimalsButton" Height="25" Width="20" Style="{StaticResource ChromeButton}" Grid.Column="1" Grid.Row="1" Margin="5" HorizontalAlignment="Right" >
+                <Button x:Name="MoreDecimalsButton" AutomationProperties.Name="Increase decimal places" ToolTip="Increase decimal places" Height="25" Width="20" Style="{StaticResource ChromeButton}" Grid.Column="1" Grid.Row="1" Margin="5" HorizontalAlignment="Right" >
                     <Label Content="&#xE76C;" FontFamily="Segoe MDL2 Assets" FontSize="12" IsHitTestVisible="False" VerticalAlignment="Center" HorizontalAlignment="Center" />
                 </Button>
 
-                <Label Content="Document Autor:" HorizontalAlignment="Right" Margin="0, 5, 5, 0" Grid.Row="2" Grid.Column="0" />
+                <Label Content="Document author:" Target="{Binding ElementName=DocumentAutorName}" HorizontalAlignment="Right" Margin="0, 5, 5, 0" Grid.Row="2" Grid.Column="0" />
                 <TextBox x:Name="DocumentAutorName" Height="22.5" Margin="25, 5" Grid.Row="2" Grid.Column="1" />
 
-                <Label Content="Show Line Numbers:" HorizontalAlignment="Right" Margin="0, 5, 5, 0" Grid.Row="3" Grid.Column="0" />
+                <Label Content="Show line numbers:" Target="{Binding ElementName=ShowLineNumbersCheckBox}" HorizontalAlignment="Right" Margin="0, 5, 5, 0" Grid.Row="3" Grid.Column="0" />
                 <CheckBox x:Name="ShowLineNumbersCheckBox" Margin="5, 6" VerticalAlignment="Center" Grid.Row="3" Grid.Column="1" />
             </Grid>
         </ScrollViewer>

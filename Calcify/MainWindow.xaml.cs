@@ -196,48 +196,10 @@ namespace Calcify
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            if (unsavedChanges && (documentPath != "" || mainEditor.Text.Split('\n').Length > 5))
-            {
-                dialogWindow = new DialogWindow();
-                if (this.WindowState != WindowState.Maximized)
-                {
-                    dialogWindow.Top = this.Top + (this.Height / 2) - 90;
-                    dialogWindow.Left = this.Left + (this.Width / 2) - 200;
-                }
-                else
-                    dialogWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-                returnState = 0;
+            if (unsavedChanges && (documentPath != "" || mainEditor.Text.Split('\n').Length > 5) && !ConfirmSaveChanges())
+                return;
 
-                dialogWindow.mWindow = this;
-
-                dialogWindow.ShowDialog();
-                if (dialogWindow.returnState == 2)
-                {
-                    App.Current.Shutdown();
-                }
-                else if (dialogWindow.returnState == 3)
-                {
-                    if (documentPath != "")
-                    {
-                        SaveFile(documentPath);
-                        App.Current.Shutdown();
-                    }
-                    else
-                    {
-                        SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
-                        if (saveFileDialog.ShowDialog() == true)
-                        {
-                            SaveFile(saveFileDialog.FileName);
-                            App.Current.Shutdown();
-                        }
-                    }
-                }
-                dialogWindow = null;
-            }
-            else
-            {
-                App.Current.Shutdown();
-            }
+            App.Current.Shutdown();
         }
         #endregion
 
@@ -336,6 +298,20 @@ namespace Calcify
             ZoomComboBox.Text = (Properties.Settings.Default.EditorZoom * 100).ToString(CultureInfo.InvariantCulture) + "%";
             mainEditor.LayoutTransform = new ScaleTransform(Properties.Settings.Default.EditorZoom, Properties.Settings.Default.EditorZoom);
             resultEditor.LayoutTransform = new ScaleTransform(Properties.Settings.Default.EditorZoom, Properties.Settings.Default.EditorZoom);
+        }
+
+        internal void DisableCurrencyConversion()
+        {
+            currencyRegex = new Regex(@"(?!)");
+            currencyDict.Clear();
+        }
+
+        internal void SetCurrencyRates(string pattern, Regex regex, Dictionary<string, double> rates)
+        {
+            CurrencyPattern = pattern;
+            currencyRegex = regex;
+            currencyDict = rates;
+            MainEditor_TextChanged(mainEditor, EventArgs.Empty);
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -451,69 +427,52 @@ namespace Calcify
 
         #region Functions
         #region Open & Save File
+        private bool ConfirmSaveChanges()
+        {
+            if (!unsavedChanges)
+                return true;
+
+            dialogWindow = new DialogWindow();
+            if (this.WindowState != WindowState.Maximized)
+            {
+                dialogWindow.Top = this.Top + (this.Height / 2) - 90;
+                dialogWindow.Left = this.Left + (this.Width / 2) - 200;
+            }
+            else
+                dialogWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
+            returnState = 0;
+            dialogWindow.mWindow = this;
+            dialogWindow.ShowDialog();
+            int dialogResult = dialogWindow.returnState;
+            dialogWindow = null;
+
+            if (dialogResult == 2)
+                return true;
+            if (dialogResult != 3)
+                return false;
+
+            if (documentPath != "")
+            {
+                SaveFile(documentPath);
+                return true;
+            }
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
+            if (saveFileDialog.ShowDialog() != true)
+                return false;
+
+            SaveFile(saveFileDialog.FileName);
+            return true;
+        }
+
         /// <summary>
         /// Open a file
         /// </summary>
         /// <param name="path"></param>
         public void OpenFile(string path)
         {
-            bool actionAllowed = false;
-            if (unsavedChanges)
-            {
-                dialogWindow = new DialogWindow();
-
-                // Calculate the position of the Dialog Window (DW) based on
-                // the window state of the main frame.
-                if (this.WindowState != WindowState.Maximized)
-                {
-                    dialogWindow.Top = this.Top + (this.Height / 2) - 90;
-                    dialogWindow.Left = this.Left + (this.Width / 2) - 200;
-                }
-                else
-                    dialogWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-                returnState = 0;
-
-                // Set the main window for the DW to the main frame
-                dialogWindow.mWindow = this;
-                // Show the DW
-                dialogWindow.ShowDialog();
-
-                // Get the return state from the DW
-                // 1 = Cancel
-                // 2 = Do not save
-                // 3 = Save
-                if (dialogWindow.returnState == 2)
-                {
-                    // Allow to proceed without saving
-                    actionAllowed = true;
-                }
-                else if (dialogWindow.returnState == 3)
-                {
-                    // Save the file and proceed
-                    // Check if the file has already a path or if it is needed to
-                    // create a new file.
-                    if (documentPath != "")
-                    {
-                        SaveFile(documentPath);
-                        actionAllowed = true;
-                    }
-                    else
-                    {
-                        SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
-                        if (saveFileDialog.ShowDialog() == true)
-                        {
-                            SaveFile(saveFileDialog.FileName);
-                            actionAllowed = true;
-                        }
-                    }
-                }
-                dialogWindow = null;
-            }
-            else
-            {
-                // Allow to open a file without saving
-                actionAllowed = true;
-            }
+            bool actionAllowed = ConfirmSaveChanges();
 
             // Proceed if the DW returned the permission to open a file
             if (actionAllowed)
@@ -1570,48 +1529,8 @@ namespace Calcify
         /// <param name="e">The event data associated with the command execution.</param>
         private void CtrlN_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (unsavedChanges)
-            {
-                dialogWindow = new DialogWindow();
-                if (this.WindowState != WindowState.Maximized)
-                {
-                    dialogWindow.Top = this.Top + (this.Height / 2) - 90;
-                    dialogWindow.Left = this.Left + (this.Width / 2) - 200;
-                }
-                else
-                    dialogWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-                returnState = 0;
-
-
-                dialogWindow.mWindow = this;
-                dialogWindow.ShowDialog();
-                if (dialogWindow.returnState == 2)
-                {
-                    NewDocument();
-                }
-                else if (dialogWindow.returnState == 3)
-                {
-                    if (documentPath != "")
-                    {
-                        SaveFile(documentPath);
-                        NewDocument();
-                    }
-                    else
-                    {
-                        SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
-                        if (saveFileDialog.ShowDialog() == true)
-                        {
-                            SaveFile(saveFileDialog.FileName);
-                            NewDocument();
-                        }
-                    }
-                }
-                dialogWindow = null;
-            }
-            else
-            {
+            if (ConfirmSaveChanges())
                 NewDocument();
-            }
         }
 
         private void Ctrl0_Executed(object sender, ExecutedRoutedEventArgs e)

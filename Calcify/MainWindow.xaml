@@ -54,7 +54,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Function button -->
-            <Button x:Name="MenuButton" Grid.Column="0" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" >
+            <Button x:Name="MenuButton" Grid.Column="0" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" AutomationProperties.Name="Application menu" ToolTip="Open menu">
                 <Button.ContextMenu>
                     <ContextMenu >
                         <MenuItem x:Name="contextNewFileButton" Header="New File"/>
@@ -93,7 +93,7 @@
             </Button>
 
             <!-- Theme button -->
-            <Button x:Name="themeButton" Grid.Column="1" Style="{StaticResource TransparentButton}" 
+            <Button x:Name="themeButton" Grid.Column="1" Style="{StaticResource TransparentButton}" AutomationProperties.Name="Toggle theme" ToolTip="Toggle theme"
                     WindowChrome.IsHitTestVisibleInChrome="True">
                 <Button.Content>
                     <Label x:Name="themeButtonLabel" FontSize="18" Content="&#xE706;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" RenderTransformOrigin="0.5, 0.5"/>
@@ -114,19 +114,19 @@
                     WindowChrome.IsHitTestVisibleInChrome="True"
                    ToolTipService.ShowDuration="120000"/>
             <!-- MinimizeButton -->
-            <Button x:Name="MinimizeButton" Grid.Column="3" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" >
+            <Button x:Name="MinimizeButton" Grid.Column="3" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" AutomationProperties.Name="Minimize" ToolTip="Minimize">
                 <Button.Content>
                     <Label FontSize="12" Content="&#xe949;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
                 </Button.Content>
             </Button>
             <!-- Maximize Button -->
-            <Button x:Name="MaximizeButton" Grid.Column="4" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" >
+            <Button x:Name="MaximizeButton" Grid.Column="4" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" AutomationProperties.Name="Maximize or restore" ToolTip="Maximize or restore">
                 <Button.Content>
                     <Label x:Name="MaximizeButtonText" FontSize="12" Content="&#xe922;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
                 </Button.Content>
             </Button>
             <!-- Close Button -->
-            <Button x:Name="closeButton" Grid.Column="5" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeCloseButton}" >
+            <Button x:Name="closeButton" Grid.Column="5" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeCloseButton}" AutomationProperties.Name="Close window" ToolTip="Close window">
                 <Button.Content>
                     <Label FontSize="14" Content="&#xe947;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                 </Button.Content>
@@ -144,7 +144,7 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Main editor, where the magic happens -->
-                <avalonEdit:TextEditor x:Name="mainEditor"
+                <avalonEdit:TextEditor x:Name="mainEditor" AutomationProperties.Name="Calculation input"
                                        Grid.Column="0" 
                                        Background="Transparent"
                                        Margin="7, 0, 2.5, 7"
@@ -160,7 +160,7 @@
 
                 <!-- The pane where the results are being displayed -->
                 <avalonEdit:TextEditor 
-                                x:Name="resultEditor" 
+                                x:Name="resultEditor" AutomationProperties.Name="Calculation results"
                                 Grid.Column="2" Margin="2.5,0,7,7"
                                 xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
                                 ScrollViewer.VerticalScrollBarVisibility="Visible" 
@@ -178,7 +178,7 @@
 
         <!-- Lower Tool Bar -->
         <Grid Grid.Row="2" Style="{StaticResource modernHeaderFooter}" >
-            <ComboBox x:Name="ZoomComboBox" Style="{StaticResource VsComboBox}" Width="75" Height="23" HorizontalAlignment="Left" Margin="5, 0" Text="100%" IsTextSearchEnabled="False" IsEditable="True">
+            <ComboBox x:Name="ZoomComboBox" AutomationProperties.Name="Editor zoom" ToolTip="Set editor zoom percentage" Style="{StaticResource VsComboBox}" Width="75" Height="23" HorizontalAlignment="Left" Margin="5, 0" Text="100%" IsTextSearchEnabled="False" IsEditable="True">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding}">
@@ -207,7 +207,7 @@
                 <ColumnDefinition Width="30" />
             </Grid.ColumnDefinitions>
 
-            <Button x:Name="StartNewButton" Grid.Column="0" Style="{StaticResource TransparentButton}" >
+            <Button x:Name="StartNewButton" Grid.Column="0" Style="{StaticResource TransparentButton}" AutomationProperties.Name="Start new instance" ToolTip="Start new instance">
                 <Button.Content>
                     <Label FontSize="15" Content="&#xE710;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" RenderTransformOrigin="0.5 0.5" >
                         <Label.RenderTransform>
@@ -231,7 +231,7 @@
             <Label x:Name="totalLabel" Grid.Column="1" Content="" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0, 0, 0, 0" />
 
 
-            <Button x:Name="settingsButton" Grid.Column="3" Style="{StaticResource TransparentButton}" >
+            <Button x:Name="settingsButton" Grid.Column="3" Style="{StaticResource TransparentButton}" AutomationProperties.Name="Settings" ToolTip="Settings">
                 <Button.Content>
                     <Label FontSize="18" Content="&#xE713;" FontFamily="Segoe MDL2 Assets" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" RenderTransformOrigin="0.5, 0.5">
                         <Label.RenderTransform>
