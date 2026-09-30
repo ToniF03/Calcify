@@ -395,6 +395,7 @@ namespace Calcify
         {
             TextDocument newDocument = new TextDocument();
             unsavedChanges = documentText != mainEditor.Text;
+            if (unsavedChanges) DocumentChanged();
 
             for (int i = 1; i <= mainEditor.LineCount; i++)
             {
@@ -426,182 +427,6 @@ namespace Calcify
         }
 
         #region Functions
-        #region Open & Save File
-        private bool ConfirmSaveChanges()
-        {
-            if (!unsavedChanges)
-                return true;
-
-            dialogWindow = new DialogWindow();
-            if (this.WindowState != WindowState.Maximized)
-            {
-                dialogWindow.Top = this.Top + (this.Height / 2) - 90;
-                dialogWindow.Left = this.Left + (this.Width / 2) - 200;
-            }
-            else
-                dialogWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-
-            returnState = 0;
-            dialogWindow.mWindow = this;
-            dialogWindow.ShowDialog();
-            int dialogResult = dialogWindow.returnState;
-            dialogWindow = null;
-
-            if (dialogResult == 2)
-                return true;
-            if (dialogResult != 3)
-                return false;
-
-            if (documentPath != "")
-            {
-                SaveFile(documentPath);
-                return true;
-            }
-
-            SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
-            if (saveFileDialog.ShowDialog() != true)
-                return false;
-
-            SaveFile(saveFileDialog.FileName);
-            return true;
-        }
-
-        /// <summary>
-        /// Open a file
-        /// </summary>
-        /// <param name="path"></param>
-        public void OpenFile(string path)
-        {
-            bool actionAllowed = ConfirmSaveChanges();
-
-            // Proceed if the DW returned the permission to open a file
-            if (actionAllowed)
-            {
-                documentPath = path;
-
-                string[] lines = File.ReadAllLines(path);
-
-                // Check if the header is empty
-                if (lines.Length != 0)
-                {
-                    // Load the meta tags from the header
-                    string[] meta = lines[0].Substring(1, lines[0].Length - 2).Split(',');
-                    documentAuthor = meta[0].Split('=')[1];
-                    documentEditedBy = meta[1].Split('=')[1];
-                    documentCreated = int.Parse(meta[2].Split('=')[1]);
-                    documentModified = int.Parse(meta[3].Split('=')[1]);
-
-                    string joinedText = string.Join("\n", lines.Skip(1).ToArray());
-                    documentText = joinedText;
-                    mainEditor.Text = joinedText;
-                }
-                else
-                {
-                    // 
-                    documentText = "";
-                    mainEditor.Text = "";
-                    documentAuthor = Properties.Settings.Default.UserName;
-                    documentEditedBy = Properties.Settings.Default.UserName;
-                    documentCreated = (int)Calculator.DateTimeToUnixTimeStamp(File.GetCreationTime(path));
-                    documentModified = documentCreated;
-                    string header = "[AUTHOR=" + Properties.Settings.Default.UserName + ",MODIFIED_BY=" + Properties.Settings.Default.UserName + ",CREATED=" + documentCreated + ",MODIFIED=" + documentModified + "]";
-                    File.WriteAllText(path, header);
-                }
-
-                DocumentChanged();
-
-                mainEditor.CaretOffset = 0;
-                EditorContainer.ScrollToTop();
-                mainEditor.Focus();
-            }
-        }
-
-        /// <summary>
-        /// Save the file to a given path
-        /// </summary>
-        /// <param name="path"></param>
-        public void SaveFile(string path)
-        {
-            // Save file with given meta tags
-            string dAuthor = documentAuthor != "" ? documentAuthor : Properties.Settings.Default.UserName;
-            int dCreated = documentCreated != 0 ? documentCreated : (int)Calculator.DateTimeToUnixTimeStamp(DateTime.UtcNow);
-            int dModified = (int)Calculator.DateTimeToUnixTimeStamp(DateTime.UtcNow);
-            string header = "[AUTHOR=" + dAuthor + ",MODIFIED_BY=" + Properties.Settings.Default.UserName + ",CREATED=" + dCreated + ",MODIFIED=" + dModified + "]";
-            string fileContent = header + "\n" + mainEditor.Text;
-            documentAuthor = dAuthor;
-            documentEditedBy = Properties.Settings.Default.UserName;
-            documentCreated = dCreated;
-            documentModified = dModified;
-            documentPath = path;
-            documentText = String.Join("\n", fileContent.Split('\n').Skip(1).ToArray());
-            unsavedChanges = false;
-            File.WriteAllText(path, fileContent);
-            DocumentChanged();
-        }
-
-        /// <summary>
-        /// Change meta tags in the tooltip
-        /// </summary>
-        public void DocumentChanged()
-        {
-            if (documentPath == "")
-                titleLabel.ToolTip = null;
-            else
-            {
-                titleLabel.ToolTip = new ToolTip();
-                ((ToolTip)titleLabel.ToolTip).Content = "Author: " + documentAuthor + "\nLast edited by: " + documentEditedBy + "\nCreated: " + Calculator.UnixTimeStampToDateTime(documentCreated).ToString() + "\nModified: " + Calculator.UnixTimeStampToDateTime(documentModified).ToString() + "\nPath: " + Path.GetDirectoryName(documentPath);
-                if (Properties.Settings.Default.DarkMode)
-                {
-                    ((ToolTip)titleLabel.ToolTip).Background = new SolidColorBrush { Color = Color.FromRgb(37, 38, 43) };
-                    ((ToolTip)titleLabel.ToolTip).Foreground = new SolidColorBrush { Color = Color.FromRgb(180, 180, 180) };
-                }
-                else
-                {
-                    ((ToolTip)titleLabel.ToolTip).Background = new SolidColorBrush { Color = Color.FromRgb(241, 242, 247) };
-                    ((ToolTip)titleLabel.ToolTip).Foreground = new SolidColorBrush { Color = Color.FromRgb(0, 0, 0) };
-                }
-            }
-
-            windowTitle = "Calcify";
-
-            string text = mainEditor.Document.GetText(0, mainEditor.Document.GetLineByNumber(1).Length);
-            if (mainEditor.Document.GetText(0, mainEditor.Document.GetLineByNumber(1).Length).StartsWith("# "))
-            {
-                text = text.Substring(2).Trim();
-                if (text != "" && text.Replace(" ", "") != "")
-                {
-                    windowTitle = windowTitle + " - " + text;
-                    this.Title = windowTitle + (documentText == mainEditor.Text ? "" : "  ●");
-                    titleLabel.Content = windowTitle + (documentText == mainEditor.Text ? "" : "  ●");
-                }
-                else
-                {
-                    this.Title = windowTitle + (documentText == mainEditor.Text ? "" : "  ●");
-                    titleLabel.Content = windowTitle + (documentText == mainEditor.Text ? "" : "  ●");
-                }
-            }
-            else
-            {
-                this.Title = windowTitle + (documentText == mainEditor.Text ? "" : "  ●");
-                titleLabel.Content = windowTitle + (documentText == mainEditor.Text ? "" : "  ●");
-            }
-        }
-
-        /// <summary>
-        /// Open a new file and reset the meta tags
-        /// </summary>
-        public void NewDocument()
-        {
-            mainEditor.Text = "";
-            documentPath = "";
-            documentText = "";
-            documentAuthor = "";
-            documentCreated = 0;
-            documentModified = 0;
-            DocumentChanged();
-        }
-        #endregion
-
         /// <summary>
         /// (De)activate the dark mode
         /// </summary>
@@ -1335,34 +1160,6 @@ namespace Calcify
 
         }
 
-        /// <summary>
-        /// Parses a zoom value from the specified text and applies it to the editor controls if valid.
-        /// </summary>
-        /// <remarks>If the parsed zoom value is outside the supported range (25% to 400%), it will be
-        /// clamped to the nearest valid value. The method updates the editor zoom setting and applies the zoom to the
-        /// relevant editor controls.</remarks>
-        /// <param name="text">A string containing the zoom value to apply. The value should be a number between 25 and 400, optionally
-        /// followed by a percent sign (e.g., "150%" or "100").</param>
-        private void ApplyZoomFromString(string text)
-        {
-            Regex parserRegex = new Regex(@"^(?<value>\d{1,3})(?<percent> ?\%?)$");
-            Match m = parserRegex.Match(text);
-            if (m.Success)
-            {
-                if (!double.TryParse(m.Groups["value"].Value.ToString(), out double scale)) return;
-                string[] items = ZoomComboBox.Items.Cast<object>().Select(s => s.ToString().Split(new[] { ' ' }, 2)[1]).Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
-                scale /= 100;
-                scale = System.Math.Max(0.25, System.Math.Min(4.0, scale));
-                Properties.Settings.Default.EditorZoom = scale;
-                Properties.Settings.Default.Save();
-                mainEditor.LayoutTransform = new ScaleTransform(scale, scale);
-                resultEditor.LayoutTransform = new ScaleTransform(scale, scale);
-                ZoomComboBox.Text = (scale * 100).ToString("F0", CultureInfo.InvariantCulture) + " %";
-                ZoomComboBox.SelectedIndex = Array.FindIndex(items, i => i == ZoomComboBox.Text);
-            }
-        }
-        #endregion
-
         #region Events
         #region ContextMenu
         private void ContextNewFileButton_Click(object sender, RoutedEventArgs e)
@@ -1472,50 +1269,6 @@ namespace Calcify
         }
         #endregion
 
-        /// <summary>
-        /// Handles the KeyDown event for the zoom combo box, applying the zoom level when the Enter key is pressed.
-        /// </summary>
-        /// <remarks>This method allows users to type a custom zoom value and apply it by pressing Enter.
-        /// The event is marked as handled to prevent further processing of the key press.</remarks>
-        /// <param name="sender">The source of the event, typically the zoom combo box control.</param>
-        /// <param name="e">A KeyEventArgs that contains the event data, including information about the key pressed.</param>
-        private void ZoomCombo_KeyDown(object sender, KeyEventArgs e)
-        {
-            // accept typed value on Enter
-            if (e.Key == Key.Enter)
-            {
-                ApplyZoomFromString(ZoomComboBox.Text);
-                e.Handled = true;
-            }
-        }
-
-        /// <summary>
-        /// Handles the SelectionChanged event for the zoom level combo box, updating the zoom level based on the user's
-        /// selection.
-        /// </summary>
-        /// <remarks>This method is intended to be used as an event handler for the SelectionChanged event
-        /// of a combo box that controls document zoom. If the selected item is valid, the zoom level is updated
-        /// accordingly.</remarks>
-        /// <param name="sender">The source of the event, typically the zoom level combo box control.</param>
-        /// <param name="e">An object that contains information about the selection change event.</param>
-        private void ZoomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (ZoomComboBox.SelectedItem != null)
-            {
-                ApplyZoomFromString(ZoomComboBox.SelectedItem.ToString().Split(new[] { ' ' }, 2)[1]);
-            }
-        }
-
-        /// <summary>
-        /// Handles the LostFocus event for the zoom combo box, applying the zoom level specified by the user's input.
-        /// </summary>
-        /// <param name="sender">The source of the event, typically the zoom combo box control.</param>
-        /// <param name="e">The event data associated with the LostFocus event.</param>
-        private void ZoomCombo_LostFocus(object sender, RoutedEventArgs e)
-        {
-            ApplyZoomFromString(ZoomComboBox.Text);
-        }
-
         #region Hotkeys
 
         /// <summary>
@@ -1598,6 +1351,7 @@ namespace Calcify
                 }
             }
         }
+        #endregion
         #endregion
     }
 }

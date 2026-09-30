@@ -7,7 +7,7 @@
         xmlns:properties="clr-namespace:Calcify.Properties"
         mc:Ignorable="d"
         WindowStyle="ToolWindow" Style="{StaticResource modernWindow}"
-        Title="DialogWindow" ShowInTaskbar="False" Height="180" Width="400">
+        Title="Unsaved changes" ShowInTaskbar="False" Height="180" Width="400">
 
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="30" />
@@ -62,17 +62,17 @@
                 </Style>
             </Rectangle.Style>
         </Rectangle>
-        <Button x:Name="SaveButton" Content="Save" Grid.Row="1" Margin="15" Style="{StaticResource modernAcceptButton}"  >
+        <Button x:Name="SaveButton" Content="Save" AutomationProperties.Name="Save changes" Grid.Row="1" Margin="15" Style="{StaticResource modernAcceptButton}"  >
             <Button.Effect>
                 <DropShadowEffect Color="Black" Direction="320" ShadowDepth="2" BlurRadius="5" Opacity="0.1" />
             </Button.Effect>
         </Button>
-        <Button x:Name="NotSaveButton" Content="Don't Save" Grid.Row="1" Grid.Column="1" Margin="15" Style="{StaticResource modernButton}" >
+        <Button x:Name="NotSaveButton" Content="Don't Save" AutomationProperties.Name="Discard changes" Grid.Row="1" Grid.Column="1" Margin="15" Style="{StaticResource modernButton}" >
             <Button.Effect>
                 <DropShadowEffect Color="Black" Direction="320" ShadowDepth="2" BlurRadius="5" Opacity="0.1" />
             </Button.Effect>
         </Button>
-        <Button x:Name="CancelButton" Content="Cancel" Grid.Row="1" Grid.Column="2" Margin="15" Style="{StaticResource modernButton}" >
+        <Button x:Name="CancelButton" Content="Cancel" AutomationProperties.Name="Cancel document action" Grid.Row="1" Grid.Column="2" Margin="15" Style="{StaticResource modernButton}" >
             <Button.Effect>
                 <DropShadowEffect Color="Black" Direction="320" ShadowDepth="2" BlurRadius="5" Opacity="0.1" />
             </Button.Effect>

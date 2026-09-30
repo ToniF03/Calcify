@@ -59,22 +59,22 @@
         /// <remarks>The comment is added in XML comment syntax (`<!-- ... -->`) and is followed by a
         /// newline and indentation. This method does not validate the content of the comment; callers should ensure
         /// that the text does not contain characters that would invalidate the XML structure.</remarks>
-        /// <param name="Comment">The text to include within the XML comment. Cannot be null.</param>
-        public void AddComment(string Comment)
+        /// <param name="comment">The text to include within the XML comment. Cannot be null.</param>
+        public void AddComment(string comment)
         {
-            _content += $"<!--{Comment}-->\n\t\t";
+            _content += $"<!--{comment}-->\n\t\t";
         }
 
         /// <summary>
         /// Adds a custom color rule to the content, associating the specified rule text with the given foreground
         /// color.
         /// </summary>
-        /// <param name="Rule">The rule text to be displayed with the specified color. Cannot be null.</param>
+        /// <param name="rule">The rule text to be displayed with the specified color. Cannot be null.</param>
         /// <param name="color">The hexadecimal color code (without the leading '#') to use as the foreground color for the rule. Must be a
         /// valid 6-digit or 8-digit hexadecimal string.</param>
-        public void AddCustomColor(string Rule, string color)
+        public void AddCustomColor(string rule, string color)
         {
-            _content += $"<Rule foreground=\"#{color}\">{Rule}</Rule>\n\t\t";
+            _content += $"<Rule foreground=\"#{color}\">{rule}</Rule>\n\t\t";
         }
 
         /// <summary>
@@ -84,11 +84,11 @@
         /// <remarks>The rule is wrapped in a <Rule> element with a foreground color attribute. This
         /// method appends the formatted rule to the internal content; it does not validate or escape the
         /// input.</remarks>
-        /// <param name="Rule">The rule operator to be added. This value is inserted as the content of the XML element and should not be
+        /// <param name="rule">The rule operator to be added. This value is inserted as the content of the XML element and should not be
         /// null.</param>
-        public void AddOperator(string Rule)
+        public void AddOperator(string rule)
         {
-            _content += $"<Rule foreground=\"#9CDCFE\">{Rule}</Rule>\n\t\t";
+            _content += $"<Rule foreground=\"#9CDCFE\">{rule}</Rule>\n\t\t";
         }
 
         /// <summary>
@@ -96,10 +96,10 @@
         /// </summary>
         /// <remarks>The rule is wrapped in a formatted XML element with a foreground color that depends
         /// on the current theme. If <paramref name="Rule"/> is null, a runtime exception may occur.</remarks>
-        /// <param name="Rule">The rule text to be added. Cannot be null.</param>
-        public void AddNumbers(string Rule)
+        /// <param name="rule">The rule text to be added. Cannot be null.</param>
+        public void AddNumbers(string rule)
         {
-            _content += $"<Rule foreground=\"#{(_theme == Theme.Dark ? "B5CEA8" : "2B91AF")}\">{Rule}</Rule>\n\t\t";
+            _content += $"<Rule foreground=\"#{(_theme == Theme.Dark ? "B5CEA8" : "2B91AF")}\">{rule}</Rule>\n\t\t";
         }
 
         /// <summary>
@@ -108,10 +108,10 @@
         /// <remarks>The rule is wrapped in a markup element with a foreground color that reflects the
         /// current theme. This method appends the rule to the internal content and does not validate the input
         /// string.</remarks>
-        /// <param name="Rule">The rule to be added. This should be a valid string representing the rule to include in the content.</param>
-        public void AddFunction(string Rule)
+        /// <param name="rule">The rule to be added. This should be a valid string representing the rule to include in the content.</param>
+        public void AddFunction(string rule)
         {
-            _content += $"<Rule foreground=\"#{(_theme == Theme.Dark ? "569CD6" : "0000FF")}\">{Rule}</Rule>\n\t\t";
+            _content += $"<Rule foreground=\"#{(_theme == Theme.Dark ? "569CD6" : "0000FF")}\">{rule}</Rule>\n\t\t";
         }
 
         /// <summary>
@@ -121,10 +121,10 @@
         /// <remarks>The foreground color of the rule element is determined by the current theme. If the
         /// theme is dark, a specific color is used; otherwise, a different color is applied. This method does not
         /// validate the rule text and assumes it is properly formatted for inclusion.</remarks>
-        /// <param name="Rule">The rule text to be added. This value is inserted as the content of the rule element and should not be null.</param>
-        public void AddConstants(string Rule)
+        /// <param name="rule">The rule text to be added. This value is inserted as the content of the rule element and should not be null.</param>
+        public void AddConstants(string rule)
         {
-            _content += $"<Rule foreground=\"#{(_theme == Theme.Dark ? "D69D85" : "A31515")}\">{Rule}</Rule>\n\t\t";
+            _content += $"<Rule foreground=\"#{(_theme == Theme.Dark ? "D69D85" : "A31515")}\">{rule}</Rule>\n\t\t";
         }
 
         /// <summary>
@@ -133,10 +133,10 @@
         /// </summary>
         /// <remarks>The foreground color of the rule element is determined by the current theme. If
         /// <paramref name="Rule"/> is null, an exception may occur.</remarks>
-        /// <param name="Rule">The rule text to be added. Cannot be null.</param>
-        public void AddUnits(string Rule)
+        /// <param name="rule">The rule text to be added. Cannot be null.</param>
+        public void AddUnits(string rule)
         {
-            _content += $"<Rule foreground=\"#{(_theme == Theme.Dark ? "8FD12D" : "A31515")}\">{Rule}</Rule>\n\t\t";
+            _content += $"<Rule foreground=\"#{(_theme == Theme.Dark ? "8FD12D" : "A31515")}\">{rule}</Rule>\n\t\t";
         }
     }
 }

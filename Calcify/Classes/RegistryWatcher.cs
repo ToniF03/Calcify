@@ -6,25 +6,25 @@ namespace Calcify.Tools
 {
     class RegistryWatcher
     {
-        DispatcherTimer Timer = new DispatcherTimer();
-        string Key = "";
-        string ValueKey = "";
-        string _val = "";
+        private readonly DispatcherTimer timer = new DispatcherTimer();
+        private string keyPath = "";
+        private string valueName = "";
+        private string value = "";
         public event EventHandler ValueChanged;
         public string Value
         {
-            get { return _val; }
-            set { _val = value; ValueChanged.Invoke(this, EventArgs.Empty); }
+            get { return value; }
+            set { this.value = value; ValueChanged.Invoke(this, EventArgs.Empty); }
         }
         public bool IsEnabled
         {
-            get { return Timer.IsEnabled; }
-            set { Timer.IsEnabled = value; }
+            get { return timer.IsEnabled; }
+            set { timer.IsEnabled = value; }
         }
         public TimeSpan Interval
         {
-            get { return Timer.Interval; }
-            set { Timer.Interval = value; }
+            get { return timer.Interval; }
+            set { timer.Interval = value; }
         }
 
         /// <summary>
@@ -34,20 +34,20 @@ namespace Calcify.Tools
         /// <param name="valueName">The name of the observed value.</param>
         public RegistryWatcher(string key, string valueName)
         {
-            Timer.Tick += Timer_Tick;
-            Timer.Interval = TimeSpan.FromMilliseconds(200);
+            timer.Tick += Timer_Tick;
+            timer.Interval = TimeSpan.FromMilliseconds(200);
             if (key != "" && valueName != "" && key != null && valueName != null)
             {
-                Key = key;
-                ValueKey = valueName;
+                keyPath = key;
+                this.valueName = valueName;
             }
             else
                 throw new ArgumentNullException();
-            RegistryKey regKey = Registry.LocalMachine.OpenSubKey(Key);
+            RegistryKey regKey = Registry.LocalMachine.OpenSubKey(keyPath);
             if (regKey != null)
                 throw new ArgumentException();
-            _val = Registry.GetValue(Key, ValueKey, (object)null).ToString();
-            Timer.Start();
+            value = Registry.GetValue(keyPath, this.valueName, (object)null).ToString();
+            timer.Start();
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Calcify.Tools
         /// </summary>
         public void Start()
         {
-            Timer.Start();
+            timer.Start();
         }
 
         /// <summary>
@@ -63,12 +63,12 @@ namespace Calcify.Tools
         /// </summary>
         public void Stop()
         {
-            Timer.Stop();
+            timer.Stop();
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            string newValue = Registry.GetValue(Key, ValueKey, (object)null).ToString();
+            string newValue = Registry.GetValue(keyPath, valueName, (object)null).ToString();
             if (Value != newValue)
                 Value = newValue;
         }
