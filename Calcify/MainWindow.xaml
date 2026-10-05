@@ -29,7 +29,14 @@
         <CommandBinding Command="{x:Static local:MainWindow.Esc}" Executed="Esc_Executed" />
         <!-- Reset Zoom -->
         <CommandBinding Command="{x:Static local:MainWindow.Ctrl0}" Executed="Ctrl0_Executed" />
+        <!-- Zoom In -->
+        <CommandBinding Command="{x:Static local:MainWindow.CtrlPlus}" Executed="CtrlPlus_Executed" />
+        <!-- Zoom Out -->
+        <CommandBinding Command="{x:Static local:MainWindow.CtrlMinus}" Executed="CtrlMinus_Executed" />
+        <!-- Open Help -->
         <CommandBinding Command="{x:Static local:MainWindow.F1}" Executed="F1_Executed" />
+        <!-- Duplicate Line -->
+        <CommandBinding Command="{x:Static local:MainWindow.CtrlD}" Executed="CtrlD_Executed" />
     </Window.CommandBindings>
 
     <!-- Defining the main grid -->

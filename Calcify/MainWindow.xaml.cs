@@ -68,7 +68,10 @@ namespace Calcify
         public static RoutedCommand CtrlShiftS = new RoutedCommand();
         public static RoutedCommand CtrlO = new RoutedCommand();
         public static RoutedCommand Ctrl0 = new RoutedCommand();
+        public static RoutedCommand CtrlPlus = new RoutedCommand();
+        public static RoutedCommand CtrlMinus = new RoutedCommand();
         public static RoutedCommand CtrlN = new RoutedCommand();
+        public static RoutedCommand CtrlD = new RoutedCommand();
         public static RoutedCommand Esc = new RoutedCommand();
         public static RoutedCommand F1 = new RoutedCommand();
         #endregion
@@ -239,6 +242,7 @@ namespace Calcify
 
             mainEditor.TextChanged += MainEditor_TextChanged;
             mainEditor.TextArea.Caret.PositionChanged += Caret_PositionChanged;
+            mainEditor.PreviewKeyDown += MainEditor_PreviewKeyDown;
 
             MinimizeButton.Click += MinimizeButton_Click;
             MaximizeButton.Click += MaximizeButton_Click;
@@ -279,6 +283,9 @@ namespace Calcify
             CtrlN.InputGestures.Add(new KeyGesture(Key.N, ModifierKeys.Control));
             Ctrl0.InputGestures.Add(new KeyGesture(Key.D0, ModifierKeys.Control));
             Ctrl0.InputGestures.Add(new KeyGesture(Key.NumPad0, ModifierKeys.Control));
+            CtrlPlus.InputGestures.Add(new KeyGesture(Key.OemPlus, ModifierKeys.Control));
+            CtrlMinus.InputGestures.Add(new KeyGesture(Key.OemMinus, ModifierKeys.Control));
+            CtrlD.InputGestures.Add(new KeyGesture(Key.D, ModifierKeys.Control));
             Esc.InputGestures.Add(new KeyGesture(Key.Escape));
             F1.InputGestures.Add(new KeyGesture(Key.F1));
             #endregion
@@ -406,6 +413,15 @@ namespace Calcify
                 newDocument.Text += "\n";
             }
             resultEditor.Document = newDocument;
+        }
+
+        private void MainEditor_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.D && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                e.Handled = true;
+                CtrlD_Executed(sender, null);
+            }
         }
 
         private void Caret_PositionChanged(object sender, EventArgs e)
@@ -1293,11 +1309,31 @@ namespace Calcify
             ApplyZoomFromString("100%");
         }
 
+        private void CtrlPlus_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ApplyZoomFromString((System.Math.Min(500, Properties.Settings.Default.EditorZoom * 100 + 10)) + "%");
+        }
+
+        private void CtrlMinus_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ApplyZoomFromString((System.Math.Max(25, Properties.Settings.Default.EditorZoom * 100 - 10)) + "%");
+        }
+
         private void CtrlO_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = "" };
             if (openFileDialog.ShowDialog() == true)
                 OpenFile(openFileDialog.FileName);
+        }
+
+        private void CtrlD_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            int caretLine = mainEditor.TextArea.Caret.Line;
+            int caretColumn = mainEditor.TextArea.Caret.Column;
+            string lineText = mainEditor.Document.GetText(mainEditor.Document.GetLineByNumber(caretLine));
+            mainEditor.Document.Insert(mainEditor.Document.GetLineByNumber(caretLine).Offset, lineText + Environment.NewLine);
+            mainEditor.TextArea.Caret.Line = caretLine + 1;
+            mainEditor.TextArea.Caret.Column = caretColumn;
         }
 
         private void CtrlShiftS_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -1427,20 +1463,8 @@ namespace Calcify
 //  - Recent Files List
 //  - toolbar
 
-//  - zoom with ctrl + mouse wheel
-//  - zoom with ctrl + '+' / '-'
-//  - zoom reset with ctrl + '0'
-
 //  - Auto Completion
 
-//  - right click context menu
-//    - Undo - Undo last action
-//    - Redo - Redo last undone action
-//    - Cut - Cut selected text
-//    - Copy - Copy selected text
-//    - Paste - Paste from clipboard
-//    - Delete - Delete selected text
-//    - Select All - Select all content
 //  - Rename settings scheme to theme
 
 //  - settings > disable auto updates
@@ -1456,7 +1480,6 @@ namespace Calcify
 //  - settings > thousands seperator
 //  - settings > Verify rates are current in Settings
 
-//  - editor > ctrl + D duplicate line
 //  - editor > ctrl + L delete line
 //  - editor > ctrl + / toggle comment line
 //  - editor > shift + tab decrease indent
@@ -1465,6 +1488,14 @@ namespace Calcify
 //  - editor > ctrl + f find
 //  - editor > ctrl + h replace
 //  - editor > ctrl + , settings
+//  - editor > right click context menu
+//    - Undo - Undo last action
+//    - Redo - Redo last undone action
+//    - Cut - Cut selected text
+//    - Copy - Copy selected text
+//    - Paste - Paste from clipboard
+//    - Delete - Delete selected text
+//    - Select All - Select all content
 
 //  - accept inches, bytes, gallons, cups, speed (kmh, mh, ...), data speed (mbps, gbps, ...), tmrw, nmi (nautical miles) (1 nmi = 1852 m), carat (1 ct = 0.2 g), turn (turn, revolution) (1 turn = 360 degrees), THz, pressure, energy, Power, area, volumes (look supported-units.md) as keyword
 //  - basic calculation 1024 * x does not work
@@ -1497,3 +1528,7 @@ namespace Calcify
 //  - Status Bar Line and column
 
 //  - editor > F1 help
+//  - editor > ctrl + '0' reset zoom
+//  - editor > ctrl + mouse wheel zoom
+//  - editor > ctrl + '+' / '-' zoom
+//  - editor > ctrl + D duplicate line
