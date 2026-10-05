@@ -74,6 +74,7 @@ namespace Calcify
         public static RoutedCommand CtrlD = new RoutedCommand();
         public static RoutedCommand CtrlL = new RoutedCommand();
         public static RoutedCommand CtrlSlash = new RoutedCommand();
+        public static RoutedCommand CtrlComma = new RoutedCommand();
         public static RoutedCommand Esc = new RoutedCommand();
         public static RoutedCommand F1 = new RoutedCommand();
         #endregion
@@ -290,6 +291,7 @@ namespace Calcify
             CtrlD.InputGestures.Add(new KeyGesture(Key.D, ModifierKeys.Control));
             CtrlL.InputGestures.Add(new KeyGesture(Key.L, ModifierKeys.Control));
             CtrlSlash.InputGestures.Add(new KeyGesture(Key.Oem2, ModifierKeys.Control));
+            CtrlComma.InputGestures.Add(new KeyGesture(Key.OemComma, ModifierKeys.Control));
             Esc.InputGestures.Add(new KeyGesture(Key.Escape));
             F1.InputGestures.Add(new KeyGesture(Key.F1));
             #endregion
@@ -1418,6 +1420,11 @@ namespace Calcify
                 SaveFile(documentPath);
         }
 
+        private void CtrlComma_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            SettingsButton_Click(this, e);
+        }
+
         private void Esc_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (DropPanel.IsEnabled)
@@ -1546,7 +1553,6 @@ namespace Calcify
 //  - editor > tab complete
 //  - editor > ctrl + f find
 //  - editor > ctrl + h replace
-//  - editor > ctrl + , settings
 //  - editor > right click context menu
 //    - Undo - Undo last action
 //    - Redo - Redo last undone action
@@ -1596,3 +1602,4 @@ namespace Calcify
 //  - editor > ctrl + L delete line
 //  - editor > ctrl + / toggle comment line
 //  - editor > shift + tab decrease indent
+//  - editor > ctrl + , settings
