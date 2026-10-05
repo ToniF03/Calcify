@@ -178,6 +178,10 @@
 
         <!-- Lower Tool Bar -->
         <Grid Grid.Row="2" Style="{StaticResource modernHeaderFooter}" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
             <ComboBox x:Name="ZoomComboBox" AutomationProperties.Name="Editor zoom" ToolTip="Set editor zoom percentage" Style="{StaticResource VsComboBox}" Width="75" Height="23" HorizontalAlignment="Left" Margin="5, 0" Text="100%" IsTextSearchEnabled="False" IsEditable="True">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -198,6 +202,8 @@
                 <ComboBoxItem Content="200 %" />
                 <ComboBoxItem Content="300 %" />
             </ComboBox>
+            
+            <Label x:Name="positionLabel" Grid.Column="1" Content="Ln: 1, Col: 1" />
         </Grid>
 
         <Grid Grid.Row="3" Style="{StaticResource modernHeaderFooter}" >

@@ -424,6 +424,8 @@ namespace Calcify
             else if (CalculatedOffset > 0)
                 EditorContainer.ScrollToVerticalOffset(VerticalOffset + CalculatedOffset);
             CalculateTotal();
+
+            positionLabel.Content = "Ln: " + (mainEditor.Document.GetLineByOffset(mainEditor.CaretOffset).LineNumber) + ", Col: " + (mainEditor.CaretOffset - mainEditor.Document.GetLineByOffset(mainEditor.CaretOffset).Offset + 1);
         }
 
         #region Functions
@@ -1439,10 +1441,9 @@ namespace Calcify
 //    - Paste - Paste from clipboard
 //    - Delete - Delete selected text
 //    - Select All - Select all content
-//  - Status Bar Line and column
 //  - Rename settings scheme to theme
-//  - disable auto updates
 
+//  - settings > disable auto updates
 //  - settings > font size
 //  - settings > autosave > interval
 //  - settings > Word Wrap (?)
@@ -1464,7 +1465,6 @@ namespace Calcify
 //  - editor > ctrl + f find
 //  - editor > ctrl + h replace
 //  - editor > ctrl + , settings
-//  - editor > F1 help
 
 //  - accept inches, bytes, gallons, cups, speed (kmh, mh, ...), data speed (mbps, gbps, ...), tmrw, nmi (nautical miles) (1 nmi = 1852 m), carat (1 ct = 0.2 g), turn (turn, revolution) (1 turn = 360 degrees), THz, pressure, energy, Power, area, volumes (look supported-units.md) as keyword
 //  - basic calculation 1024 * x does not work
@@ -1494,3 +1494,6 @@ namespace Calcify
 //  - changed the way syntax files are generated to make it less static and more flexible
 //  - refactored all code files to improve readability and maintainability
 //  - added optional line numbers
+//  - Status Bar Line and column
+
+//  - editor > F1 help
