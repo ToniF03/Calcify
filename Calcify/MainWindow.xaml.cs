@@ -1544,7 +1544,6 @@ namespace Calcify
 //  - settings > Verify rates are current in Settings
 
 //  - editor > tab complete
-//  - editor > ctrl + / toggle comment
 //  - editor > ctrl + f find
 //  - editor > ctrl + h replace
 //  - editor > ctrl + , settings
