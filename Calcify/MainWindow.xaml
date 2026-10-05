@@ -37,6 +37,10 @@
         <CommandBinding Command="{x:Static local:MainWindow.F1}" Executed="F1_Executed" />
         <!-- Duplicate Line -->
         <CommandBinding Command="{x:Static local:MainWindow.CtrlD}" Executed="CtrlD_Executed" />
+        <!-- Delete Line -->
+        <CommandBinding Command="{x:Static local:MainWindow.CtrlL}" Executed="CtrlL_Executed" />
+        <!-- Toggle Comment -->
+        <CommandBinding Command="{x:Static local:MainWindow.CtrlSlash}" Executed="CtrlSlash_Executed" />
     </Window.CommandBindings>
 
     <!-- Defining the main grid -->

@@ -72,6 +72,8 @@ namespace Calcify
         public static RoutedCommand CtrlMinus = new RoutedCommand();
         public static RoutedCommand CtrlN = new RoutedCommand();
         public static RoutedCommand CtrlD = new RoutedCommand();
+        public static RoutedCommand CtrlL = new RoutedCommand();
+        public static RoutedCommand CtrlSlash = new RoutedCommand();
         public static RoutedCommand Esc = new RoutedCommand();
         public static RoutedCommand F1 = new RoutedCommand();
         #endregion
@@ -286,6 +288,8 @@ namespace Calcify
             CtrlPlus.InputGestures.Add(new KeyGesture(Key.OemPlus, ModifierKeys.Control));
             CtrlMinus.InputGestures.Add(new KeyGesture(Key.OemMinus, ModifierKeys.Control));
             CtrlD.InputGestures.Add(new KeyGesture(Key.D, ModifierKeys.Control));
+            CtrlL.InputGestures.Add(new KeyGesture(Key.L, ModifierKeys.Control));
+            CtrlSlash.InputGestures.Add(new KeyGesture(Key.Oem2, ModifierKeys.Control));
             Esc.InputGestures.Add(new KeyGesture(Key.Escape));
             F1.InputGestures.Add(new KeyGesture(Key.F1));
             #endregion
@@ -421,6 +425,48 @@ namespace Calcify
             {
                 e.Handled = true;
                 CtrlD_Executed(sender, null);
+            }
+            if (e.Key == Key.Tab && Keyboard.Modifiers == ModifierKeys.None)
+            {
+                e.Handled = true;
+                int currentLineNumber = mainEditor.Document.GetLineByOffset(mainEditor.CaretOffset).LineNumber;
+                DocumentLine currentLine = mainEditor.Document.GetLineByNumber(currentLineNumber);
+                string lineText = mainEditor.Document.GetText(currentLine.Offset, currentLine.Length);
+                int spaces = 0;
+                if (lineText.StartsWith(" "))
+                {
+                    while (spaces < lineText.Length && lineText[spaces] == ' ')
+                        spaces++;
+                }
+                mainEditor.Document.Insert(currentLine.Offset, new string(' ', Properties.Settings.Default.TabSize - spaces % Properties.Settings.Default.TabSize));
+            }
+            else if (e.Key == Key.Tab && Keyboard.Modifiers == ModifierKeys.Shift)
+            {
+                e.Handled = true;
+                int currentLineNumber = mainEditor.Document.GetLineByOffset(mainEditor.CaretOffset).LineNumber;
+                DocumentLine currentLine = mainEditor.Document.GetLineByNumber(currentLineNumber);
+                string lineText = mainEditor.Document.GetText(currentLine.Offset, currentLine.Length);
+                if (lineText.StartsWith(new string(' ', Properties.Settings.Default.TabSize)))
+                    mainEditor.Document.Remove(currentLine.Offset, Properties.Settings.Default.TabSize);
+            }
+            if (e.Key == Key.Back && Keyboard.Modifiers == ModifierKeys.None)
+            {
+                int currentLineNumber = mainEditor.Document.GetLineByOffset(mainEditor.CaretOffset).LineNumber;
+                DocumentLine currentLine = mainEditor.Document.GetLineByNumber(currentLineNumber);
+                string lineText = mainEditor.Document.GetText(currentLine.Offset, currentLine.Length);
+
+                if (lineText.StartsWith(new string(' ', Properties.Settings.Default.TabSize)))
+                {
+                    int spaces = 0;
+                    while (spaces < lineText.Length && lineText[spaces] == ' ')
+                        spaces++;
+
+                    if (mainEditor.CaretOffset == currentLine.Offset + spaces && spaces % Properties.Settings.Default.TabSize == 0)
+                    {
+                        e.Handled = true;
+                        mainEditor.Document.Remove(currentLine.Offset, Properties.Settings.Default.TabSize);
+                    }
+                }
             }
         }
 
@@ -1336,6 +1382,23 @@ namespace Calcify
             mainEditor.TextArea.Caret.Column = caretColumn;
         }
 
+        private void CtrlSlash_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            int caretLine = mainEditor.TextArea.Caret.Line;
+            string lineText = mainEditor.Document.GetText(mainEditor.Document.GetLineByNumber(caretLine));
+            if (lineText.TrimStart().StartsWith("#"))
+                mainEditor.Document.Replace(mainEditor.Document.GetLineByNumber(caretLine).Offset, lineText.Length, lineText.Replace("#", ""));
+            else
+                mainEditor.Document.Insert(mainEditor.Document.GetLineByNumber(caretLine).Offset, "#");
+        }
+
+        private void CtrlL_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            int caretLine = mainEditor.TextArea.Caret.Line;
+            mainEditor.Document.Remove(mainEditor.Document.GetLineByNumber(caretLine));
+            mainEditor.Document.Remove(mainEditor.Document.GetLineByNumber(caretLine).Offset, 1);
+        }
+
         private void CtrlShiftS_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog { Filter = "Calcify File (*.calcify)|*.calcify|All Files (*.*)|*.*", FileName = documentPath != "" ? Path.GetFileNameWithoutExtension(documentPath) : "" };
@@ -1480,9 +1543,6 @@ namespace Calcify
 //  - settings > thousands seperator
 //  - settings > Verify rates are current in Settings
 
-//  - editor > ctrl + L delete line
-//  - editor > ctrl + / toggle comment line
-//  - editor > shift + tab decrease indent
 //  - editor > tab complete
 //  - editor > ctrl + / toggle comment
 //  - editor > ctrl + f find
@@ -1532,3 +1592,6 @@ namespace Calcify
 //  - editor > ctrl + mouse wheel zoom
 //  - editor > ctrl + '+' / '-' zoom
 //  - editor > ctrl + D duplicate line
+//  - editor > ctrl + L delete line
+//  - editor > ctrl + / toggle comment line
+//  - editor > shift + tab decrease indent
