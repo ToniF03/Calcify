@@ -50,7 +50,7 @@ namespace Calcify.Classes
                 JObject exchangerate = JObject.Parse(File.ReadAllText(filePath));
                 foreach (JProperty child in exchangerate["rates"].Children())
                 {
-                    newCurrencyDict.Add(child.Name, double.Parse(child.Value.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture));
+                    newCurrencyDict.Add(child.Name, double.Parse(child.Value.ToString().Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture));
                 }
                 currencyDict = newCurrencyDict;
                 currencyPattern = "(EUR|" + string.Join("|", currencyDict.Keys) + ")";
