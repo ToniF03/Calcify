@@ -1566,6 +1566,8 @@ namespace Calcify
 //  - maybe update architecture.md
 //  - Time Formats (now.format("HH:mm:ss"), today.format("yyyy-MM-dd"))
 
+// Refactor:
+//  - put hotkeys into MainWindow.Hotkeys.cs
 
 
 // Future TODO:
