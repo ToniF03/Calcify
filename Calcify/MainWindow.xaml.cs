@@ -830,6 +830,7 @@ namespace Calcify
 
                     case "yesterday":
                     case "tomorrow":
+                    case "tmrw":
                         timeString = dateTime
                             .AddDays(match.Value.ToLower() == "yesterday" ? -1 : 1)
                             .ToString("yyyy/MM/dd", CultureInfo.InvariantCulture);
@@ -837,30 +838,35 @@ namespace Calcify
 
                     case "yesterday.day":
                     case "tomorrow.day":
+                    case "tmrw.day":
                         timeString = dateTime
                             .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
                             .ToString("dd", CultureInfo.InvariantCulture);
                         break;
                     case "yesterday.month":
                     case "tomorrow.month":
+                    case "tmrw.month":
                         timeString = dateTime
                             .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
                             .ToString("MM", CultureInfo.InvariantCulture);
                         break;
                     case "yesterday.year":
                     case "tomorrow.year":
+                    case "tmrw.year":
                         timeString = dateTime
                             .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
                             .ToString("yyyy", CultureInfo.InvariantCulture);
                         break;
                     case "yesterday.weekday":
                     case "tomorrow.weekday":
+                    case "tmrw.weekday":
                         timeString = dateTime
                             .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
                             .ToString("dddd", CultureInfo.InvariantCulture);
                         break;
                     case "yesterday.dayofyear":
                     case "tomorrow.dayofyear":
+                    case "tmrw.dayofyear":
                         timeString = dateTime
                             .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
                             .DayOfYear
@@ -868,6 +874,7 @@ namespace Calcify
                         break;
                     case "yesterday.weekofyear":
                     case "tomorrow.weekofyear":
+                    case "tmrw.weekofyear":
                         timeString = dateTime
                             .AddDays(match.Value.ToLower()
                             .StartsWith("yesterday") ? -1 : 1)
@@ -1200,7 +1207,7 @@ namespace Calcify
             darkSyntax.AddComment("Time");
             darkSyntax.AddUnits(TimePattern);
             darkSyntax.AddComment("Time Keywords");
-            darkSyntax.AddFunction(@"(((yester|to)?day|tomorrow)(\.(day(ofyear)?|week(day|ofyear)?|month|year))?|now(\.(hour|minute|second))?)");
+            darkSyntax.AddFunction(@"(((yester|to)?day|tomorrow|tmrw)(\.(day(ofyear)?|week(day|ofyear)?|month|year))?|now(\.(hour|minute|second))?)");
             darkSyntax.AddComment("Constants");
             darkSyntax.AddConstants(ConstantsPattern);
             darkSyntax.AddComment("Keywords");
