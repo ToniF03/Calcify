@@ -702,6 +702,87 @@ namespace Calcify
                             input = input.Replace(match.Value, ToNumberString(factValue));
                         }
                         break;
+                    case "sin":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double sinValue = System.Math.Sin(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(sinValue, Properties.Settings.Default.Digits)));
+                        break;
+                    case "asin":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double asinValue = System.Math.Asin(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(asinValue, Properties.Settings.Default.Digits)));
+                        break;
+                    case "sinh":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double sinhValue = System.Math.Sinh(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(sinhValue, Properties.Settings.Default.Digits)));
+                        break;
+                    case "asinh":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double asinhValue = Functions.Asinh(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(asinhValue, Properties.Settings.Default.Digits)));
+                        break;
+                    case "sinr":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double sinrValue = System.Math.Sin(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(sinrValue, Properties.Settings.Default.Digits)));
+                        break;
+
+                    case "cos":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double cosValue = System.Math.Cos(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(cosValue, Properties.Settings.Default.Digits)));
+                        break;
+                    case "acos":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double acosValue = System.Math.Acos(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(acosValue, Properties.Settings.Default.Digits)));
+                        break;
+                    case "cosh":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double coshValue = System.Math.Cosh(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(coshValue, Properties.Settings.Default.Digits)));
+                        break;
+                    case "acosh":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        if (extractedNumber < 1)
+                            break; // acosh is only defined for x >= 1
+                        double acoshValue = Functions.Acosh(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(acoshValue, Properties.Settings.Default.Digits)));
+                        break;
+                    case "cosr":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double cosrValue = System.Math.Cos(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(cosrValue, Properties.Settings.Default.Digits)));
+                        break;
+
+                    case "tan":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double tanValue = System.Math.Tan(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(tanValue, Properties.Settings.Default.Digits)));
+                        break;
+                    case "atan":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double atanValue = System.Math.Atan(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(atanValue, Properties.Settings.Default.Digits)));
+                        break;
+                    case "tanh":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double tanhValue = System.Math.Tanh(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(tanhValue, Properties.Settings.Default.Digits)));
+                        break;
+                    case "atanh":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        if (extractedNumber <= -1 || extractedNumber >= 1)
+                            break; // atanh is only defined for -1 < x < 1
+                        double atanhValue = Functions.Atanh(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(atanhValue, Properties.Settings.Default.Digits)));
+                        break;
+                    case "tanr":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double tanrValue = System.Math.Tan(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(tanrValue, Properties.Settings.Default.Digits)));
+                        break;
                 }
             }
             return input;
@@ -1226,7 +1307,7 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|sign|abs|floor|ceil|cbrt|fact|root|(?=\\d)C(?=\\d)))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|root|(?=\\d)C(?=\\d)))");
             darkSyntax.AddComment("Brackets and signs");
             darkSyntax.AddFunction("\\(|\\{|\\)|\\}|,|!");
             darkSyntax.AddComment("Operators");
@@ -1377,19 +1458,6 @@ namespace Calcify
 
 //  - functions like
 //    - Modulo operator (%)
-//    - sin()
-//    - asin()
-//    - sinh()
-//    - asinh()
-//    - sinr() (sin to radians)...
-//    - cos()
-//    - acos()
-//    - cosh()
-//    - acosh()
-//    - tan()
-//    - atan()
-//    - tanh()
-//    - atanh()
 //    - log()
 //    - ln()
 //    - clamp()
@@ -1517,3 +1585,16 @@ namespace Calcify
 //    - ceil()
 //    - cbrt()
 //    - fact()
+//    - sin()
+//    - asin()
+//    - sinh()
+//    - asinh()
+//    - sinr() (sin to radians)...
+//    - cos()
+//    - acos()
+//    - cosh()
+//    - acosh()
+//    - tan()
+//    - atan()
+//    - tanh()
+//    - atanh()

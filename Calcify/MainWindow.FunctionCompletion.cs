@@ -42,6 +42,21 @@ namespace Calcify
             new FunctionCompletionData("floor", "floor(value)"),
             new FunctionCompletionData("ceil", "ceil(value)"),
             new FunctionCompletionData("fact", "fact(value)"),
+            new FunctionCompletionData("sin", "sin(value)"),
+            new FunctionCompletionData("cos", "cos(value)"),
+            new FunctionCompletionData("tan", "tan(value)"),
+            new FunctionCompletionData("sinh", "sinh(value)"),
+            new FunctionCompletionData("cosh", "cosh(value)"),
+            new FunctionCompletionData("tanh", "tanh(value)"),
+            new FunctionCompletionData("asin", "asin(value)"),
+            new FunctionCompletionData("acos", "acos(value)"),
+            new FunctionCompletionData("atan", "atan(value)"),
+            new FunctionCompletionData("asinh", "asinh(value)"),
+            new FunctionCompletionData("acosh", "acosh(value)"),
+            new FunctionCompletionData("atanh", "atanh(value)"),
+            new FunctionCompletionData("sinr", "sinr(value)"),
+            new FunctionCompletionData("cosr", "cosr(value)"),
+            new FunctionCompletionData("tanr", "tanr(value)"),
         };
 
         private void InitializeFunctionCompletion()
