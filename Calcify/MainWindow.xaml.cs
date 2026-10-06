@@ -694,6 +694,14 @@ namespace Calcify
                         double ceilValue = System.Math.Ceiling(extractedNumber);
                         input = input.Replace(match.Value, ToNumberString(ceilValue));
                         break;
+                    case "fact":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        if (extractedNumber >= 0 && extractedNumber == System.Math.Floor(extractedNumber))
+                        {
+                            double factValue = Functions.Factorial(extractedNumber);
+                            input = input.Replace(match.Value, ToNumberString(factValue));
+                        }
+                        break;
                 }
             }
             return input;
@@ -1218,7 +1226,7 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|sign|abs|floor|ceil|cbrt|root|(?=\\d)C(?=\\d)))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|sign|abs|floor|ceil|cbrt|fact|root|(?=\\d)C(?=\\d)))");
             darkSyntax.AddComment("Brackets and signs");
             darkSyntax.AddFunction("\\(|\\{|\\)|\\}|,|!");
             darkSyntax.AddComment("Operators");
@@ -1391,7 +1399,6 @@ namespace Calcify
 //    - trunc()
 //    - min()
 //    - max()
-//    - fact()
 //    - perm() (permutation)
 //    - comb() (combination)
 //    - sum()
@@ -1509,3 +1516,4 @@ namespace Calcify
 //    - floor()
 //    - ceil()
 //    - cbrt()
+//    - fact()

@@ -41,6 +41,7 @@ namespace Calcify
             new FunctionCompletionData("abs", "abs(value)"),
             new FunctionCompletionData("floor", "floor(value)"),
             new FunctionCompletionData("ceil", "ceil(value)"),
+            new FunctionCompletionData("fact", "fact(value)"),
         };
 
         private void InitializeFunctionCompletion()
