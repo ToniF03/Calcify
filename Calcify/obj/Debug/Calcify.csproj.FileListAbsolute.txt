@@ -167,3 +167,6 @@ C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify.csproj.Cor
 C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify.csproj.Up2Date
 C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify.exe
 C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Calcify.pdb
+C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Controls\SearchReplaceControl.baml
+C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\Controls\SearchReplaceControl.g.cs
+C:\Users\ToniFey\Documents\Projects\Calcify\Calcify\obj\Debug\GeneratedInternalTypeHelper.g.cs

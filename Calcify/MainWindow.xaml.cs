@@ -72,6 +72,8 @@ namespace Calcify
         public static RoutedCommand CtrlMinus = new RoutedCommand();
         public static RoutedCommand CtrlN = new RoutedCommand();
         public static RoutedCommand CtrlD = new RoutedCommand();
+        public static RoutedCommand CtrlFind = new RoutedCommand();
+        public static RoutedCommand CtrlReplace = new RoutedCommand();
         public static RoutedCommand CtrlL = new RoutedCommand();
         public static RoutedCommand CtrlSlash = new RoutedCommand();
         public static RoutedCommand CtrlComma = new RoutedCommand();
@@ -212,6 +214,8 @@ namespace Calcify
         public MainWindow()
         {
             InitializeComponent();
+            SearchReplacePanel.Editor = mainEditor;
+            SearchReplacePanel.Overview = SearchOverview;
 
             // Set up the basics
             if (Properties.Settings.Default.UserName == "")
@@ -289,6 +293,8 @@ namespace Calcify
             CtrlPlus.InputGestures.Add(new KeyGesture(Key.OemPlus, ModifierKeys.Control));
             CtrlMinus.InputGestures.Add(new KeyGesture(Key.OemMinus, ModifierKeys.Control));
             CtrlD.InputGestures.Add(new KeyGesture(Key.D, ModifierKeys.Control));
+            CtrlFind.InputGestures.Add(new KeyGesture(Key.F, ModifierKeys.Control));
+            CtrlReplace.InputGestures.Add(new KeyGesture(Key.H, ModifierKeys.Control));
             CtrlL.InputGestures.Add(new KeyGesture(Key.L, ModifierKeys.Control));
             CtrlSlash.InputGestures.Add(new KeyGesture(Key.Oem2, ModifierKeys.Control));
             CtrlComma.InputGestures.Add(new KeyGesture(Key.OemComma, ModifierKeys.Control));
@@ -311,6 +317,16 @@ namespace Calcify
             ZoomComboBox.Text = (Properties.Settings.Default.EditorZoom * 100).ToString(CultureInfo.InvariantCulture) + "%";
             mainEditor.LayoutTransform = new ScaleTransform(Properties.Settings.Default.EditorZoom, Properties.Settings.Default.EditorZoom);
             resultEditor.LayoutTransform = new ScaleTransform(Properties.Settings.Default.EditorZoom, Properties.Settings.Default.EditorZoom);
+        }
+
+        private void CtrlFind_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            SearchReplacePanel.ShowSearch(false);
+        }
+
+        private void CtrlReplace_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            SearchReplacePanel.ShowSearch(true);
         }
 
         internal void DisableCurrencyConversion()
@@ -423,6 +439,13 @@ namespace Calcify
 
         private void MainEditor_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control && (e.Key == Key.F || e.Key == Key.H))
+            {
+                SearchReplacePanel.ShowSearch(e.Key == Key.H);
+                e.Handled = true;
+                return;
+            }
+
             if (e.Key == Key.D && Keyboard.Modifiers == ModifierKeys.Control)
             {
                 e.Handled = true;
@@ -1433,6 +1456,8 @@ namespace Calcify
                 DropPanel.IsHitTestVisible = false;
                 EditorContainer.Effect = new BlurEffect { Radius = 0 };
             }
+            else if (SearchReplacePanel.IsVisible)
+                SearchReplacePanel.CloseSearch();
         }
 
         private void F1_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -1551,8 +1576,6 @@ namespace Calcify
 //  - settings > Verify rates are current in Settings
 
 //  - editor > tab complete
-//  - editor > ctrl + f find
-//  - editor > ctrl + h replace
 //  - editor > right click context menu
 //    - Undo - Undo last action
 //    - Redo - Redo last undone action
@@ -1574,6 +1597,9 @@ namespace Calcify
 
 // Refactor:
 //  - put hotkeys into MainWindow.Hotkeys.cs
+//  - put context menu into MainWindow.ContextMenu.cs
+//  - put drag and drop into MainWindow.DragDrop.cs
+//  - put WindowChrome into seperate Control
 
 
 // Future TODO:
@@ -1603,3 +1629,5 @@ namespace Calcify
 //  - editor > ctrl + / toggle comment line
 //  - editor > shift + tab decrease indent
 //  - editor > ctrl + , settings
+//  - editor > ctrl + f find
+//  - editor > ctrl + h replace

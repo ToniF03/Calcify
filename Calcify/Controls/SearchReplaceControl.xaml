@@ -1,0 +1,29 @@
+<UserControl x:Class="Calcify.Controls.SearchReplaceControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Calcify.Controls"
+             AutomationProperties.Name="Search and replace">
+    <Border Style="{StaticResource SearchReplacePanelBorder}">
+        <StackPanel>
+            <DockPanel Margin="10, 0, 0, 0">
+                <Button DockPanel.Dock="Right" Content="&#xe947;" Style="{StaticResource ChromeButton}" Click="CloseButton_Click" AutomationProperties.Name="Close search" FontFamily="Segoe MDL2 Assets" Width="25" Height="25" />
+                <TextBlock Text="Find" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <TextBox x:Name="FindTextBox" Width="200" Style="{StaticResource SearchReplaceTextBox}" AutomationProperties.Name="Find text" TextChanged="FindTextBox_TextChanged" />
+				<Button Content="&#xEC52;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource ChromeButton}" Click="PreviousButton_Click" AutomationProperties.Name="Find previous match" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" IsEnabled="False"/>
+				<Button Content="&#xEBE7;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource ChromeButton}" Click="NextButton_Click" AutomationProperties.Name="Find next match" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" IsEnabled="False"/>
+                <TextBlock x:Name="MatchStatusText" VerticalAlignment="Center" Margin="5,0" />
+            </DockPanel>
+            <StackPanel x:Name="ReplaceRow" Orientation="Horizontal" Margin="10,5,0,0" ><!--Visibility="Collapsed"-->
+                <TextBlock Text="Replace" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <TextBox x:Name="ReplaceTextBox" Width="200" Style="{StaticResource SearchReplaceTextBox}" AutomationProperties.Name="Replace with" />
+                <Button x:Name="ReplaceCurrentButton" Content="Replace" Style="{StaticResource SearchReplaceButton}" Click="ReplaceButton_Click" AutomationProperties.Name="Replace current match" />
+                <Button x:Name="ReplaceAllButton" Content="Replace All" Style="{StaticResource SearchReplaceButton}" Click="ReplaceAllButton_Click" AutomationProperties.Name="Replace all matches" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                <CheckBox x:Name="MatchCaseCheckBox" Content="Match case" Style="{StaticResource SearchReplaceCheckBox}" IsChecked="False" Checked="SearchOption_Changed" Unchecked="SearchOption_Changed" />
+                <CheckBox x:Name="WholeWordCheckBox" Content="Whole word" Style="{StaticResource SearchReplaceCheckBox}" IsChecked="False" Checked="SearchOption_Changed" Unchecked="SearchOption_Changed" />
+                <CheckBox x:Name="UseRegexCheckBox" Content="Use regular expressions" Style="{StaticResource SearchReplaceCheckBox}" IsChecked="False" Checked="SearchOption_Changed" Unchecked="SearchOption_Changed" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

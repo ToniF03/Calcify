@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Calcify.Math.Conversion;
 
 namespace Calcify
 {
@@ -14,6 +15,14 @@ namespace Calcify
         /// </summary>
         private string UnitArithmeticCalculation(string input)
         {
+            Regex dataSizeRegex = new Regex("^" + Math.Units.Patterns.DataSizePattern + "$", RegexOptions.IgnoreCase);
+            Regex lengthRegex = new Regex("^" + Math.Units.Patterns.LengthPattern + "$", RegexOptions.IgnoreCase);
+            Regex massRegex = new Regex("^" + Math.Units.Patterns.MassPattern + "$", RegexOptions.IgnoreCase);
+            Regex temperatureRegex = new Regex("^" + Math.Units.Patterns.TemperaturePattern + "$", RegexOptions.IgnoreCase);
+            Regex timeCalculationRegex = new Regex("^" + Math.Units.Patterns.TimePattern + "$", RegexOptions.IgnoreCase);
+            Regex frequencyRegex = new Regex("^" + Math.Units.Patterns.FrequencyPattern + "$", RegexOptions.IgnoreCase);
+            Regex angleRegex = new Regex("^" + Math.Units.Patterns.AnglePattern + "$", RegexOptions.IgnoreCase);
+
             // Combined unit pattern: check the main categories used throughout the app
             string unitsAll = "(" + CurrencyPattern + "|" + DataSizePattern + "|" + LengthPattern + "|" + MassPattern + "|" + TemperaturePattern + "|" + TimePattern + "|" + FrequencyPattern + "|" + AnglePattern + ")";
             // Match sequences like: <number> <unit> ( (+|-) <number> <unit> )+
@@ -214,7 +223,7 @@ namespace Calcify
         private string GeometricCalculation(string input)
         {
             // small helper to format value
-            string fmt(double v) => ToNumberString(Math.Round(v, Properties.Settings.Default.Digits));
+            string fmt(double v) => ToNumberString(System.Math.Round(v, Properties.Settings.Default.Digits));
 
             // accept optional unit token (letters, %, ° and common symbols) or the app's known units
             string unitToken = "(?<unit>[a-zA-Z%°‰\\u00B0\\u00B2\\u00B3]+)?";
@@ -244,7 +253,7 @@ namespace Calcify
             {
                 double r = double.Parse(m.Groups["r"].Value, CultureInfo.InvariantCulture);
                 string u = m.Groups["unit"].Success ? m.Groups["unit"].Value : null;
-                double area = Math.PI * r * r;
+                double area = System.Math.PI * r * r;
                 if (!string.IsNullOrEmpty(u)) return fmt(area) + " " + u + "^2";
                 return fmt(area);
             });
@@ -254,7 +263,7 @@ namespace Calcify
             {
                 double r = double.Parse(m.Groups["r"].Value, CultureInfo.InvariantCulture);
                 string u = m.Groups["unit"].Success ? m.Groups["unit"].Value : null;
-                double per = 2 * Math.PI * r;
+                double per = 2 * System.Math.PI * r;
                 if (!string.IsNullOrEmpty(u)) return fmt(per) + " " + u;
                 return fmt(per);
             });
@@ -316,7 +325,7 @@ namespace Calcify
             {
                 double r = double.Parse(m.Groups["r"].Value, CultureInfo.InvariantCulture);
                 string u = m.Groups["unit"].Success ? m.Groups["unit"].Value : null;
-                double vol = 4.0 / 3.0 * Math.PI * r * r * r;
+                double vol = 4.0 / 3.0 * System.Math.PI * r * r * r;
                 if (!string.IsNullOrEmpty(u)) return fmt(vol) + " " + u + "^3";
                 return fmt(vol);
             });
@@ -327,7 +336,7 @@ namespace Calcify
                 double r = double.Parse(m.Groups["r"].Value, CultureInfo.InvariantCulture);
                 double h = double.Parse(m.Groups["h"].Value, CultureInfo.InvariantCulture);
                 string u = m.Groups["unit"].Success ? m.Groups["unit"].Value : null;
-                double vol = Math.PI * r * r * h;
+                double vol = System.Math.PI * r * r * h;
                 if (!string.IsNullOrEmpty(u)) return fmt(vol) + " " + u + "^3";
                 return fmt(vol);
             });

@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Calcify"
+        xmlns:controls="clr-namespace:Calcify.Controls"
         xmlns:properties="clr-namespace:Calcify.Properties"
         mc:Ignorable="d"
         AllowDrop="True"        
@@ -37,6 +38,8 @@
         <CommandBinding Command="{x:Static local:MainWindow.F1}" Executed="F1_Executed" />
         <!-- Duplicate Line -->
         <CommandBinding Command="{x:Static local:MainWindow.CtrlD}" Executed="CtrlD_Executed" />
+        <CommandBinding Command="{x:Static local:MainWindow.CtrlFind}" Executed="CtrlFind_Executed" />
+        <CommandBinding Command="{x:Static local:MainWindow.CtrlReplace}" Executed="CtrlReplace_Executed" />
         <!-- Delete Line -->
         <CommandBinding Command="{x:Static local:MainWindow.CtrlL}" Executed="CtrlL_Executed" />
         <!-- Toggle Comment -->
@@ -147,7 +150,17 @@
         </Grid>
 
         <!-- Container with the two text boxes inside -->
-        <ScrollViewer x:Name="EditorContainer" Grid.Row="1" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel" Margin="0, 7, 0, 0">
+        <Grid Grid.Row="1">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="8" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+          <controls:SearchReplaceControl x:Name="SearchReplacePanel" Grid.Row="0" Grid.ColumnSpan="2" />
+          <ScrollViewer x:Name="EditorContainer" Grid.Row="1" Grid.Column="0" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel" Margin="0,7,0,0">
             <Grid Grid.Row="1" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="6*" />
@@ -168,7 +181,6 @@
                                        HorizontalScrollBarVisibility="Hidden"
                                        ShowLineNumbers="{Binding Source={x:Static properties:Settings.Default}, Path=ShowLineNumbers}">
                 </avalonEdit:TextEditor>
-
                 <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
                 <!-- The pane where the results are being displayed -->
@@ -185,9 +197,10 @@
                                 HorizontalScrollBarVisibility="Hidden" 
                                 VerticalScrollBarVisibility="Disabled" >
                 </avalonEdit:TextEditor>
-
             </Grid>
-        </ScrollViewer>
+          </ScrollViewer>
+          <controls:SearchResultOverview x:Name="SearchOverview" Grid.Row="1" Grid.Column="1" Margin="0,7,0,7" Panel.ZIndex="1" Style="{StaticResource SearchResultOverview}" />
+        </Grid>
 
         <!-- Lower Tool Bar -->
         <Grid Grid.Row="2" Style="{StaticResource modernHeaderFooter}" >

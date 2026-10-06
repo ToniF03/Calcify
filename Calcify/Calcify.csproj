@@ -98,6 +98,11 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SearchReplaceControl.xaml.cs">
+      <DependentUpon>SearchReplaceControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SearchResultBackgroundRenderer.cs" />
+    <Compile Include="Controls\SearchResultOverview.cs" />
     <Compile Include="Classes\ExchangeRateLoader.cs" />
     <Compile Include="Classes\Math\Calculator.cs" />
     <Compile Include="Classes\Math\Constants.cs" />
@@ -168,6 +173,10 @@
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\SyntaxFile.cs" />
+    <Page Include="Controls\SearchReplaceControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="About.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -191,6 +200,9 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.Documents.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainWindow.Units.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
