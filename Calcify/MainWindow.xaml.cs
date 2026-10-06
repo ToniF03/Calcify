@@ -669,6 +669,11 @@ namespace Calcify
                             input = input.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)));
                         }
                         break;
+                    case "cbrt":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double cbrtValue = Functions.Cbrt(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(cbrtValue, Properties.Settings.Default.Digits)));
+                        break;
                     case "sign":
                         extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
                         double signValue = Functions.sign(extractedNumber);
@@ -1213,7 +1218,7 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|sign|abs|floor|ceil|root|(?=\\d)C(?=\\d)))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|sign|abs|floor|ceil|cbrt|root|(?=\\d)C(?=\\d)))");
             darkSyntax.AddComment("Brackets and signs");
             darkSyntax.AddFunction("\\(|\\{|\\)|\\}|,|!");
             darkSyntax.AddComment("Operators");
@@ -1382,7 +1387,6 @@ namespace Calcify
 //    - clamp()
 //    - pow()
 //    - exp()
-//    - cbrt()
 //    - root(float, int)
 //    - trunc()
 //    - min()
@@ -1504,3 +1508,4 @@ namespace Calcify
 //    - abs()
 //    - floor()
 //    - ceil()
+//    - cbrt()

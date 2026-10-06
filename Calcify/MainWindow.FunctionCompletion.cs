@@ -28,6 +28,7 @@ namespace Calcify
             new FunctionCompletionData("randint", "randint(min, max)"),
             new FunctionCompletionData("round", "round(value, digits)"),
             new FunctionCompletionData("sqrt", "sqrt(value)"),
+            new FunctionCompletionData("cbrt", "cbrt(value)"),
             new FunctionCompletionData("avg", "avg(x, y, n...)"),
             new FunctionCompletionData("sum", "sum(x, y, n...)"),
             new FunctionCompletionData("today", "today"),
