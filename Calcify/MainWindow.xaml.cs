@@ -671,7 +671,7 @@ namespace Calcify
         /// Replaces all recognized single-variable mathematical function expressions in the input string with their
         /// computed numeric results.
         /// </summary>
-        /// <remarks>Currently supports replacement of square root, sign, absolute value, floor, and ceiling expressions in the form 'function(number)'.
+        /// <remarks>Currently supports replacement of square root, cube root, sign, absolute value, floor, and ceiling expressions in the form 'function(number)'.
         /// Only positive numbers are evaluated; other values are ignored. The numeric result is rounded according to
         /// the application's digit settings before replacement.</remarks>
         /// <param name="input">The input string containing mathematical function expressions to be evaluated and replaced.</param>
@@ -1522,22 +1522,25 @@ namespace Calcify
 //  - 'About' change date
 
 //  - functions like
-//    - clamp()
-//    - root(float, int)
-//    - trunc()
-//    - min()
-//    - max()
-//    - perm() (permutation)
-//    - comb() (combination)
-//    - sum()
-//    - avg()
-//    - mean() (average)
-//    - median()
-//    - mode()
-//    - stdev() (standard deviation)
-//    - var() (variance)
-//    - randomint()
-//    - random()
+//    Multiple Variables:
+//      - clamp(x1, x2, ..., xn)
+//      - min(x1, x2, ..., xn)
+//      - max(x1, x2, ..., xn)
+//      - sum()
+//      - avg()
+//      - mean() (average)
+//      - median()
+//      - mode() (most frequent value)
+//      - stdev() (standard deviation)
+//      - var() (variance)
+//
+//    Two Variables:
+//      - root(float, int)
+//      - perm(n, r) (permutation)
+//      - comb(n, r) (combination)
+//      - randomint()
+//      - random()
+//
 //  - chained operations
 //  - constants like 
 //    - tau
@@ -1663,3 +1666,4 @@ namespace Calcify
 //    - log()
 //    - pow()
 //    - exp()
+//    - trunc()
