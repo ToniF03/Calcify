@@ -845,7 +845,7 @@ namespace Calcify
         /// numeric results.</returns>
         private string ReplaceTwoVariableFunctions(string input)
         {
-            Regex functionsRegex = new Regex(@"\b(?<func>(diff|rand|randint|round|mod|log|pow))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
+            Regex functionsRegex = new Regex(@"\b(?<func>(diff|rand|randint|round|mod|log|pow|perm|comb(a)?))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
             // Replace and execute functions
             while (functionsRegex.IsMatch(input))
             {
@@ -902,6 +902,33 @@ namespace Calcify
                     case "pow":
                         generatedNumber = System.Math.Pow(minNumber, maxNumber);
                         input = input.Replace(match.Value, ToNumberString(System.Math.Round(generatedNumber, Properties.Settings.Default.Digits))).Trim();
+                        break;
+                    case "perm":
+                        if (!Functions.isInteger(minNumber) || !Functions.isInteger(maxNumber) || minNumber < 0 || maxNumber < 0 || minNumber < maxNumber)
+                        {
+                            input = input.Replace(match.Value, "NaN").Trim();
+                            break;
+                        }
+                        generatedNumber = Functions.Permutation((int)minNumber, (int)maxNumber);
+                        input = input.Replace(match.Value, ToNumberString(generatedNumber)).Trim();
+                        break;
+                    case "comb":
+                        if (!Functions.isInteger(minNumber) || !Functions.isInteger(maxNumber) || minNumber < 0 || maxNumber < 0 || minNumber < maxNumber)
+                        {
+                            input = input.Replace(match.Value, "NaN").Trim();
+                            break;
+                        }
+                        generatedNumber = Functions.Combination((int)minNumber, (int)maxNumber);
+                        input = input.Replace(match.Value, ToNumberString(generatedNumber)).Trim();
+                        break;
+                    case "comba":
+                        if (!Functions.isInteger(minNumber) || !Functions.isInteger(maxNumber) || minNumber < 0 || maxNumber < 0 || minNumber < maxNumber)
+                        {
+                            input = input.Replace(match.Value, "NaN").Trim();
+                            break;
+                        }
+                        generatedNumber = Functions.CombinationA((int)minNumber, (int)maxNumber);
+                        input = input.Replace(match.Value, ToNumberString(generatedNumber)).Trim();
                         break;
                 }
             }
@@ -1370,7 +1397,7 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|log|pow|exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|perm|comb(a)?|log|pow|exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
             darkSyntax.AddFunction("(?&lt;=\\d)C(?=\\d)");
             darkSyntax.AddFunction("(?&lt;=\\-?\\d+(\\.\\d+)?)%(?=\\-?\\d+(\\.\\d+)?)");
             darkSyntax.AddComment("Brackets and signs");
@@ -1534,10 +1561,6 @@ namespace Calcify
 //      - stdev() (standard deviation)
 //      - var() (variance)
 //
-//    Two Variables:
-//      - perm(n, r) (permutation)
-//      - comb(n, r) (combination)
-//
 //  - chained operations
 //  - constants like 
 //    - tau
@@ -1667,3 +1690,6 @@ namespace Calcify
 //    - root(float, int)
 //    - randint()
 //    - rand()
+//    - perm(n, r) (permutation)
+//    - comb(n, r) (combination)
+//    - comba(n, r) (combination with repetition)
