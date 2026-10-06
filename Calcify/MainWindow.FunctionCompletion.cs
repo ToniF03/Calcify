@@ -66,6 +66,9 @@ namespace Calcify
             new FunctionCompletionData("perm", "perm(n, r)"),
             new FunctionCompletionData("comb", "comb(n, r)"),
             new FunctionCompletionData("comba", "comba(n, r)"),
+            new FunctionCompletionData("clamp", "clamp(value, min, max)"),
+            new FunctionCompletionData("sum", "sum(value1, value2, ...)"),
+            new FunctionCompletionData("avg", "avg(value1, value2, ...)"),
         };
 
         private void InitializeFunctionCompletion()

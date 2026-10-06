@@ -547,6 +547,8 @@ namespace Calcify
             input = ReplaceConstants(input);
 
             // Replace Functions
+            input = ReplaceMultipleVariableFunctions(input);
+            input = ReplaceThreeVariableFunctions(input);
             input = ReplaceTwoVariableFunctions(input);
             input = ReplaceOneVariableFunctions(input);
 
@@ -630,7 +632,7 @@ namespace Calcify
                 {
                     case "%":
                         if (num2 == 0) continue; // Avoid division by zero
-                        text = text.Replace(match.Value, Functions.modulo(num1, num2).ToString());
+                        text = text.Replace(match.Value, Functions.Modulo(num1, num2).ToString());
                         break;
                 }
             }
@@ -887,7 +889,7 @@ namespace Calcify
                             input = input.Replace(match.Value, "NaN").Trim();
                             break;
                         }
-                        generatedNumber = Functions.modulo(minNumber, maxNumber);
+                        generatedNumber = Functions.Modulo(minNumber, maxNumber);
                         input = input.Replace(match.Value, ToNumberString(generatedNumber)).Trim();
                         break;
                     case "log":
@@ -935,6 +937,69 @@ namespace Calcify
 
 
 
+            return input;
+        }
+
+        /// <summary>
+        /// Replaces supported three-variable function expressions in the input string with their computed results.
+        /// </summary>
+        /// <param name="input">The input string containing function expressions each with three
+        /// numeric arguments.</param>
+        /// <returns>A string in which all recognized three-variable function expressions have been replaced by their evaluated
+        /// numeric results.</returns>
+        private string ReplaceThreeVariableFunctions(string input)
+        {
+            Regex functionsRegex = new Regex(@"\b(?<func>(clamp))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?), ?(?<variable3>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
+
+            while (functionsRegex.IsMatch(input))
+            {
+                Match match = functionsRegex.Match(input);
+                string function = match.Groups["func"].Value;
+                double variable1 = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                double variable2 = double.Parse(match.Groups["variable2"].Value, CultureInfo.InvariantCulture);
+                double variable3 = double.Parse(match.Groups["variable3"].Value, CultureInfo.InvariantCulture);
+                switch (function)
+                {
+                    case "clamp":
+                        if (variable2 > variable3)
+                        {
+                            input = input.Replace(match.Value, "NaN").Trim();
+                            break;
+                        }
+                        double clampedValue = Functions.Clamp(variable1, variable2, variable3);
+                        input = input.Replace(match.Value, ToNumberString(clampedValue)).Trim();
+                        break;
+                }
+            }
+            return input;
+        }
+
+        private string ReplaceMultipleVariableFunctions(string input)
+        {
+            Regex functionsRegex = new Regex(@"\b(?<func>(sum|avg))\((?<variable1>-?\d+(\.\d+)?)(, ?(?<variable>-?\d+(\.\d+)?))+\)", RegexOptions.RightToLeft);
+
+            while (functionsRegex.IsMatch(input))
+            {
+                Match match = functionsRegex.Match(input);
+                string function = match.Groups["func"].Value;
+                double variable1 = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                List<double> variables = new List<double>();
+                foreach (Capture capture in match.Groups["variable"].Captures)
+                {
+                    variables.Add(double.Parse(capture.Value, CultureInfo.InvariantCulture));
+                }
+                switch (function)
+                {
+                    case "sum":
+                        double sum = variable1 + variables.Sum();
+                        input = input.Replace(match.Value, ToNumberString(sum)).Trim();
+                        break;
+                    case "avg":
+                        double avg = (variable1 + variables.Sum()) / (variables.Count + 1);
+                        input = input.Replace(match.Value, ToNumberString(avg)).Trim();
+                        break;
+                }
+            }
             return input;
         }
 
@@ -1398,6 +1463,7 @@ namespace Calcify
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
             darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|perm|comb(a)?|log|pow|exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
+            darkSyntax.AddFunction("clamp");
             darkSyntax.AddFunction("(?&lt;=\\d)C(?=\\d)");
             darkSyntax.AddFunction("(?&lt;=\\-?\\d+(\\.\\d+)?)%(?=\\-?\\d+(\\.\\d+)?)");
             darkSyntax.AddComment("Brackets and signs");
@@ -1550,11 +1616,8 @@ namespace Calcify
 
 //  - functions like
 //    Multiple Variables:
-//      - clamp(x1, x2, ..., xn)
 //      - min(x1, x2, ..., xn)
 //      - max(x1, x2, ..., xn)
-//      - sum()
-//      - avg()
 //      - mean() (average)
 //      - median()
 //      - mode() (most frequent value)
@@ -1693,3 +1756,6 @@ namespace Calcify
 //    - perm(n, r) (permutation)
 //    - comb(n, r) (combination)
 //    - comba(n, r) (combination with repetition)
+//    - clamp(x1, x2, ..., xn)
+//    - sum()
+//    - avg()
