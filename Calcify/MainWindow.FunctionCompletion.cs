@@ -60,6 +60,7 @@ namespace Calcify
             new FunctionCompletionData("ln", "ln(value)"),
             new FunctionCompletionData("trunc", "trunc(value)"),
             new FunctionCompletionData("mod", "mod(value, divisor)"),
+            new FunctionCompletionData("log", "log(value, base)"),
         };
 
         private void InitializeFunctionCompletion()

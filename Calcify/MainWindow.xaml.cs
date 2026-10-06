@@ -489,6 +489,8 @@ namespace Calcify
         /// <returns></returns>
         public double GetRandomDouble(double minimum, double maximum)
         {
+            if (minimum > maximum)
+                (minimum, maximum) = (maximum, minimum);
             Random random = new Random();
             return random.NextDouble() * (maximum - minimum) + minimum;
         }
@@ -838,7 +840,7 @@ namespace Calcify
         /// numeric results.</returns>
         private string ReplaceTwoVariableFunctions(string input)
         {
-            Regex functionsRegex = new Regex(@"\b(?<func>(diff|rand|randint|round|mod))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
+            Regex functionsRegex = new Regex(@"\b(?<func>(diff|rand|randint|round|mod|log))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
             // Replace and execute functions
             while (functionsRegex.IsMatch(input))
             {
@@ -847,17 +849,12 @@ namespace Calcify
                 double minNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
                 double maxNumber = double.Parse(match.Groups["variable2"].Value, CultureInfo.InvariantCulture);
 
-                // Swap if min is greater than max
-                if (minNumber > maxNumber && function != "round")
-                    (maxNumber, minNumber) = (minNumber, maxNumber);
-
-
                 double generatedNumber;
                 switch (function)
                 {
                     // Calculate difference
                     case "diff":
-                        generatedNumber = maxNumber - minNumber;
+                        generatedNumber = System.Math.Abs(maxNumber - minNumber);
                         generatedNumber = System.Math.Round(generatedNumber, Properties.Settings.Default.Digits);
                         input = input.Replace(match.Value, ToNumberString(System.Math.Round(generatedNumber, Properties.Settings.Default.Digits)));
                         break;
@@ -869,6 +866,8 @@ namespace Calcify
                         break;
                     // Generate random integer
                     case "randint":
+                        if (minNumber > maxNumber)
+                            (minNumber, maxNumber) = (maxNumber, minNumber);
                         generatedNumber = new Random().Next((int)minNumber, (int)maxNumber);
                         input = input.Replace(match.Value, ToNumberString(generatedNumber)).Trim();
                         break;
@@ -877,14 +876,23 @@ namespace Calcify
                         generatedNumber = System.Math.Round(minNumber, (int)maxNumber);
                         input = input.Replace(match.Value, ToNumberString(generatedNumber)).Trim();
                         break;
-                    case "modulo":
+                    case "mod":
                         if (maxNumber == 0)
                         {
                             input = input.Replace(match.Value, "NaN").Trim();
                             break;
                         }
-                        generatedNumber = Functions.modulo(maxNumber, minNumber);
+                        generatedNumber = Functions.modulo(minNumber, maxNumber);
                         input = input.Replace(match.Value, ToNumberString(generatedNumber)).Trim();
+                        break;
+                    case "log":
+                        if (minNumber <= 0 || maxNumber <= 0 || minNumber == 1)
+                        {
+                            input = input.Replace(match.Value, "NaN").Trim();
+                            break;
+                        }
+                        generatedNumber = System.Math.Log(minNumber, maxNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(generatedNumber, Properties.Settings.Default.Digits))).Trim();
                         break;
                 }
             }
@@ -1353,7 +1361,7 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|log|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
             darkSyntax.AddFunction("(?&lt;=\\d)C(?=\\d)");
             darkSyntax.AddFunction("(?&lt;=\\-?\\d+(\\.\\d+)?)%(?=\\-?\\d+(\\.\\d+)?)");
             darkSyntax.AddComment("Brackets and signs");
@@ -1505,7 +1513,6 @@ namespace Calcify
 //  - 'About' change date
 
 //  - functions like
-//    - log()
 //    - clamp()
 //    - pow()
 //    - exp()
@@ -1646,3 +1653,4 @@ namespace Calcify
 //    - atanh()
 //    - ln()
 //    - Modulo operator (%)
+//    - log()
