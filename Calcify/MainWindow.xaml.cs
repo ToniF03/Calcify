@@ -783,6 +783,20 @@ namespace Calcify
                         double tanrValue = System.Math.Tan(extractedNumber);
                         input = input.Replace(match.Value, ToNumberString(System.Math.Round(tanrValue, Properties.Settings.Default.Digits)));
                         break;
+
+                    case "ln":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        if (extractedNumber <= 0)
+                            break; // ln is only defined for x > 0
+                        double lnValue = System.Math.Log(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(lnValue, Properties.Settings.Default.Digits)));
+                        break;
+
+                    case "trunc":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double truncValue = System.Math.Truncate(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(truncValue));
+                        break;
                 }
             }
             return input;
@@ -1307,7 +1321,7 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|root|(?=\\d)C(?=\\d)))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root|(?=\\d)C(?=\\d)))");
             darkSyntax.AddComment("Brackets and signs");
             darkSyntax.AddFunction("\\(|\\{|\\)|\\}|,|!");
             darkSyntax.AddComment("Operators");
@@ -1459,7 +1473,6 @@ namespace Calcify
 //  - functions like
 //    - Modulo operator (%)
 //    - log()
-//    - ln()
 //    - clamp()
 //    - pow()
 //    - exp()
@@ -1598,3 +1611,4 @@ namespace Calcify
 //    - atan()
 //    - tanh()
 //    - atanh()
+//    - ln()

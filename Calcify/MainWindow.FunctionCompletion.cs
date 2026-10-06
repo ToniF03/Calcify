@@ -57,6 +57,8 @@ namespace Calcify
             new FunctionCompletionData("sinr", "sinr(value)"),
             new FunctionCompletionData("cosr", "cosr(value)"),
             new FunctionCompletionData("tanr", "tanr(value)"),
+            new FunctionCompletionData("ln", "ln(value)"),
+            new FunctionCompletionData("trunc", "trunc(value)"),
         };
 
         private void InitializeFunctionCompletion()
