@@ -838,7 +838,7 @@ namespace Calcify
         /// numeric results.</returns>
         private string ReplaceTwoVariableFunctions(string input)
         {
-            Regex functionsRegex = new Regex(@"\b(?<func>(diff|rand|randint|round))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
+            Regex functionsRegex = new Regex(@"\b(?<func>(diff|rand|randint|round|modulo))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
             // Replace and execute functions
             while (functionsRegex.IsMatch(input))
             {
@@ -875,6 +875,15 @@ namespace Calcify
                     // Round number
                     case "round":
                         generatedNumber = System.Math.Round(minNumber, (int)maxNumber);
+                        input = input.Replace(match.Value, ToNumberString(generatedNumber)).Trim();
+                        break;
+                    case "modulo":
+                        if (maxNumber == 0)
+                        {
+                            input = input.Replace(match.Value, "NaN").Trim();
+                            break;
+                        }
+                        generatedNumber = Functions.modulo(maxNumber, minNumber);
                         input = input.Replace(match.Value, ToNumberString(generatedNumber)).Trim();
                         break;
                 }
@@ -1344,7 +1353,7 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|modulo|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
             darkSyntax.AddFunction("(?&lt;=\\d)C(?=\\d)");
             darkSyntax.AddFunction("(?&lt;=\\-?\\d+(\\.\\d+)?)%(?=\\-?\\d+(\\.\\d+)?)");
             darkSyntax.AddComment("Brackets and signs");
