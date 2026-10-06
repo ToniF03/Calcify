@@ -822,6 +822,11 @@ namespace Calcify
                         double truncValue = System.Math.Truncate(extractedNumber);
                         input = input.Replace(match.Value, ToNumberString(truncValue));
                         break;
+                    case "exp":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double expValue = System.Math.Exp(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(expValue, Properties.Settings.Default.Digits)));
+                        break;
                 }
             }
             return input;
@@ -1365,7 +1370,7 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|log|pow|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|log|pow|exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
             darkSyntax.AddFunction("(?&lt;=\\d)C(?=\\d)");
             darkSyntax.AddFunction("(?&lt;=\\-?\\d+(\\.\\d+)?)%(?=\\-?\\d+(\\.\\d+)?)");
             darkSyntax.AddComment("Brackets and signs");
@@ -1518,7 +1523,6 @@ namespace Calcify
 
 //  - functions like
 //    - clamp()
-//    - exp()
 //    - root(float, int)
 //    - trunc()
 //    - min()
@@ -1658,3 +1662,4 @@ namespace Calcify
 //    - Modulo operator (%)
 //    - log()
 //    - pow()
+//    - exp()

@@ -62,6 +62,7 @@ namespace Calcify
             new FunctionCompletionData("mod", "mod(value, divisor)"),
             new FunctionCompletionData("log", "log(value, base)"),
             new FunctionCompletionData("pow", "pow(value, exponent)"),
+            new FunctionCompletionData("exp", "exp(value)"),
         };
 
         private void InitializeFunctionCompletion()
