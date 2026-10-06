@@ -674,6 +674,11 @@ namespace Calcify
                         double signValue = Functions.sign(extractedNumber);
                         input = input.Replace(match.Value, ToNumberString(signValue));
                         break;
+                    case "abs":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double absValue = System.Math.Abs(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(absValue));
+                        break;
                 }
             }
             return input;
@@ -1191,7 +1196,7 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|root|(?=\\d)C(?=\\d)))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|sign|abs|root|(?=\\d)C(?=\\d)))");
             darkSyntax.AddComment("Brackets and signs");
             darkSyntax.AddFunction("\\(|\\{|\\)|\\}|,|!");
             darkSyntax.AddComment("Operators");
@@ -1344,7 +1349,6 @@ namespace Calcify
 //    - Modulo operator (%)
 //    - floor()
 //    - ceil()
-//    - abs()
 //    - sin()
 //    - asin()
 //    - sinh()
@@ -1482,3 +1486,4 @@ namespace Calcify
 
 //  - Added Functions:
 //    - sign()
+//    - abs()
