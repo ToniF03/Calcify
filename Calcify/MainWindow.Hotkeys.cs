@@ -80,10 +80,12 @@ namespace Calcify
         {
             int caretLine = mainEditor.TextArea.Caret.Line;
             string lineText = mainEditor.Document.GetText(mainEditor.Document.GetLineByNumber(caretLine));
-            if (lineText.TrimStart().StartsWith("#"))
+            if (lineText.TrimStart().StartsWith("# "))
+                mainEditor.Document.Replace(mainEditor.Document.GetLineByNumber(caretLine).Offset, lineText.Length, lineText.Replace("# ", ""));
+            else if (lineText.TrimStart().StartsWith("#"))
                 mainEditor.Document.Replace(mainEditor.Document.GetLineByNumber(caretLine).Offset, lineText.Length, lineText.Replace("#", ""));
             else
-                mainEditor.Document.Insert(mainEditor.Document.GetLineByNumber(caretLine).Offset, "#");
+                mainEditor.Document.Insert(mainEditor.Document.GetLineByNumber(caretLine).Offset, "# ");
         }
 
         private void CtrlL_Executed(object sender, ExecutedRoutedEventArgs e)

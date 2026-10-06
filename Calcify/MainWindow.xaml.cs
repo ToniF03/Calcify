@@ -192,6 +192,7 @@ namespace Calcify
 
             mainEditor.TextChanged += MainEditor_TextChanged;
             mainEditor.TextArea.Caret.PositionChanged += Caret_PositionChanged;
+            InitializeFunctionCompletion();
             mainEditor.PreviewKeyDown += MainEditor_PreviewKeyDown;
 
             MinimizeButton.Click += MinimizeButton_Click;
@@ -382,6 +383,9 @@ namespace Calcify
 
         private void MainEditor_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            if (HandleFunctionCompletionKeyDown(e))
+                return;
+
             if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control && (e.Key == Key.F || e.Key == Key.H))
             {
                 SearchReplacePanel.ShowSearch(e.Key == Key.H);
@@ -1320,6 +1324,7 @@ namespace Calcify
                 }
             }
         }
+
         #endregion
         #endregion
     }
