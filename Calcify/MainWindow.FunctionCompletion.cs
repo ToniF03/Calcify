@@ -69,6 +69,8 @@ namespace Calcify
             new FunctionCompletionData("clamp", "clamp(value, min, max)"),
             new FunctionCompletionData("sum", "sum(value1, value2, ...)"),
             new FunctionCompletionData("avg", "avg(value1, value2, ...)"),
+            new FunctionCompletionData("min", "min(value1, value2, ...)"),
+            new FunctionCompletionData("max", "max(value1, value2, ...)"),
         };
 
         private void InitializeFunctionCompletion()

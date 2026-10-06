@@ -976,7 +976,7 @@ namespace Calcify
 
         private string ReplaceMultipleVariableFunctions(string input)
         {
-            Regex functionsRegex = new Regex(@"\b(?<func>(sum|avg))\((?<variable1>-?\d+(\.\d+)?)(, ?(?<variable>-?\d+(\.\d+)?))+\)", RegexOptions.RightToLeft);
+            Regex functionsRegex = new Regex(@"\b(?<func>(sum|avg|min|max))\((?<variable1>-?\d+(\.\d+)?)(, ?(?<variable>-?\d+(\.\d+)?))+\)", RegexOptions.RightToLeft);
 
             while (functionsRegex.IsMatch(input))
             {
@@ -997,6 +997,14 @@ namespace Calcify
                     case "avg":
                         double avg = (variable1 + variables.Sum()) / (variables.Count + 1);
                         input = input.Replace(match.Value, ToNumberString(avg)).Trim();
+                        break;
+                    case "min":
+                        double min = System.Math.Min(variable1, variables.Min());
+                        input = input.Replace(match.Value, ToNumberString(min)).Trim();
+                        break;
+                    case "max":
+                        double max = System.Math.Max(variable1, variables.Max());
+                        input = input.Replace(match.Value, ToNumberString(max)).Trim();
                         break;
                 }
             }
@@ -1462,7 +1470,7 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|perm|comb(a)?|log|pow|exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|perm|comb(a)?|sum|avg|min|max|log|pow|exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
             darkSyntax.AddFunction("clamp");
             darkSyntax.AddFunction("(?&lt;=\\d)C(?=\\d)");
             darkSyntax.AddFunction("(?&lt;=\\-?\\d+(\\.\\d+)?)%(?=\\-?\\d+(\\.\\d+)?)");
@@ -1616,8 +1624,6 @@ namespace Calcify
 
 //  - functions like
 //    Multiple Variables:
-//      - min(x1, x2, ..., xn)
-//      - max(x1, x2, ..., xn)
 //      - mean() (average)
 //      - median()
 //      - mode() (most frequent value)
@@ -1759,3 +1765,5 @@ namespace Calcify
 //    - clamp(x1, x2, ..., xn)
 //    - sum()
 //    - avg()
+//    - min(x1, x2, ..., xn)
+//    - max(x1, x2, ..., xn)
