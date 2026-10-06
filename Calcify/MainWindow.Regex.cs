@@ -22,6 +22,7 @@ namespace Calcify
         readonly Regex oneVariableFunctionRegex = new Regex(@"\b(?<func>(sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc))\((?<variable1>(-)?\d+(\.\d+)?)\)(( )?|$)");
         readonly Regex dateTimeKeyWordsRegex = new Regex(@"\b(?i)(((now|time)(\.(hour|minute|second))?)|(yesterday|date|today|tomorrow|tmrw)(\.(day|month|year|weekday|dayofyear|weekofyear))?)(?-i)\b");
         readonly Regex PermutationRegex = new Regex(@"(?<n>\d+)C(?<r>\d+)");
+        readonly Regex middleFunctionRegex = new Regex(@"(?<num1>-?\d+(\.\d+)?)(?<func>(\%))(?<num2>-?\d+(\.\d+)?)");
         readonly Regex calculatorRegex = new Regex(@"^((\d+(\.\d+)?)|\||(\+|\-|\*|\/|\^)(?!\+|\*|\/|\^|\!)|(|\(|\)|\!))*$");
         readonly Regex directRegex;
         readonly Regex constantsRegex;

@@ -538,6 +538,9 @@ namespace Calcify
             // Replace all permutation expressions in the input
             input = ReplacePermutations(input);
 
+            // Replace all middle functions in the input
+            input = ReplaceMiddleFunctions(input);
+
             // Replace constants
             input = ReplaceConstants(input);
 
@@ -608,6 +611,26 @@ namespace Calcify
 
                 if (n >= r)
                     text = text.Replace(match.Value, Functions.nCr(n, r).ToString());
+            }
+            return text;
+        }
+
+        private string ReplaceMiddleFunctions(string text)
+        {
+            var matches = middleFunctionRegex.Matches(text).Cast<Match>().ToArray();
+            foreach (var match in matches)
+            {
+                if (!double.TryParse(match.Groups["num1"].Value, out double num1)) continue;
+                if (!double.TryParse(match.Groups["num2"].Value, out double num2)) continue;
+                string function = match.Groups["func"].Value;
+
+                switch (function)
+                {
+                    case "%":
+                        if (num2 == 0) continue; // Avoid division by zero
+                        text = text.Replace(match.Value, Functions.modulo(num1, num2).ToString());
+                        break;
+                }
             }
             return text;
         }
@@ -1321,7 +1344,9 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root|(?=\\d)C(?=\\d)))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
+            darkSyntax.AddFunction("(?&lt;=\\d)C(?=\\d)");
+            darkSyntax.AddFunction("(?&lt;=\\-?\\d+(\\.\\d+)?)%(?=\\-?\\d+(\\.\\d+)?)");
             darkSyntax.AddComment("Brackets and signs");
             darkSyntax.AddFunction("\\(|\\{|\\)|\\}|,|!");
             darkSyntax.AddComment("Operators");
