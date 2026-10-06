@@ -1496,7 +1496,6 @@ namespace Calcify
 //  - 'About' change date
 
 //  - functions like
-//    - Modulo operator (%)
 //    - log()
 //    - clamp()
 //    - pow()
@@ -1637,3 +1636,4 @@ namespace Calcify
 //    - tanh()
 //    - atanh()
 //    - ln()
+//    - Modulo operator (%)
