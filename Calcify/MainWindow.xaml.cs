@@ -1535,11 +1535,8 @@ namespace Calcify
 //      - var() (variance)
 //
 //    Two Variables:
-//      - root(float, int)
 //      - perm(n, r) (permutation)
 //      - comb(n, r) (combination)
-//      - randomint()
-//      - random()
 //
 //  - chained operations
 //  - constants like 
@@ -1667,3 +1664,6 @@ namespace Calcify
 //    - pow()
 //    - exp()
 //    - trunc()
+//    - root(float, int)
+//    - randint()
+//    - rand()
