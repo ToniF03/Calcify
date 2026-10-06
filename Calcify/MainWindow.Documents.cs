@@ -11,6 +11,13 @@ namespace Calcify
 {
     public partial class MainWindow
     {
+        public string documentPath = "";
+        public string documentText = "";
+        public string documentAuthor = "";
+        public string documentEditedBy = "";
+        public int documentCreated = 0;
+        public int documentModified = 0;
+
         private bool ConfirmSaveChanges()
         {
             if (!unsavedChanges)

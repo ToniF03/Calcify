@@ -9,7 +9,6 @@ using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -28,41 +27,6 @@ namespace Calcify
     public partial class MainWindow : Window
     {
         #region Variables
-        #region Pattern
-        readonly string AnglePattern = Math.Units.Patterns.AnglePattern;
-        public string CurrencyPattern = @"\b(EUR|AED|AFN|ALL|AMD|ANG|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BGN|BHD|BIF|BMD|BND|BOB|BRL|BSD|BTC|BTN|BWP|BYN|BYR|BZD|CAD|CDF|CHF|CLF|CLP|CNY|COP|CRC|CUC|CUP|CVE|CZK|DJF|DKK|DOP|DZD|EGP|ERN|ETB|EUR|FJD|FKP|GBP|GEL|GGP|GHS|GIP|GMD|GNF|GTQ|GYD|HKD|HNL|HRK|HTG|HUF|IDR|ILS|IMP|INR|IQD|IRR|ISK|JEP|JMD|JOD|JPY|KES|KGS|KHR|KMF|KPW|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LSL|LTL|LVL|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|MRO|MUR|MVR|MWK|MXN|MYR|MZN|NAD|NGN|NIO|NOK|NPR|NZD|OMR|PAB|PEN|PGK|PHP|PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLL|SOS|SRD|STD|SVC|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TWD|TZS|UAH|UGX|USD|UYU|UZS|VEF|VND|VUV|WST|XAF|XAG|XAU|XCD|XDR|XOF|XPF|YER|ZAR|ZMK|ZMW|ZWL)\b";
-        readonly string DataSizePattern = Math.Units.Patterns.DataSizePattern;
-        readonly string FrequencyPattern = Math.Units.Patterns.FrequencyPattern;
-        readonly string LengthPattern = Math.Units.Patterns.LengthPattern;
-        readonly string MassPattern = Math.Units.Patterns.MassPattern;
-        readonly string TemperaturePattern = Math.Units.Patterns.TemperaturePattern;
-        readonly string TimePattern = Math.Units.Patterns.TimePattern;
-        readonly string ConstantsPattern = @"(π|\b(p(h)?i|e)\b)";
-        #endregion
-        #region Regex
-        readonly Regex prevRegex = new Regex(@"\b(previous|prev|answer|ans)\b");
-
-        readonly Regex sqrtRegex = new Regex(@"\b(?<func>sqrt)\((?<variable1>(-)?\d+(\.\d+)?)\)(( )?|$)");
-
-        readonly Regex dateTimeKeyWordsRegex = new Regex(@"\b(?i)(((now|time)(\.(hour|minute|second))?)|(yesterday|date|today|tomorrow)(\.(day|month|year|weekday|dayofyear|weekofyear))?)(?-i)\b");
-        readonly Regex PermutationRegex = new Regex(@"(?<n>\d+)C(?<r>\d+)");
-        readonly Regex calculatorRegex = new Regex(@"^((\d+(\.\d+)?)|\||(\+|\-|\*|\/|\^)(?!\+|\*|\/|\^|\!)|(|\(|\)|\!))*$");
-        readonly Regex directRegex;
-        readonly Regex constantsRegex;
-        readonly Regex sumAvgRegex;
-        readonly Regex inlineCalculationRegex = new Regex(@"(?<=\{)(?<subtask>[^{}]*)(?=\})", RegexOptions.RightToLeft);
-        public Regex currencyRegex;
-
-        readonly Regex allUnitRegex;
-        #endregion
-        #region Document Informations
-        public string documentPath = "";
-        public string documentText = "";
-        public string documentAuthor = "";
-        public string documentEditedBy = "";
-        public int documentCreated = 0;
-        public int documentModified = 0;
-        #endregion
         #region Dictionaries
         readonly Dictionary<string, double> variable = new Dictionary<string, double>();
         readonly Dictionary<string, AngleUnit> angleDict = new Dictionary<string, AngleUnit>();
@@ -136,8 +100,6 @@ namespace Calcify
             System.Diagnostics.Process.Start(System.Reflection.Assembly.GetEntryAssembly().Location);
         }
 
-
-
         private void ThemeButton_MouseEnter(object sender, MouseEventArgs e)
         {
             oldTotalValue = totalLabel.Content.ToString();
@@ -154,8 +116,6 @@ namespace Calcify
         {
             Properties.Settings.Default.DarkMode = !Properties.Settings.Default.DarkMode;
         }
-
-
 
         private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -1475,6 +1435,7 @@ namespace Calcify
 //  - put context menu into MainWindow.ContextMenu.cs
 //  - put drag and drop into MainWindow.DragDrop.cs
 //  - put WindowChrome into seperate Control
+//  - put syntax highlighting into MainWindow.SyntaxHighlighting.cs
 
 
 // Future TODO:
@@ -1508,3 +1469,4 @@ namespace Calcify
 //  - editor > ctrl + h replace
 
 //  - put hotkeys into MainWindow.Hotkeys.cs
+//  - put Regex into MainWindow.Regex.cs
