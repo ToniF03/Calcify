@@ -38,6 +38,8 @@ namespace Calcify
             new FunctionCompletionData("time", "time"),
             new FunctionCompletionData("sign", "sign(value)"),
             new FunctionCompletionData("abs", "abs(value)"),
+            new FunctionCompletionData("floor", "floor(value)"),
+            new FunctionCompletionData("ceil", "ceil(value)"),
         };
 
         private void InitializeFunctionCompletion()

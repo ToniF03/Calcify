@@ -646,7 +646,7 @@ namespace Calcify
         /// Replaces all recognized single-variable mathematical function expressions in the input string with their
         /// computed numeric results.
         /// </summary>
-        /// <remarks>Currently supports replacement of square root expressions in the form 'sqrt(number)'.
+        /// <remarks>Currently supports replacement of square root, sign, absolute value, floor, and ceiling expressions in the form 'function(number)'.
         /// Only positive numbers are evaluated; other values are ignored. The numeric result is rounded according to
         /// the application's digit settings before replacement.</remarks>
         /// <param name="input">The input string containing mathematical function expressions to be evaluated and replaced.</param>
@@ -678,6 +678,16 @@ namespace Calcify
                         extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
                         double absValue = System.Math.Abs(extractedNumber);
                         input = input.Replace(match.Value, ToNumberString(absValue));
+                        break;
+                    case "floor":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double floorValue = System.Math.Floor(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(floorValue));
+                        break;
+                    case "ceil":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double ceilValue = System.Math.Ceiling(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(ceilValue));
                         break;
                 }
             }
@@ -1196,7 +1206,7 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|sign|abs|root|(?=\\d)C(?=\\d)))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|sqrt|sign|abs|floor|ceil|root|(?=\\d)C(?=\\d)))");
             darkSyntax.AddComment("Brackets and signs");
             darkSyntax.AddFunction("\\(|\\{|\\)|\\}|,|!");
             darkSyntax.AddComment("Operators");
@@ -1347,8 +1357,6 @@ namespace Calcify
 
 //  - functions like
 //    - Modulo operator (%)
-//    - floor()
-//    - ceil()
 //    - sin()
 //    - asin()
 //    - sinh()
@@ -1487,3 +1495,5 @@ namespace Calcify
 //  - Added Functions:
 //    - sign()
 //    - abs()
+//    - floor()
+//    - ceil()

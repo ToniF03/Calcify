@@ -19,7 +19,7 @@ namespace Calcify
         readonly string TimePattern = Math.Units.Patterns.TimePattern;
         readonly string ConstantsPattern = @"(π|\b(p(h)?i|e)\b)";
         readonly Regex prevRegex = new Regex(@"\b(previous|prev|answer|ans)\b");
-        readonly Regex oneVariableFunctionRegex = new Regex(@"\b(?<func>(sqrt|sign|abs))\((?<variable1>(-)?\d+(\.\d+)?)\)(( )?|$)");
+        readonly Regex oneVariableFunctionRegex = new Regex(@"\b(?<func>(sqrt|sign|abs|floor|ceil))\((?<variable1>(-)?\d+(\.\d+)?)\)(( )?|$)");
         readonly Regex dateTimeKeyWordsRegex = new Regex(@"\b(?i)(((now|time)(\.(hour|minute|second))?)|(yesterday|date|today|tomorrow)(\.(day|month|year|weekday|dayofyear|weekofyear))?)(?-i)\b");
         readonly Regex PermutationRegex = new Regex(@"(?<n>\d+)C(?<r>\d+)");
         readonly Regex calculatorRegex = new Regex(@"^((\d+(\.\d+)?)|\||(\+|\-|\*|\/|\^)(?!\+|\*|\/|\^|\!)|(|\(|\)|\!))*$");
