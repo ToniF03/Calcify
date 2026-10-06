@@ -840,7 +840,7 @@ namespace Calcify
         /// numeric results.</returns>
         private string ReplaceTwoVariableFunctions(string input)
         {
-            Regex functionsRegex = new Regex(@"\b(?<func>(diff|rand|randint|round|mod|log))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
+            Regex functionsRegex = new Regex(@"\b(?<func>(diff|rand|randint|round|mod|log|pow))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
             // Replace and execute functions
             while (functionsRegex.IsMatch(input))
             {
@@ -892,6 +892,10 @@ namespace Calcify
                             break;
                         }
                         generatedNumber = System.Math.Log(minNumber, maxNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(generatedNumber, Properties.Settings.Default.Digits))).Trim();
+                        break;
+                    case "pow":
+                        generatedNumber = System.Math.Pow(minNumber, maxNumber);
                         input = input.Replace(match.Value, ToNumberString(System.Math.Round(generatedNumber, Properties.Settings.Default.Digits))).Trim();
                         break;
                 }
@@ -1361,7 +1365,7 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|log|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|log|pow|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
             darkSyntax.AddFunction("(?&lt;=\\d)C(?=\\d)");
             darkSyntax.AddFunction("(?&lt;=\\-?\\d+(\\.\\d+)?)%(?=\\-?\\d+(\\.\\d+)?)");
             darkSyntax.AddComment("Brackets and signs");
@@ -1514,7 +1518,6 @@ namespace Calcify
 
 //  - functions like
 //    - clamp()
-//    - pow()
 //    - exp()
 //    - root(float, int)
 //    - trunc()
@@ -1654,3 +1657,4 @@ namespace Calcify
 //    - ln()
 //    - Modulo operator (%)
 //    - log()
+//    - pow()
