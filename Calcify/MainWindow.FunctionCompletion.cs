@@ -36,6 +36,7 @@ namespace Calcify
             new FunctionCompletionData("date", "date"),
             new FunctionCompletionData("now", "now"),
             new FunctionCompletionData("time", "time"),
+            new FunctionCompletionData("sign", "sign(value)"),
         };
 
         private void InitializeFunctionCompletion()

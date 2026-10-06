@@ -258,7 +258,7 @@ namespace Calcify
             DropPanel.Visibility = Visibility.Visible;
             resultEditor.TextArea.Caret.CaretBrush = Brushes.Transparent;
 
-            ZoomComboBox.Text = (Properties.Settings.Default.EditorZoom * 100).ToString(CultureInfo.InvariantCulture) + "%";
+            ZoomComboBox.Text = (Properties.Settings.Default.EditorZoom * 100).ToString(CultureInfo.InvariantCulture) + " %";
             mainEditor.LayoutTransform = new ScaleTransform(Properties.Settings.Default.EditorZoom, Properties.Settings.Default.EditorZoom);
             resultEditor.LayoutTransform = new ScaleTransform(Properties.Settings.Default.EditorZoom, Properties.Settings.Default.EditorZoom);
         }
@@ -654,7 +654,7 @@ namespace Calcify
         /// value. If no such expressions are found, the original input string is returned unchanged.</returns>
         private string ReplaceOneVariableFunctions(string input)
         {
-            MatchCollection matches = sqrtRegex.Matches(input);
+            MatchCollection matches = oneVariableFunctionRegex.Matches(input);
             foreach (Match match in matches)
             {
                 double extractedNumber;
@@ -668,6 +668,11 @@ namespace Calcify
                             double value = System.Math.Sqrt(extractedNumber);
                             input = input.Replace(match.Value, ToNumberString(System.Math.Round(value, Properties.Settings.Default.Digits)));
                         }
+                        break;
+                    case "sign":
+                        extractedNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
+                        double signValue = Functions.sign(extractedNumber);
+                        input = input.Replace(match.Value, ToNumberString(signValue));
                         break;
                 }
             }
@@ -1361,7 +1366,6 @@ namespace Calcify
 //    - cbrt()
 //    - root(float, int)
 //    - trunc()
-//    - sign()
 //    - min()
 //    - max()
 //    - fact()
@@ -1475,3 +1479,6 @@ namespace Calcify
 
 //  - put hotkeys into MainWindow.Hotkeys.cs
 //  - put Regex into MainWindow.Regex.cs
+
+//  - Added Functions:
+//    - sign()
