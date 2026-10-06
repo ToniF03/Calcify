@@ -59,6 +59,7 @@ namespace Calcify
             new FunctionCompletionData("tanr", "tanr(value)"),
             new FunctionCompletionData("ln", "ln(value)"),
             new FunctionCompletionData("trunc", "trunc(value)"),
+            new FunctionCompletionData("mod", "mod(value, divisor)"),
         };
 
         private void InitializeFunctionCompletion()
