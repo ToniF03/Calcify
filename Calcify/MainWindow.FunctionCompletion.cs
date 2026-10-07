@@ -76,6 +76,7 @@ namespace Calcify
             new FunctionCompletionData("median", "median(value1, value2, ...)"),
             new FunctionCompletionData("mode", "mode(value1, value2, ...)"),
             new FunctionCompletionData("stdev", "stdev(value1, value2, ...)"),
+            new FunctionCompletionData("var", "var(value1, value2, ...)"),
         };
 
         private void InitializeFunctionCompletion()
