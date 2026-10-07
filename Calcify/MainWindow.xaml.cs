@@ -976,7 +976,7 @@ namespace Calcify
 
         private string ReplaceMultipleVariableFunctions(string input)
         {
-            Regex functionsRegex = new Regex(@"\b(?<func>(sum|avg|min|max|mean))\((?<variable1>-?\d+(\.\d+)?)(, ?(?<variable>-?\d+(\.\d+)?))+\)", RegexOptions.RightToLeft);
+            Regex functionsRegex = new Regex(@"\b(?<func>(sum|avg|min|max|mean|median))\((?<variable1>-?\d+(\.\d+)?)(, ?(?<variable>-?\d+(\.\d+)?))+\)", RegexOptions.RightToLeft);
 
             while (functionsRegex.IsMatch(input))
             {
@@ -1009,6 +1009,20 @@ namespace Calcify
                     case "mean":
                         double mean = (variable1 + variables.Sum()) / (variables.Count + 1);
                         input = input.Replace(match.Value, ToNumberString(mean)).Trim();
+                        break;
+                    case "median":
+                        List<double> allValues = new List<double> { variable1 };
+                        allValues.AddRange(variables);
+                        allValues.Sort();
+                        double median;
+                        int count = allValues.Count;
+                        if (count % 2 == 0)
+                            // Even number of elements
+                            median = (allValues[count / 2 - 1] + allValues[count / 2]) / 2.0;
+                        else
+                            // Odd number of elements
+                            median = allValues[count / 2];
+                        input = input.Replace(match.Value, ToNumberString(median)).Trim();
                         break;
                 }
             }
@@ -1474,7 +1488,7 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|perm|mean|comb(a)?|sum|avg|min|max|log|pow|exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|perm|mean|median|comb(a)?|sum|avg|min|max|log|pow|exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
             darkSyntax.AddFunction("clamp");
             darkSyntax.AddFunction("(?&lt;=\\d)C(?=\\d)");
             darkSyntax.AddFunction("(?&lt;=\\-?\\d+(\\.\\d+)?)%(?=\\-?\\d+(\\.\\d+)?)");
@@ -1628,7 +1642,6 @@ namespace Calcify
 
 //  - functions like
 //    Multiple Variables:
-//      - median()
 //      - mode() (most frequent value)
 //      - stdev() (standard deviation)
 //      - var() (variance)
@@ -1771,3 +1784,4 @@ namespace Calcify
 //    - min(x1, x2, ..., xn)
 //    - max(x1, x2, ..., xn)
 //    - mean() (average)
+//    - median()
