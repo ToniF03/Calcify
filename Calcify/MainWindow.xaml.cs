@@ -976,7 +976,7 @@ namespace Calcify
 
         private string ReplaceMultipleVariableFunctions(string input)
         {
-            Regex functionsRegex = new Regex(@"\b(?<func>(sum|avg|min|max|mean|median))\((?<variable1>-?\d+(\.\d+)?)(, ?(?<variable>-?\d+(\.\d+)?))+\)", RegexOptions.RightToLeft);
+            Regex functionsRegex = new Regex(@"\b(?<func>(sum|avg|min|max|mean|median|mode|stdev))\((?<variable1>-?\d+(\.\d+)?)(, ?(?<variable>-?\d+(\.\d+)?))+\)", RegexOptions.RightToLeft);
 
             while (functionsRegex.IsMatch(input))
             {
@@ -1023,6 +1023,22 @@ namespace Calcify
                             // Odd number of elements
                             median = allValues[count / 2];
                         input = input.Replace(match.Value, ToNumberString(median)).Trim();
+                        break;
+                    case "mode":
+                        List<double> allModeValues = new List<double> { variable1 };
+                        allModeValues.AddRange(variables);
+                        var modeGroups = allModeValues.GroupBy(v => v)
+                            .Select(g => new { Value = g.Key, Count = g.Count() })
+                            .OrderByDescending(g => g.Count)
+                            .ToList();
+                        double modeValue = modeGroups.First().Value;
+                        input = input.Replace(match.Value, ToNumberString(modeValue)).Trim();
+                        break;
+                    case "stdev":
+                        List<double> allStdevValues = new List<double> { variable1 };
+                        allStdevValues.AddRange(variables);
+                        double stdev = Functions.StandardDeviation(allStdevValues.ToArray());
+                        input = input.Replace(match.Value, ToNumberString(stdev)).Trim();
                         break;
                 }
             }
@@ -1486,9 +1502,9 @@ namespace Calcify
             darkSyntax.AddComment("Constants");
             darkSyntax.AddConstants(ConstantsPattern);
             darkSyntax.AddComment("Keywords");
-            darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
+            darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|ans|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|perm|mean|median|comb(a)?|sum|avg|min|max|log|pow|exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod(e)?|perm|mean|median|comb(a)?|sum|avg|stdev|min|max|log|pow|exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
             darkSyntax.AddFunction("clamp");
             darkSyntax.AddFunction("(?&lt;=\\d)C(?=\\d)");
             darkSyntax.AddFunction("(?&lt;=\\-?\\d+(\\.\\d+)?)%(?=\\-?\\d+(\\.\\d+)?)");
@@ -1640,10 +1656,12 @@ namespace Calcify
 //
 //  - 'About' change date
 
-//  - functions like
+// Bugs:
+//  - Calculation is not working if line starts with brackets
+//  - -2^2 = -2?
+
+// Functions:
 //    Multiple Variables:
-//      - mode() (most frequent value)
-//      - stdev() (standard deviation)
 //      - var() (variance)
 //
 //  - chained operations
@@ -1785,3 +1803,5 @@ namespace Calcify
 //    - max(x1, x2, ..., xn)
 //    - mean() (average)
 //    - median()
+//    - mode() (most frequent value)
+//    - stdev() (standard deviation)
