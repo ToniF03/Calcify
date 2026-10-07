@@ -664,6 +664,21 @@ namespace Calcify
                     case "e":
                         text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(System.Math.E, Properties.Settings.Default.Digits)), 1);
                         break;
+                    case "tau":
+                        text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(Constants.Tau, Properties.Settings.Default.Digits)), 1);
+                        break;
+                    case "c":
+                        text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(Constants.c, Properties.Settings.Default.Digits)), 1);
+                        break;
+                    case "R":
+                        text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(Constants.R, Properties.Settings.Default.Digits)), 1);
+                        break;
+                    case "Na":
+                        text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(Constants.Na, Properties.Settings.Default.Digits)), 1);
+                        break;
+                    case "g":
+                        text = constantsRegex.Replace(text, ToNumberString(System.Math.Round(Constants.g, Properties.Settings.Default.Digits)), 1);
+                        break;
                 }
             }
             return text;
@@ -976,7 +991,7 @@ namespace Calcify
 
         private string ReplaceMultipleVariableFunctions(string input)
         {
-            Regex functionsRegex = new Regex(@"\b(?<func>(sum|avg|min|max|mean|median|mode|stdev))\((?<variable1>-?\d+(\.\d+)?)(, ?(?<variable>-?\d+(\.\d+)?))+\)", RegexOptions.RightToLeft);
+            Regex functionsRegex = new Regex(@"\b(?<func>(sum|avg|min|max|mean|median|mode|stdev|var))\((?<variable1>-?\d+(\.\d+)?)(, ?(?<variable>-?\d+(\.\d+)?))+\)", RegexOptions.RightToLeft);
 
             while (functionsRegex.IsMatch(input))
             {
@@ -1039,6 +1054,12 @@ namespace Calcify
                         allStdevValues.AddRange(variables);
                         double stdev = Functions.StandardDeviation(allStdevValues.ToArray());
                         input = input.Replace(match.Value, ToNumberString(stdev)).Trim();
+                        break;
+                    case "var":
+                        List<double> allVarValues = new List<double> { variable1 };
+                        allVarValues.AddRange(variables);
+                        double var = Functions.Variance(allVarValues.ToArray());
+                        input = input.Replace(match.Value, ToNumberString(var)).Trim();
                         break;
                 }
             }
@@ -1504,7 +1525,7 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|ans|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod(e)?|perm|mean|median|comb(a)?|sum|avg|stdev|min|max|log|pow|exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod(e)?|perm|mean|median|var|comb(a)?|sum|avg|stdev|min|max|log|pow|exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
             darkSyntax.AddFunction("clamp");
             darkSyntax.AddFunction("(?&lt;=\\d)C(?=\\d)");
             darkSyntax.AddFunction("(?&lt;=\\-?\\d+(\\.\\d+)?)%(?=\\-?\\d+(\\.\\d+)?)");
@@ -1660,24 +1681,7 @@ namespace Calcify
 //  - Calculation is not working if line starts with brackets
 //  - -2^2 = -2?
 
-// Functions:
-//    Multiple Variables:
-//      - var() (variance)
-//
 //  - chained operations
-//  - constants like 
-//    - tau
-//    - phi
-//    - c (speed of light) >> add to docs (math-functions.md)
-//    - h (Planck constant) >> add to docs (math-functions.md)
-//    - G (gravitational constant) >> add to docs (math-functions.md)
-//    - R (ideal gas constant) >> add to docs (math-functions.md)
-//    - Na (Avogadro constant) >> add to docs (math-functions.md)
-//    - k (Boltzmann constant) >> add to docs (math-functions.md)
-//    - μ0 (magnetic constant) >> add to docs (math-functions.md)
-//    - ε0 (electric constant) >> add to docs (math-functions.md)
-//    - σ (Stefan-Boltzmann constant) >> add to docs (math-functions.md)
-//    - g (standard gravity) >> add to docs (math-functions.md)
 //  - implement variables
 //  - calculations within functions
 
@@ -1805,3 +1809,10 @@ namespace Calcify
 //    - median()
 //    - mode() (most frequent value)
 //    - stdev() (standard deviation)
+//    - var() (variance)
+//  - Added Constants
+//    - tau
+//    - c (speed of light) >> add to docs (math-functions.md)
+//    - R (ideal gas constant) >> add to docs (math-functions.md)
+//    - Na (Avogadro constant) >> add to docs (math-functions.md)
+//    - g (standard gravity) >> add to docs (math-functions.md)

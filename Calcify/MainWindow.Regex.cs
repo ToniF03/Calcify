@@ -17,7 +17,7 @@ namespace Calcify
         readonly string MassPattern = Math.Units.Patterns.MassPattern;
         readonly string TemperaturePattern = Math.Units.Patterns.TemperaturePattern;
         readonly string TimePattern = Math.Units.Patterns.TimePattern;
-        readonly string ConstantsPattern = @"(π|\b(p(h)?i|e)\b)";
+        readonly string ConstantsPattern = @"(π|\b(p(h)?i|e|tau|c|R|Na|g)\b)";
         readonly Regex prevRegex = new Regex(@"\b(previous|prev|answer|ans)\b");
         readonly Regex oneVariableFunctionRegex = new Regex(@"\b(?<func>(exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc))\((?<variable1>(-)?\d+(\.\d+)?)\)(( )?|$)");
         readonly Regex dateTimeKeyWordsRegex = new Regex(@"\b(?i)(((now|time)(\.(hour|minute|second))?)|(yesterday|date|today|tomorrow|tmrw)(\.(day|month|year|weekday|dayofyear|weekofyear))?)(?-i)\b");
