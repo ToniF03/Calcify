@@ -862,7 +862,7 @@ namespace Calcify
         /// numeric results.</returns>
         private string ReplaceTwoVariableFunctions(string input)
         {
-            Regex functionsRegex = new Regex(@"\b(?<func>(diff|rand|randint|round|mod|log|pow|perm|comb(a)?))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
+            Regex functionsRegex = new Regex(@"\b(?<func>(diff|rand|randint|round|root|mod|log|pow|perm|comb(a)?))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
             // Replace and execute functions
             while (functionsRegex.IsMatch(input))
             {
@@ -946,6 +946,15 @@ namespace Calcify
                         }
                         generatedNumber = Functions.CombinationA((int)minNumber, (int)maxNumber);
                         input = input.Replace(match.Value, ToNumberString(generatedNumber)).Trim();
+                        break;
+                    case "root":
+                        if (maxNumber == 0)
+                        {
+                            input = input.Replace(match.Value, "NaN").Trim();
+                            break;
+                        }
+                        generatedNumber = Functions.Root(minNumber, maxNumber);
+                        input = input.Replace(match.Value, ToNumberString(System.Math.Round(generatedNumber, Properties.Settings.Default.Digits))).Trim();
                         break;
                 }
             }
@@ -1691,7 +1700,9 @@ namespace Calcify
 //  - Recent Files List
 //  - toolbar
 
+
 //  - Rename settings scheme to theme
+
 
 //  - settings > disable auto updates
 //  - settings > font size
@@ -1706,6 +1717,7 @@ namespace Calcify
 //  - settings > thousands seperator
 //  - settings > Verify rates are current in Settings
 
+
 //  - editor > tab complete
 //  - editor > right click context menu
 //    - Undo - Undo last action
@@ -1715,6 +1727,7 @@ namespace Calcify
 //    - Paste - Paste from clipboard
 //    - Delete - Delete selected text
 //    - Select All - Select all content
+
 
 //  - accept inches, bytes, gallons, cups, speed (kmh, mh, ...), data speed (mbps, gbps, ...), tmrw, nmi (nautical miles) (1 nmi = 1852 m), carat (1 ct = 0.2 g), turn (turn, revolution) (1 turn = 360 degrees), THz, pressure, energy, Power, area, volumes (look supported-units.md) as keyword
 //  - basic calculation 1024 * x does not work
@@ -1726,6 +1739,7 @@ namespace Calcify
 //  - maybe update architecture.md
 //  - Time Formats (now.format("HH:mm:ss"), today.format("yyyy-MM-dd"))
 
+
 // Refactor:
 //  - put context menu into MainWindow.ContextMenu.cs
 //  - put drag and drop into MainWindow.DragDrop.cs
@@ -1733,10 +1747,14 @@ namespace Calcify
 //  - put syntax highlighting into MainWindow.SyntaxHighlighting.cs
 
 
+
 // Future TODO:
 //  - Plugin Support
 //  - Plugin Marketplace
 //  - equations
+
+
+
 
 
 // Done:
