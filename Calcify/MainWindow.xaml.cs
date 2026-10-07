@@ -976,7 +976,7 @@ namespace Calcify
 
         private string ReplaceMultipleVariableFunctions(string input)
         {
-            Regex functionsRegex = new Regex(@"\b(?<func>(sum|avg|min|max))\((?<variable1>-?\d+(\.\d+)?)(, ?(?<variable>-?\d+(\.\d+)?))+\)", RegexOptions.RightToLeft);
+            Regex functionsRegex = new Regex(@"\b(?<func>(sum|avg|min|max|mean))\((?<variable1>-?\d+(\.\d+)?)(, ?(?<variable>-?\d+(\.\d+)?))+\)", RegexOptions.RightToLeft);
 
             while (functionsRegex.IsMatch(input))
             {
@@ -1005,6 +1005,10 @@ namespace Calcify
                     case "max":
                         double max = System.Math.Max(variable1, variables.Max());
                         input = input.Replace(match.Value, ToNumberString(max)).Trim();
+                        break;
+                    case "mean":
+                        double mean = (variable1 + variables.Sum()) / (variables.Count + 1);
+                        input = input.Replace(match.Value, ToNumberString(mean)).Trim();
                         break;
                 }
             }
@@ -1470,7 +1474,7 @@ namespace Calcify
             darkSyntax.AddComment("Keywords");
             darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|last|avg|sum|to)\\b");
             darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|perm|comb(a)?|sum|avg|min|max|log|pow|exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
+            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod|perm|mean|comb(a)?|sum|avg|min|max|log|pow|exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
             darkSyntax.AddFunction("clamp");
             darkSyntax.AddFunction("(?&lt;=\\d)C(?=\\d)");
             darkSyntax.AddFunction("(?&lt;=\\-?\\d+(\\.\\d+)?)%(?=\\-?\\d+(\\.\\d+)?)");
@@ -1624,7 +1628,6 @@ namespace Calcify
 
 //  - functions like
 //    Multiple Variables:
-//      - mean() (average)
 //      - median()
 //      - mode() (most frequent value)
 //      - stdev() (standard deviation)
@@ -1652,8 +1655,6 @@ namespace Calcify
 
 //  - Recent Files List
 //  - toolbar
-
-//  - Auto Completion
 
 //  - Rename settings scheme to theme
 
@@ -1715,6 +1716,8 @@ namespace Calcify
 //  - added optional line numbers
 //  - Status Bar Line and column
 
+//  - Auto Completion
+
 //  - editor > F1 help
 //  - editor > ctrl + '0' reset zoom
 //  - editor > ctrl + mouse wheel zoom
@@ -1767,3 +1770,4 @@ namespace Calcify
 //    - avg()
 //    - min(x1, x2, ..., xn)
 //    - max(x1, x2, ..., xn)
+//    - mean() (average)

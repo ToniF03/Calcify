@@ -71,6 +71,8 @@ namespace Calcify
             new FunctionCompletionData("avg", "avg(value1, value2, ...)"),
             new FunctionCompletionData("min", "min(value1, value2, ...)"),
             new FunctionCompletionData("max", "max(value1, value2, ...)"),
+            new FunctionCompletionData("abs", "abs(value)"),
+            new FunctionCompletionData("mean", "mean(value1, value2, ...)"),
         };
 
         private void InitializeFunctionCompletion()
