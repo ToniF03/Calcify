@@ -51,8 +51,6 @@ namespace Calcify
         private string windowTitle = "";
         private bool unsavedChanges = false;
         private readonly RegistryWatcher watcher = null;
-        private readonly SyntaxFile lightSyntax = new SyntaxFile(SyntaxFile.Theme.Light);
-        private readonly SyntaxFile darkSyntax = new SyntaxFile(SyntaxFile.Theme.Dark);
 
         public int returnState = -1;
         public About aboutWindow = null;
@@ -619,6 +617,11 @@ namespace Calcify
             return text;
         }
 
+        /// <summary>
+        /// Replaces all recognized middle-function expressions in the specified text with their computed numeric results.
+        /// </summary>
+        /// <param name="text">The input string containing middle-function expressions to be replaced.</param>
+        /// <returns>A string in which all valid middle-function expressions have been replaced with their computed results.</returns>
         private string ReplaceMiddleFunctions(string text)
         {
             var matches = middleFunctionRegex.Matches(text).Cast<Match>().ToArray();
@@ -696,7 +699,7 @@ namespace Calcify
         /// value. If no such expressions are found, the original input string is returned unchanged.</returns>
         private string ReplaceOneVariableFunctions(string input)
         {
-            MatchCollection matches = oneVariableFunctionRegex.Matches(input);
+            MatchCollection matches = oneValueFunctionRegex.Matches(input);
             foreach (Match match in matches)
             {
                 double extractedNumber;
@@ -862,11 +865,10 @@ namespace Calcify
         /// numeric results.</returns>
         private string ReplaceTwoVariableFunctions(string input)
         {
-            Regex functionsRegex = new Regex(@"\b(?<func>(diff|rand|randint|round|root|mod|log|pow|perm|comb(a)?))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
             // Replace and execute functions
-            while (functionsRegex.IsMatch(input))
+            while (twoValueFunctionRegex.IsMatch(input))
             {
-                Match match = functionsRegex.Match(input);
+                Match match = twoValueFunctionRegex.Match(input);
                 string function = match.Groups["func"].Value;
                 double minNumber = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
                 double maxNumber = double.Parse(match.Groups["variable2"].Value, CultureInfo.InvariantCulture);
@@ -973,11 +975,9 @@ namespace Calcify
         /// numeric results.</returns>
         private string ReplaceThreeVariableFunctions(string input)
         {
-            Regex functionsRegex = new Regex(@"\b(?<func>(clamp))\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?), ?(?<variable3>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
-
-            while (functionsRegex.IsMatch(input))
+            while (threeValueRegex.IsMatch(input))
             {
-                Match match = functionsRegex.Match(input);
+                Match match = threeValueRegex.Match(input);
                 string function = match.Groups["func"].Value;
                 double variable1 = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
                 double variable2 = double.Parse(match.Groups["variable2"].Value, CultureInfo.InvariantCulture);
@@ -1000,11 +1000,9 @@ namespace Calcify
 
         private string ReplaceMultipleVariableFunctions(string input)
         {
-            Regex functionsRegex = new Regex(@"\b(?<func>(sum|avg|min|max|mean|median|mode|stdev|var))\((?<variable1>-?\d+(\.\d+)?)(, ?(?<variable>-?\d+(\.\d+)?))+\)", RegexOptions.RightToLeft);
-
-            while (functionsRegex.IsMatch(input))
+            while (multipleValueRegex.IsMatch(input))
             {
-                Match match = functionsRegex.Match(input);
+                Match match = multipleValueRegex.Match(input);
                 string function = match.Groups["func"].Value;
                 double variable1 = double.Parse(match.Groups["variable1"].Value, CultureInfo.InvariantCulture);
                 List<double> variables = new List<double>();
@@ -1498,52 +1496,6 @@ namespace Calcify
                 { typeof(TimeUnit), (val, current, target) => Converter.TimeConverter(val, (TimeUnit)current, (TimeUnit)target) },
                 { typeof(TemperatureUnit), (val, current, target) => Converter.TemperatureConverter(val, (TemperatureUnit)current, (TemperatureUnit)target) }
             };
-
-        }
-
-        /// <summary>
-        /// Updates the syntax highlighting rules for various domain-specific patterns, including currency, data size
-        /// formats, time keywords, frequency, and other measurement units.
-        /// </summary>
-        /// <remarks>This method refreshes the highlighting configuration by adding comments, units,
-        /// functions, and constants to the underlying syntax engine. It should be called whenever the relevant patterns
-        /// or highlighting rules need to be reapplied, such as after changes to pattern definitions or initialization
-        /// of the syntax engine.</remarks>
-        private void UpdateSyntaxHighlighting()
-        {
-            darkSyntax.AddComment("Currency");
-            darkSyntax.AddUnits(CurrencyPattern);
-            darkSyntax.AddComment("Data Size Formats");
-            darkSyntax.AddUnits(DataSizePattern);
-            darkSyntax.AddComment("Frequency");
-            darkSyntax.AddUnits(FrequencyPattern);
-            darkSyntax.AddComment("Length");
-            darkSyntax.AddUnits(LengthPattern);
-            darkSyntax.AddComment("Mass");
-            darkSyntax.AddUnits(MassPattern);
-            darkSyntax.AddComment("Temperature");
-            darkSyntax.AddUnits(TemperaturePattern);
-            darkSyntax.AddComment("Angle");
-            darkSyntax.AddUnits(AnglePattern);
-            darkSyntax.AddComment("Time");
-            darkSyntax.AddUnits(TimePattern);
-            darkSyntax.AddComment("Time Keywords");
-            darkSyntax.AddFunction(@"(((yester|to)?day|tomorrow|tmrw)(\.(day(ofyear)?|week(day|ofyear)?|month|year))?|now(\.(hour|minute|second))?)");
-            darkSyntax.AddComment("Constants");
-            darkSyntax.AddConstants(ConstantsPattern);
-            darkSyntax.AddComment("Keywords");
-            darkSyntax.AddFunction("\\b(in(to)?|as|plus|add|minus|of(f)?|remove|prev(ious)?|ans|last|avg|sum|to)\\b");
-            darkSyntax.AddComment("Functions");
-            darkSyntax.AddFunction("(\\b(diff|round|rand(int)?|mod(e)?|perm|mean|median|var|comb(a)?|sum|avg|stdev|min|max|log|pow|exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc|root))");
-            darkSyntax.AddFunction("clamp");
-            darkSyntax.AddFunction("(?&lt;=\\d)C(?=\\d)");
-            darkSyntax.AddFunction("(?&lt;=\\-?\\d+(\\.\\d+)?)%(?=\\-?\\d+(\\.\\d+)?)");
-            darkSyntax.AddComment("Brackets and signs");
-            darkSyntax.AddFunction("\\(|\\{|\\)|\\}|,|!");
-            darkSyntax.AddComment("Operators");
-            darkSyntax.AddOperator("(\\+|\\-|\\*|\\/|\\||\\^)");
-            darkSyntax.AddComment("Numbers");
-            darkSyntax.AddNumbers("(-?((\\d{1,3},)*\\d{3}|\\d+)(\\.\\d+)?)");
 
         }
 

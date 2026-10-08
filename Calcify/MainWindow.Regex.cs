@@ -18,8 +18,11 @@ namespace Calcify
         readonly string TemperaturePattern = Math.Units.Patterns.TemperaturePattern;
         readonly string TimePattern = Math.Units.Patterns.TimePattern;
         readonly string ConstantsPattern = @"(π|\b(p(h)?i|e|tau|c|R|Na|g)\b)";
-        readonly Regex prevRegex = new Regex(@"\b(previous|prev|answer|ans)\b");
-        readonly Regex oneVariableFunctionRegex = new Regex(@"\b(?<func>(exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc))\((?<variable1>(-)?\d+(\.\d+)?)\)(( )?|$)");
+        readonly Regex prevRegex = new Regex(@"\b" + lastKeywords + "\b");
+        readonly Regex oneValueFunctionRegex = new Regex(@"\b(?<func>" + oneValueFunctionKeywords + @")\((?<variable1>(-)?\d+(\.\d+)?)\)(( )?|$)");
+        readonly Regex twoValueFunctionRegex = new Regex(@"\b(?<func>" + twoValueFunctionKeywords + @")\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
+        readonly Regex threeValueRegex = new Regex(@"\b(?<func>" + threeValueFunctionKeywords + @")\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?), ?(?<variable3>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
+        readonly Regex multipleValueRegex = new Regex(@"\b(?<func>" + multipleValueFunctionKeywords + @")\((?<variable1>-?\d+(\.\d+)?)(, ?(?<variable>-?\d+(\.\d+)?))+\)", RegexOptions.RightToLeft);
         readonly Regex dateTimeKeyWordsRegex = new Regex(@"\b(?i)(((now|time)(\.(hour|minute|second))?)|(yesterday|date|today|tomorrow|tmrw)(\.(day|month|year|weekday|dayofyear|weekofyear))?)(?-i)\b");
         readonly Regex PermutationRegex = new Regex(@"(?<n>\d+)C(?<r>\d+)");
         readonly Regex middleFunctionRegex = new Regex(@"(?<num1>-?\d+(\.\d+)?)(?<func>(\%))(?<num2>-?\d+(\.\d+)?)");
@@ -30,5 +33,38 @@ namespace Calcify
         readonly Regex inlineCalculationRegex = new Regex(@"(?<=\{)(?<subtask>[^{}]*)(?=\})", RegexOptions.RightToLeft);
         public Regex currencyRegex;
         readonly Regex allUnitRegex;
+
+        /// <summary>
+        /// Defines a regular expression pattern to match keywords related to "last" or "previous" values, as well as "answer" references, for use in syntax highlighting and parsing.
+        /// </summary>
+        static readonly string lastKeywords = @"(last|prev(ious)?|ans(wer)?)";
+        /// <summary>
+        /// Defines a regular expression pattern to match keywords related to conversion operations, such as "in", "into", and "as", for use in syntax highlighting and parsing.
+        /// </summary>
+        static readonly string convertKeywords = @"(in(to)?|as|to)";
+        /// <summary>
+        /// Defines a regular expression pattern to match keywords related to mathematical operations, such as "plus", "add", "minus", "of", and "remove", for use in syntax highlighting and parsing.
+        /// </summary>
+        static readonly string operatorKeywords = "(plus|add|minus|of(f)?|remove)";
+        /// <summary>
+        /// Defines a regular expression pattern to match keywords related to one-word functions, such as "ans", "last", "avg", and "sum", for use in syntax highlighting and parsing.
+        /// </summary>
+        static readonly string noValueFunctionKeywords = "(ans(wer)?|last|prev(ious)?|avg|average|sum)";
+        /// <summary>
+        /// Defines a regular expression pattern to match keywords related to one-value functions, such as "exp", "sqrt", "sign", "abs", "floor", "ceil", "cbrt", "fact", trigonometric functions, "ln", and "trunc", for use in syntax highlighting and parsing.
+        /// </summary>
+        static readonly string oneValueFunctionKeywords = @"(exp|sqrt|sign|abs|floor|ceil|cbrt|fact|(sin|cos|tan)r|((a)?(sin|cos|tan)(h)?)|ln|trunc)";
+        /// <summary>
+        /// Defines a regular expression pattern to match keywords related to two-value functions, such as "diff", "rand", "randint", "round", "root", "mod", "log", "pow", "perm", and "comb(a)?", for use in syntax highlighting and parsing.
+        /// </summary>
+        static readonly string twoValueFunctionKeywords = @"(diff|rand|randint|round|root|mod|log|pow|perm|comb(a)?)";
+        /// <summary>
+        /// Defines a regular expression pattern to match keywords related to three-value functions, such as "clamp", for use in syntax highlighting and parsing.
+        /// </summary>
+        static readonly string threeValueFunctionKeywords = @"(clamp)";
+        /// <summary>
+        /// Defines a regular expression pattern to match keywords related to multiple-value functions, such as "median", "mean", "var", "stdev", "min", "max", "sum", and "avg", for use in syntax highlighting and parsing.
+        /// </summary>
+        static readonly string multipleValueFunctionKeywords = @"(median|mean|var|stdev|min|max|sum|avg|mode)";
     }
 }

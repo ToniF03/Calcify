@@ -6,4 +6,4 @@ Use the body to explain what and why you have done something. In most cases, you
 In the body, use bullet points to describe everything.
 Avoid vague terms like "update", "enhance", "improve", or "better".
 If multiple changes are made, pick the most significant one or group them and describe them in detail. The other details may be included as bullet points in the body.
-Describe what has been done in the commit. Use explicit terms at the beginning of the subject like "added", "removed", "changed", "fixed", "refactored", etc. and explain why those changes were necessary.
+Describe what has been done in the commit. Use explicit terms at the beginning of the subject like "added", "removed", "changed", "fixed", "refactored", etc. and explain why those changes were necessary. Do not use Emojis!
