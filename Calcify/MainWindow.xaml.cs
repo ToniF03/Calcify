@@ -1713,11 +1713,6 @@ namespace Calcify
 //  - chained operations
 //  - implement variables
 //  - calculations within functions
-
-
-
-
-//  - Recent Files List
 //  - toolbar
 
 
@@ -1790,6 +1785,7 @@ namespace Calcify
 //  - Status Bar Line and column
 
 //  - Auto Completion
+//  - Recent Files List
 
 //  - editor > F1 help
 //  - editor > ctrl + '0' reset zoom

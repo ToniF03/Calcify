@@ -73,15 +73,17 @@
             <Button x:Name="MenuButton" Grid.Column="0" WindowChrome.IsHitTestVisibleInChrome="True" Style="{StaticResource ChromeButton}" AutomationProperties.Name="Application menu" ToolTip="Open menu">
                 <Button.ContextMenu>
                     <ContextMenu >
-                        <MenuItem x:Name="contextNewFileButton" Header="New File"/>
-                        <MenuItem x:Name="contextOpenButton" Header="Open"/>
-                        <MenuItem x:Name="contextSaveButton" Header="Save"/>
-                        <MenuItem x:Name="recentFilesMenu" Header="Recent Files">
+                        <MenuItem x:Name="contextNewFileButton" Header="New File" Style="{StaticResource RecentFilesSubmenuStyle}" />
+                        <MenuItem x:Name="contextOpenButton" Header="Open" Style="{StaticResource RecentFilesSubmenuStyle}" />
+                        <MenuItem x:Name="contextSaveButton" Header="Save" Style="{StaticResource RecentFilesSubmenuStyle}" />
+                        <MenuItem x:Name="recentFilesMenu"
+                                  Header="Recent Files"
+                                  Style="{StaticResource RecentFilesSubmenuStyle}">
                         </MenuItem>
-                        <MenuItem x:Name="contextSaveAsButton" Header="Save as..."/>
-                        <MenuItem x:Name="contextAboutButton" Header="About"/>
-                        <MenuItem x:Name="contextSettingsButton" Header="Settings"/>
-                        <MenuItem x:Name="contextExitButton" Header="Exit"/>
+                        <MenuItem x:Name="contextSaveAsButton" Header="Save as..." Style="{StaticResource RecentFilesSubmenuStyle}" />
+                        <MenuItem x:Name="contextAboutButton" Header="About" Style="{StaticResource RecentFilesSubmenuStyle}" />
+                        <MenuItem x:Name="contextSettingsButton" Header="Settings" Style="{StaticResource RecentFilesSubmenuStyle}" />
+                        <MenuItem x:Name="contextExitButton" Header="Exit" Style="{StaticResource RecentFilesSubmenuStyle}" />
                     </ContextMenu>
                 </Button.ContextMenu>
                 <Button.Content>

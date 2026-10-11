@@ -464,41 +464,53 @@
                 </Setter>
             </Style>
 
-            <!-- Menu row with a subtle translucent theme-aware hover highlight. -->
-            <Style TargetType="MenuItem" >
-                <Setter Property="Template" >
+            <!-- Use WPF's native MenuItem template so nested menus retain popup and keyboard behavior. -->
+            <Style TargetType="MenuItem">
+                <Setter Property="Padding" Value="5,3" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="False">
+                        <Setter Property="Foreground" Value="{StaticResource LightModernForegroundbrush}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True">
+                        <Setter Property="Foreground" Value="{StaticResource DarkModernForegroundbrush}" />
+                    </DataTrigger>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="False" />
+                            <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                        </MultiDataTrigger.Conditions>
+                        <Setter Property="Background" Value="#33000000" />
+                    </MultiDataTrigger>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True" />
+                            <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                        </MultiDataTrigger.Conditions>
+                        <Setter Property="Background" Value="#33FFFFFF" />
+                    </MultiDataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="RecentFilesSubmenuStyle" TargetType="MenuItem">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="{StaticResource LightModernForegroundbrush}" />
+                <Setter Property="Padding" Value="5,3" />
+                <Setter Property="Template">
                     <Setter.Value>
-                        <ControlTemplate TargetType="MenuItem" >
+                        <ControlTemplate TargetType="MenuItem">
                             <Grid>
-                                <Border>
-                                    <Border.Style>
-                                        <!-- Border surface with a subtle theme-aware background or hover highlight. -->
-                                        <Style TargetType="Border" >
-                                            <Style.Triggers>
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="False" />
-                                                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
-                                                    </MultiDataTrigger.Conditions>
-                                                    <Setter Property="Background" Value="#33000000" />
-                                                </MultiDataTrigger>
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True" />
-                                                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
-                                                    </MultiDataTrigger.Conditions>
-                                                    <Setter Property="Background" Value="#33FFFFFF" />
-                                                </MultiDataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
+                                <Border Background="{TemplateBinding Background}">
                                     <Grid>
-                                        <ContentPresenter ContentSource="Header" HorizontalAlignment="Stretch" Margin="5, 3" />
-                                        <ContentPresenter ContentSource="Header" HorizontalAlignment="Stretch" Opacity="0" Margin="5, 0, 50, 0" />
-                                        <Path x:Name="SubmenuArrow" Data="M 0,0 L 4,3.5 L 0,7 Z"
-                                              Fill="{Binding Foreground, RelativeSource={RelativeSource TemplatedParent}}"
-                                              HorizontalAlignment="Right" VerticalAlignment="Center"
-                                              Margin="0,0,8,0" Visibility="Collapsed" />
+                                        <ContentPresenter ContentSource="Header"
+                                                          Margin="8,5,30,5"
+                                                          VerticalAlignment="Center" />
+                                        <Path x:Name="SubmenuArrow"
+                                              Data="M 0,0 L 4,3.5 L 0,7 Z"
+                                              Fill="{TemplateBinding Foreground}"
+                                              HorizontalAlignment="Right"
+                                              VerticalAlignment="Center"
+                                              Margin="0,0,10,0"
+                                              Visibility="Collapsed" />
                                     </Grid>
                                 </Border>
                                 <Popup x:Name="PART_Popup"
@@ -508,17 +520,21 @@
                                        AllowsTransparency="True"
                                        Focusable="False"
                                        PopupAnimation="Fade">
-                                    <Border BorderThickness="0.33" CornerRadius="2">
+                                    <Border MinWidth="190"
+                                            MaxHeight="420"
+                                            Padding="4"
+                                            BorderThickness="1"
+                                            CornerRadius="5">
                                         <Border.Style>
                                             <Style TargetType="Border">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="False">
                                                         <Setter Property="Background" Value="{StaticResource LightModernWindowBackgroundbrush}" />
-                                                        <Setter Property="BorderBrush" Value="#333333" />
+                                                        <Setter Property="BorderBrush" Value="#D0D0D0" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True">
                                                         <Setter Property="Background" Value="{StaticResource DarkModernWindowBackgroundbrush}" />
-                                                        <Setter Property="BorderBrush" Value="#CCCCCC" />
+                                                        <Setter Property="BorderBrush" Value="#505050" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -535,6 +551,24 @@
                                 <Trigger Property="HasItems" Value="True">
                                     <Setter TargetName="SubmenuArrow" Property="Visibility" Value="Visible" />
                                 </Trigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="False" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsHighlighted}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Background" Value="#33000000" />
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsHighlighted}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Background" Value="#33FFFFFF" />
+                                    <Setter Property="Foreground" Value="{StaticResource DarkModernForegroundbrush}" />
+                                </MultiDataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True">
+                                    <Setter Property="Foreground" Value="{StaticResource DarkModernForegroundbrush}" />
+                                </DataTrigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>

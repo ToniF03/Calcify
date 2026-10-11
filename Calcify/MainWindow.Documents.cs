@@ -178,13 +178,15 @@ namespace Calcify
         private void RebuildRecentFilesMenu()
         {
             recentFilesMenu.Items.Clear();
+            Style recentFilesItemStyle = (Style)FindResource("RecentFilesSubmenuStyle");
 
             if (recentFiles.Count == 0)
             {
                 recentFilesMenu.Items.Add(new MenuItem
                 {
                     Header = "No recent files",
-                    IsEnabled = false
+                    IsEnabled = false,
+                    Style = recentFilesItemStyle
                 });
             }
             else
@@ -195,7 +197,8 @@ namespace Calcify
                     {
                         Header = Path.GetFileName(path),
                         Tag = path,
-                        ToolTip = path
+                        ToolTip = path,
+                        Style = recentFilesItemStyle
                     };
                     item.Click += RecentFile_Click;
                     recentFilesMenu.Items.Add(item);
@@ -206,7 +209,8 @@ namespace Calcify
             MenuItem clearItem = new MenuItem
             {
                 Header = "Clear Recent",
-                IsEnabled = recentFiles.Count > 0
+                IsEnabled = recentFiles.Count > 0,
+                Style = recentFilesItemStyle
             };
             clearItem.Click += ClearRecentFiles_Click;
             recentFilesMenu.Items.Add(clearItem);
