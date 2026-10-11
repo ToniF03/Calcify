@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Calcify.Classes;
 
 namespace Calcify
 {
@@ -54,6 +55,7 @@ namespace Calcify
             ShowLineNumbersCheckBox.Unchecked += ShowLineNumbersCheckBox_Checked;
             HighlightCurrentLineCheckBox.Checked += HighlightCurrentLineCheckBox_Checked;
             HighlightCurrentLineCheckBox.Unchecked += HighlightCurrentLineCheckBox_Checked;
+            ((Button)FindName("UpdateExchangeRatesButton")).Click += UpdateExchangeRatesButton_Click;
             this.Loaded += Settings_Loaded;
         }
 
@@ -86,6 +88,39 @@ namespace Calcify
             EditorFontSizeTextBox.Text = Properties.Settings.Default.EditorFontSize.ToString();
             ShowLineNumbersCheckBox.IsChecked = Properties.Settings.Default.ShowLineNumbers;
             HighlightCurrentLineCheckBox.IsChecked = Properties.Settings.Default.HighlightCurrentLine;
+            UpdateLastExchangeRateDate();
+        }
+
+        internal void UpdateLastExchangeRateDate()
+        {
+            DateTime? rateDate = ExchangeRateLoader.GetLastUpdatedDate();
+            TextBlock lastUpdatedTextBlock = FindName("LastExchangeRateUpdateTextBlock") as TextBlock;
+            if (lastUpdatedTextBlock == null)
+                return;
+
+            lastUpdatedTextBlock.Text = rateDate.HasValue
+                ? "Rates last updated: " + rateDate.Value.ToString("D", System.Globalization.CultureInfo.CurrentCulture)
+                : "Rates last updated: Not available";
+        }
+
+        private async void UpdateExchangeRatesButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button updateButton = (Button)FindName("UpdateExchangeRatesButton");
+            TextBlock statusTextBlock = (TextBlock)FindName("ExchangeRateStatusTextBlock");
+            updateButton.IsEnabled = false;
+            statusTextBlock.Text = "Updating exchange rates…";
+            try
+            {
+                bool updated = await ((App)Application.Current).RefreshExchangeRatesAsync(_MainWindow);
+                UpdateLastExchangeRateDate();
+                statusTextBlock.Text = updated
+                    ? "Exchange rates updated successfully."
+                    : "Update failed. Existing rates have been kept.";
+            }
+            finally
+            {
+                updateButton.IsEnabled = true;
+            }
         }
 
         private void DocumentAutorName_TextChanged(object sender, TextChangedEventArgs e)

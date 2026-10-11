@@ -299,6 +299,8 @@ namespace Calcify
             currencyRegex = regex;
             currencyDict = rates;
             MainEditor_TextChanged(mainEditor, EventArgs.Empty);
+            if (settingsWindow != null)
+                settingsWindow.UpdateLastExchangeRateDate();
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -1720,7 +1722,6 @@ namespace Calcify
 
 
 //  - settings > disable auto updates
-//  - settings > font size
 //  - settings > autosave > interval
 //  - settings > Word Wrap (?)
 //  - settings > Line Spacing
@@ -1799,6 +1800,7 @@ namespace Calcify
 //  - editor > ctrl + h replace
 
 //  - settings > highlight current line
+//  - settings > font size
 
 //  - put hotkeys into MainWindow.Hotkeys.cs
 //  - put Regex into MainWindow.Regex.cs

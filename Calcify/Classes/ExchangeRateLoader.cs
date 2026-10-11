@@ -60,6 +60,25 @@ namespace Calcify.Classes
             }
         }
 
+        public static DateTime? GetLastUpdatedDate()
+        {
+            string filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "exchangerate.json");
+            if (!File.Exists(filePath))
+                return null;
+
+            try
+            {
+                JObject exchangeRate = JObject.Parse(File.ReadAllText(filePath));
+                if (TryGetRateDate(exchangeRate, out DateTime rateDate))
+                    return rateDate;
+            }
+            catch
+            {
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Downloads the current exchange rate of the day
         /// </summary>
@@ -75,6 +94,10 @@ namespace Calcify.Classes
                 using (WebClient webClient = new WebClient())
                 {
                     string downloadedContent = webClient.DownloadString(exchangeRateLink);
+                    JObject exchangeRate = JObject.Parse(downloadedContent);
+                    if (!TryGetRateDate(exchangeRate, out DateTime rateDate))
+                        return false;
+
                     File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "exchangerate.json"), downloadedContent);
                 }
                 return true;
@@ -83,6 +106,26 @@ namespace Calcify.Classes
             {
                 return false;
             }
+        }
+
+        private static bool TryGetRateDate(JObject exchangeRate, out DateTime rateDate)
+        {
+            rateDate = default(DateTime);
+            JToken dateToken = exchangeRate["date"];
+            JToken ratesToken = exchangeRate["rates"];
+            if (dateToken == null || !(ratesToken is JObject rates) || !rates.Properties().Any())
+                return false;
+
+            foreach (JProperty rate in rates.Properties())
+            {
+                string rateValue = rate.Value.ToString().Replace(',', '.');
+                if (!double.TryParse(rateValue, NumberStyles.Float, CultureInfo.InvariantCulture, out double value) ||
+                    value <= 0 || double.IsNaN(value) || double.IsInfinity(value))
+                    return false;
+            }
+
+            return DateTime.TryParseExact(dateToken.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out rateDate);
         }
     }
 }

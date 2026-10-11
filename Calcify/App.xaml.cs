@@ -18,6 +18,8 @@ namespace Calcify
     /// </summary>
     public partial class App : Application
     {
+        private Task<bool> exchangeRateUpdateTask;
+
         async void App_Startup(object sender, StartupEventArgs e)
         {
             // Application is running
@@ -49,25 +51,52 @@ namespace Calcify
                 mainWindow.WindowState = WindowState.Minimized;
             mainWindow.Show();
 
-            await LoadExchangeRatesAsync(mainWindow);
+            if (!await LoadExchangeRatesAsync(mainWindow))
+            {
+                MessageBox.Show(mainWindow,
+                    "Currency conversion is unavailable because exchange rates could not be loaded. The rest of the calculator will continue to work.",
+                    "Currency conversion unavailable",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
 
             if (openFile)
                 mainWindow.OpenFile(filePath);
         }
 
-        private async Task LoadExchangeRatesAsync(MainWindow mainWindow)
+        internal async Task<bool> RefreshExchangeRatesAsync(MainWindow mainWindow)
         {
-            string exchangeRatePath = Path.Combine(AppContext.BaseDirectory, "exchangerate.json");
+            return await LoadExchangeRatesAsync(mainWindow, true);
+        }
 
+        private async Task<bool> LoadExchangeRatesAsync(MainWindow mainWindow, bool forceDownload = false)
+        {
+            if (exchangeRateUpdateTask != null)
+            {
+                bool existingUpdateSucceeded = await exchangeRateUpdateTask;
+                if (!forceDownload)
+                    return existingUpdateSucceeded;
+            }
+
+            Task<bool> updateTask = LoadExchangeRatesCoreAsync(mainWindow, forceDownload);
+            exchangeRateUpdateTask = updateTask;
             try
             {
-                bool shouldDownload = true;
-                if (File.Exists(exchangeRatePath))
-                {
-                    JObject exchangeRate = JObject.Parse(File.ReadAllText(exchangeRatePath));
-                    DateTime rateDate = DateTime.ParseExact(exchangeRate["date"].ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                    shouldDownload = rateDate.Date < DateTime.Today;
-                }
+                return await updateTask;
+            }
+            finally
+            {
+                if (ReferenceEquals(exchangeRateUpdateTask, updateTask))
+                    exchangeRateUpdateTask = null;
+            }
+        }
+
+        private async Task<bool> LoadExchangeRatesCoreAsync(MainWindow mainWindow, bool forceDownload)
+        {
+            try
+            {
+                DateTime? rateDate = ExchangeRateLoader.GetLastUpdatedDate();
+                bool shouldDownload = forceDownload || !rateDate.HasValue || rateDate.Value.Date < DateTime.Today;
 
                 if (shouldDownload && !await Task.Run(() => ExchangeRateLoader.DownloadExchangeRate()))
                     throw new InvalidOperationException("Exchange rates could not be downloaded.");
@@ -77,15 +106,13 @@ namespace Calcify
                     throw new InvalidDataException("No exchange rates were loaded.");
 
                 mainWindow.SetCurrencyRates(currencyPattern, currencyRegex, currencyRates);
+                return true;
             }
             catch
             {
-                mainWindow.DisableCurrencyConversion();
-                MessageBox.Show(mainWindow,
-                    "Currency conversion is unavailable because exchange rates could not be loaded. The rest of the calculator will continue to work.",
-                    "Currency conversion unavailable",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                if (!forceDownload)
+                    mainWindow.DisableCurrencyConversion();
+                return false;
             }
         }
     }

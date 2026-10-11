@@ -154,6 +154,22 @@
                     </StackPanel>
                 </Border>
 
+                <Border Style="{StaticResource SettingsCard}">
+                    <StackPanel>
+                        <TextBlock Text="Exchange rates" FontSize="15" FontWeight="SemiBold"
+                                   Style="{StaticResource modernTextBlock}" />
+                        <TextBlock Text="Check the date of the available currency rates or fetch the latest data."
+                                   Margin="0,4,0,12" Style="{StaticResource SettingsDescription}" />
+                        <TextBlock x:Name="LastExchangeRateUpdateTextBlock" Margin="0,0,0,12"
+                                   Style="{StaticResource modernTextBlock}" />
+                        <Button x:Name="UpdateExchangeRatesButton" Content="Update rates"
+                                HorizontalAlignment="Left" Height="32" Padding="12,4"
+                                Style="{StaticResource SearchReplaceButton}" />
+                        <TextBlock x:Name="ExchangeRateStatusTextBlock" Margin="0,8,0,0"
+                                   Style="{StaticResource SettingsDescription}" />
+                    </StackPanel>
+                </Border>
+
                 <Border Style="{StaticResource SettingsCard}" Margin="0,0,0,8">
                     <StackPanel>
                         <TextBlock Text="Document" FontSize="15" FontWeight="SemiBold"
