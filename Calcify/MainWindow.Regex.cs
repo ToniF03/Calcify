@@ -49,7 +49,7 @@ namespace Calcify
         /// <summary>
         /// Defines a regular expression pattern to match keywords related to one-word functions, such as "ans", "last", "avg", and "sum", for use in syntax highlighting and parsing.
         /// </summary>
-        static readonly string noValueFunctionKeywords = "(ans(wer)?|last|prev(ious)?|avg|average|sum)";
+        static readonly string noValueFunctionKeywords = "(ans(wer)?|last|prev(ious)?|avg|average|sum|diff(erence)?)";
         /// <summary>
         /// Defines a regular expression pattern to match keywords related to one-value functions, such as "exp", "sqrt", "sign", "abs", "floor", "ceil", "cbrt", "fact", trigonometric functions, "ln", and "trunc", for use in syntax highlighting and parsing.
         /// </summary>
@@ -66,5 +66,21 @@ namespace Calcify
         /// Defines a regular expression pattern to match keywords related to multiple-value functions, such as "median", "mean", "var", "stdev", "min", "max", "sum", and "avg", for use in syntax highlighting and parsing.
         /// </summary>
         static readonly string multipleValueFunctionKeywords = @"(median|mean|var|stdev|min|max|sum|avg|mode)";
+        /// <summary>
+        /// Defines a regular expression pattern to match keywords related to date functions, such as "yesterday", "today", "tomorrow", and "tmrw", for use in syntax highlighting and parsing.
+        /// </summary>
+        static readonly string dateFunctionKeywords = @"((yester|to)?day|tomorrow|tmrw)";
+        /// <summary>
+        /// Defines a regular expression pattern to match sub-keywords related to date functions, such as ".day", ".month", ".year", ".weekday", ".dayofyear", and ".weekofyear", for use in syntax highlighting and parsing.
+        /// </summary>
+        static readonly string dateFunctionSubKeywords = @"\.(day(ofyear)?|week(day|ofyear)?|month|year)";
+        /// <summary>
+        /// Defines a regular expression pattern to match keywords related to time functions, such as "now" and "time", for use in syntax highlighting and parsing.
+        /// </summary>
+        static readonly string timeFunctionKeywords = @"(now|time)";
+        /// <summary>
+        /// Defines a regular expression pattern to match sub-keywords related to time functions, such as ".hour", ".minute", and ".second", for use in syntax highlighting and parsing.
+        /// </summary>
+        static readonly string timeFunctionSubKeywords = @"\.(hour|minute|second)";
     }
 }

@@ -21,6 +21,11 @@ namespace Calcify
         /// of the syntax engine.</remarks>
         private void UpdateSyntaxHighlighting()
         {
+            // Add support for strings enclosed in double quotes and single quotes
+            darkSyntax.AddComment("Strings");
+            darkSyntax.AddConstants("\".*\"");
+            darkSyntax.AddConstants("\'.*\'");
+
             // Add syntax highlighting rules for various domain-specific patterns, including currency, data size formats, time keywords, frequency, and other measurement units.
             darkSyntax.AddComment("Currency");
             darkSyntax.AddUnits("(?&lt;=\\d\\x20)" + CurrencyPattern);
@@ -28,6 +33,8 @@ namespace Calcify
             darkSyntax.AddUnits("(?&lt;=" + lastKeywords + "\\x20"+ convertKeywords + "\\x20)" + CurrencyPattern);
             darkSyntax.AddFunction("(?&lt;=\\d\\x20" + CurrencyPattern + "\\x20)" + convertKeywords + "(?=\\x20" + CurrencyPattern + ")");
             darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + convertKeywords + "(?=\\x20" + CurrencyPattern + ")");
+            darkSyntax.AddFunction("(?&lt;=\\d\\x20" + CurrencyPattern + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + CurrencyPattern + ")");
+            darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + CurrencyPattern + ")");
 
             darkSyntax.AddComment("Data Size Formats");
             darkSyntax.AddUnits("(?&lt;=\\d\\x20)" + DataSizePattern);
@@ -35,6 +42,8 @@ namespace Calcify
             darkSyntax.AddUnits("(?&lt;=" + lastKeywords + "\\x20" + convertKeywords + "\\x20)" + DataSizePattern);
             darkSyntax.AddFunction("(?&lt;=\\d\\x20" + DataSizePattern + "\\x20)" + convertKeywords + "(?=\\x20" + DataSizePattern + ")");
             darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + convertKeywords + "(?=\\x20" + DataSizePattern + ")");
+            darkSyntax.AddFunction("(?&lt;=\\d\\x20" + DataSizePattern + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + DataSizePattern + ")");
+            darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + DataSizePattern + ")");
 
             darkSyntax.AddComment("Frequency");
             darkSyntax.AddUnits("(?&lt;=\\d\\x20)" + FrequencyPattern);
@@ -42,6 +51,8 @@ namespace Calcify
             darkSyntax.AddUnits("(?&lt;=" + lastKeywords + "\\x20" + convertKeywords + "\\x20)" + FrequencyPattern);
             darkSyntax.AddFunction("(?&lt;=\\d\\x20" + FrequencyPattern + "\\x20)" + convertKeywords + "(?=\\x20" + FrequencyPattern + ")");
             darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + convertKeywords + "(?=\\x20" + FrequencyPattern + ")");
+            darkSyntax.AddFunction("(?&lt;=\\d\\x20" + FrequencyPattern + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + FrequencyPattern + ")");
+            darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + FrequencyPattern + ")");
 
             darkSyntax.AddComment("Length");
             darkSyntax.AddUnits("(?&lt;=\\d\\x20)" + LengthPattern);
@@ -49,6 +60,8 @@ namespace Calcify
             darkSyntax.AddUnits("(?&lt;=" + lastKeywords + "\\x20" + convertKeywords + "\\x20)" + LengthPattern);
             darkSyntax.AddFunction("(?&lt;=\\d\\x20" + LengthPattern + "\\x20)" + convertKeywords + "(?=\\x20" + LengthPattern + ")");
             darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + convertKeywords + "(?=\\x20" + LengthPattern + ")");
+            darkSyntax.AddFunction("(?&lt;=\\d\\x20" + LengthPattern + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + LengthPattern + ")");
+            darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + LengthPattern + ")");
 
             darkSyntax.AddComment("Mass");
             darkSyntax.AddUnits("(?&lt;=\\d\\x20)" + MassPattern);
@@ -56,6 +69,8 @@ namespace Calcify
             darkSyntax.AddUnits("(?&lt;=" + lastKeywords + "\\x20" + convertKeywords + "\\x20)" + MassPattern);
             darkSyntax.AddFunction("(?&lt;=\\d\\x20" + MassPattern + "\\x20)" + convertKeywords + "(?=\\x20" + MassPattern + ")");
             darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + convertKeywords + "(?=\\x20" + MassPattern + ")");
+            darkSyntax.AddFunction("(?&lt;=\\d\\x20" + MassPattern + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + MassPattern + ")");
+            darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + MassPattern + ")");
 
             darkSyntax.AddComment("Temperature");
             darkSyntax.AddUnits("(?&lt;=\\d\\x20)" + TemperaturePattern);
@@ -63,6 +78,8 @@ namespace Calcify
             darkSyntax.AddUnits("(?&lt;=" + lastKeywords + "\\x20" + convertKeywords + "\\x20)" + TemperaturePattern);
             darkSyntax.AddFunction("(?&lt;=\\d\\x20" + TemperaturePattern + "\\x20)" + convertKeywords + "(?=\\x20" + TemperaturePattern + ")");
             darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + convertKeywords + "(?=\\x20" + TemperaturePattern + ")");
+            darkSyntax.AddFunction("(?&lt;=\\d\\x20" + TemperaturePattern + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + TemperaturePattern + ")");
+            darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + TemperaturePattern + ")");
 
             darkSyntax.AddComment("Angle");
             darkSyntax.AddUnits("(?&lt;=\\d\\x20)" + AnglePattern);
@@ -70,6 +87,8 @@ namespace Calcify
             darkSyntax.AddUnits("(?&lt;=" + lastKeywords + "\\x20" + convertKeywords + "\\x20)" + AnglePattern);
             darkSyntax.AddFunction("(?&lt;=\\d\\x20" + AnglePattern + "\\x20)" + convertKeywords + "(?=\\x20" + AnglePattern + ")");
             darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + convertKeywords + "(?=\\x20" + AnglePattern + ")");
+            darkSyntax.AddFunction("(?&lt;=\\d\\x20" + AnglePattern + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + AnglePattern + ")");
+            darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + AnglePattern + ")");
 
             darkSyntax.AddComment("Time");
             darkSyntax.AddUnits("(?&lt;=\\d\\x20)" + TimePattern);
@@ -77,10 +96,17 @@ namespace Calcify
             darkSyntax.AddUnits("(?&lt;=" + lastKeywords + "\\x20" + convertKeywords + "\\x20)" + TimePattern);
             darkSyntax.AddFunction("(?&lt;=\\d\\x20" + TimePattern + "\\x20)" + convertKeywords + "(?=\\x20" + TimePattern + ")");
             darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + convertKeywords + "(?=\\x20" + TimePattern + ")");
+            darkSyntax.AddFunction("(?&lt;=\\d\\x20" + TimePattern + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + TimePattern + ")");
+            darkSyntax.AddFunction("(?&lt;=" + lastKeywords + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + TimePattern + ")");
+            darkSyntax.AddFunction("(?&lt;=" + dateFunctionKeywords + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + TimePattern + ")");
+            darkSyntax.AddFunction("(?&lt;=" + timeFunctionKeywords + "\\x20)" + operatorKeywords + "(?=\\x20-?\\d+(\\.\\d+)?\\x20" + TimePattern + ")");
 
             // Add support for time-related keywords like "yesterday", "today", "tomorrow", and "now"
             darkSyntax.AddComment("Time Keywords");
-            darkSyntax.AddFunction(@"(((yester|to)?day|tomorrow|tmrw)(\.(day(ofyear)?|week(day|ofyear)?|month|year))?|now(\.(hour|minute|second))?)");
+            darkSyntax.AddFunction(dateFunctionKeywords);
+            darkSyntax.AddFunction("\\b(?&lt;=" + dateFunctionKeywords + ")(" + dateFunctionSubKeywords + "|" + timeFunctionSubKeywords + "|\\.format(?=\\(\".*\"\\))|\\.format(?=\\('.*'\\)))");
+            darkSyntax.AddFunction(timeFunctionKeywords);
+            darkSyntax.AddFunction("\\b(?&lt;=" + timeFunctionKeywords + ")(" + timeFunctionSubKeywords + "|\\.format(?=\\(\".*\"\\))|\\.format(?=\\(\'.*\'\\)))");
 
             // Add support for constants like "pi", "e", "tau", "c", "R", "Na", and "g"
             darkSyntax.AddComment("Constants");
@@ -125,7 +151,6 @@ namespace Calcify
             // Add support for numbers, including integers and decimals, with optional commas for thousands separators
             darkSyntax.AddComment("Numbers");
             darkSyntax.AddNumbers("(-?((\\d{1,3},)*\\d{3}|\\d+)(\\.\\d+)?)");
-
         }
     }
 }
