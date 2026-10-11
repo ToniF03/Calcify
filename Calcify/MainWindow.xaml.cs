@@ -1059,6 +1059,13 @@ namespace Calcify
             return input;
         }
 
+        /// <summary>
+        /// Replaces supported multiple-variable function expressions in the input string with their computed results.
+        /// </summary>
+        /// <param name="input">The input string containing function expressions each with multiple
+        /// numeric arguments.</param>
+        /// <returns>A string in which all recognized multiple-variable function expressions have been replaced by their evaluated
+        /// numeric results.</returns>
         private string ReplaceMultipleVariableFunctions(string input)
         {
             while (multipleValueRegex.IsMatch(input))
