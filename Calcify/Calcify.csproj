@@ -172,7 +172,7 @@
     <Compile Include="MainWindow.Hotkeys.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainWindow.LineHighlighting.cs" >
+    <Compile Include="MainWindow.LineHighlighting.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.Regex.cs">

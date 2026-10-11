@@ -160,6 +160,7 @@ namespace Calcify
             InitializeComponent();
             SearchReplacePanel.Editor = mainEditor;
             SearchReplacePanel.Overview = SearchOverview;
+            LoadRecentFiles();
 
             // Set up the basics
             if (Properties.Settings.Default.UserName == "")
@@ -220,6 +221,7 @@ namespace Calcify
             contextNewFileButton.Click += ContextNewFileButton_Click;
             contextOpenButton.Click += ContextOpenButton_Click;
             contextSaveButton.Click += ContextSaveButton_Click;
+            recentFilesMenu.SubmenuOpened += RecentFilesMenu_SubmenuOpened;
             contextSaveAsButton.Click += ContextSaveButton_Click;
             contextAboutButton.Click += ContextAboutButton_Click;
             contextSettingsButton.Click += SettingsButton_Click;

@@ -1,6 +1,7 @@
 using Calcify.Math;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -17,6 +18,9 @@ namespace Calcify
         public string documentEditedBy = "";
         public int documentCreated = 0;
         public int documentModified = 0;
+
+        private const int MaximumRecentFiles = 10;
+        private readonly List<string> recentFiles = new List<string>();
 
         private bool ConfirmSaveChanges()
         {
@@ -104,6 +108,7 @@ namespace Calcify
                 mainEditor.CaretOffset = 0;
                 EditorContainer.ScrollToTop();
                 mainEditor.Focus();
+                AddRecentFile(path);
             }
         }
 
@@ -128,6 +133,114 @@ namespace Calcify
             unsavedChanges = false;
             File.WriteAllText(path, fileContent);
             DocumentChanged();
+            AddRecentFile(path);
+        }
+
+        private void LoadRecentFiles()
+        {
+            string storedPaths = Properties.Settings.Default.RecentFiles ?? string.Empty;
+            foreach (string path in storedPaths.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (File.Exists(path) && !recentFiles.Contains(path, StringComparer.OrdinalIgnoreCase))
+                    recentFiles.Add(path);
+
+                if (recentFiles.Count == MaximumRecentFiles)
+                    break;
+            }
+
+            SaveRecentFiles();
+            RebuildRecentFilesMenu();
+        }
+
+        private void AddRecentFile(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+                return;
+
+            string fullPath = Path.GetFullPath(path);
+            recentFiles.RemoveAll(existingPath =>
+                string.Equals(existingPath, fullPath, StringComparison.OrdinalIgnoreCase));
+            recentFiles.Insert(0, fullPath);
+
+            if (recentFiles.Count > MaximumRecentFiles)
+                recentFiles.RemoveRange(MaximumRecentFiles, recentFiles.Count - MaximumRecentFiles);
+
+            SaveRecentFiles();
+            RebuildRecentFilesMenu();
+        }
+
+        private void SaveRecentFiles()
+        {
+            Properties.Settings.Default.RecentFiles = string.Join("|", recentFiles);
+            Properties.Settings.Default.Save();
+        }
+
+        private void RebuildRecentFilesMenu()
+        {
+            recentFilesMenu.Items.Clear();
+
+            if (recentFiles.Count == 0)
+            {
+                recentFilesMenu.Items.Add(new MenuItem
+                {
+                    Header = "No recent files",
+                    IsEnabled = false
+                });
+            }
+            else
+            {
+                foreach (string path in recentFiles)
+                {
+                    MenuItem item = new MenuItem
+                    {
+                        Header = Path.GetFileName(path),
+                        Tag = path,
+                        ToolTip = path
+                    };
+                    item.Click += RecentFile_Click;
+                    recentFilesMenu.Items.Add(item);
+                }
+            }
+
+            recentFilesMenu.Items.Add(new Separator());
+            MenuItem clearItem = new MenuItem
+            {
+                Header = "Clear Recent",
+                IsEnabled = recentFiles.Count > 0
+            };
+            clearItem.Click += ClearRecentFiles_Click;
+            recentFilesMenu.Items.Add(clearItem);
+        }
+
+        private void RecentFilesMenu_SubmenuOpened(object sender, RoutedEventArgs e)
+        {
+            RebuildRecentFilesMenu();
+        }
+
+        private void RecentFile_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = sender as MenuItem;
+            string path = item == null ? null : item.Tag as string;
+            if (string.IsNullOrEmpty(path))
+                return;
+
+            if (!File.Exists(path))
+            {
+                recentFiles.RemoveAll(existingPath =>
+                    string.Equals(existingPath, path, StringComparison.OrdinalIgnoreCase));
+                SaveRecentFiles();
+                RebuildRecentFilesMenu();
+                return;
+            }
+
+            OpenFile(path);
+        }
+
+        private void ClearRecentFiles_Click(object sender, RoutedEventArgs e)
+        {
+            recentFiles.Clear();
+            SaveRecentFiles();
+            RebuildRecentFilesMenu();
         }
 
         /// <summary>
