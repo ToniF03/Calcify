@@ -43,6 +43,8 @@ namespace Calcify
             DocumentAutorName.TextChanged += DocumentAutorName_TextChanged;
             ShowLineNumbersCheckBox.Checked += ShowLineNumbersCheckBox_Checked;
             ShowLineNumbersCheckBox.Unchecked += ShowLineNumbersCheckBox_Checked;
+            HighlightCurrentLineCheckBox.Checked += HighlightCurrentLineCheckBox_Checked;
+            HighlightCurrentLineCheckBox.Unchecked += HighlightCurrentLineCheckBox_Checked;
             this.Loaded += Settings_Loaded;
         }
 
@@ -50,6 +52,13 @@ namespace Calcify
         {
             Properties.Settings.Default.ShowLineNumbers = (bool)ShowLineNumbersCheckBox.IsChecked;
             _MainWindow.UpdateTextBoxLineNumbers();
+        }
+
+        private void HighlightCurrentLineCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.HighlightCurrentLine = HighlightCurrentLineCheckBox.IsChecked == true;
+            Properties.Settings.Default.Save();
+            _MainWindow.UpdateCurrentLineHighlighting();
         }
 
         private void Settings_Loaded(object sender, RoutedEventArgs e)
@@ -66,6 +75,7 @@ namespace Calcify
             DocumentAutorName.Text = Properties.Settings.Default.UserName;
             DecimalPlacesTextBox.Text = Properties.Settings.Default.Digits.ToString();
             ShowLineNumbersCheckBox.IsChecked = Properties.Settings.Default.ShowLineNumbers;
+            HighlightCurrentLineCheckBox.IsChecked = Properties.Settings.Default.HighlightCurrentLine;
         }
 
         private void DocumentAutorName_TextChanged(object sender, TextChangedEventArgs e)

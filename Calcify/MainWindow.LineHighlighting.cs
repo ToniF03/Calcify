@@ -24,6 +24,26 @@ namespace Calcify
             AddCurrentLineHighlighting(resultEditor, null, null);
         }
 
+        internal void UpdateCurrentLineHighlighting()
+        {
+            mainEditor.TextArea.TextView.InvalidateLayer(KnownLayer.Background);
+            resultEditor.TextArea.TextView.InvalidateLayer(KnownLayer.Background);
+
+            for (int i = 0; i < mainEditor.TextArea.LeftMargins.Count; i++)
+                mainEditor.TextArea.LeftMargins[i].InvalidateVisual();
+
+            Border splitterHighlight = FindName("splitterLineHighlight") as Border;
+            if (!Properties.Settings.Default.HighlightCurrentLine)
+            {
+                if (splitterHighlight != null)
+                    splitterHighlight.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            if (splitterHighlight != null)
+                UpdateSplitterHighlight(mainEditor, FindName("EditorGrid") as Grid, splitterHighlight);
+        }
+
         private static void AddCurrentLineHighlighting(TextEditor editor, Grid editorGrid, Border splitterHighlight)
         {
             editor.TextArea.TextView.BackgroundRenderers.Add(
@@ -63,6 +83,12 @@ namespace Calcify
 
         private static void UpdateSplitterHighlight(TextEditor editor, Grid editorGrid, Border splitterHighlight)
         {
+            if (!Properties.Settings.Default.HighlightCurrentLine)
+            {
+                splitterHighlight.Visibility = Visibility.Collapsed;
+                return;
+            }
+
             TextView textView = editor.TextArea.TextView;
             try
             {
@@ -131,7 +157,7 @@ namespace Calcify
 
                 try
                 {
-                    if (textView.VisualLines.Count > 0)
+                    if (Properties.Settings.Default.HighlightCurrentLine && textView.VisualLines.Count > 0)
                     {
                         DocumentLine documentLine =
                             editor.Document.GetLineByOffset(editor.CaretOffset);
@@ -175,7 +201,8 @@ namespace Calcify
 
             public void Draw(TextView textView, DrawingContext drawingContext)
             {
-                if (textView.VisualLines.Count == 0 || textView.ActualWidth <= 0)
+                if (!Properties.Settings.Default.HighlightCurrentLine ||
+                    textView.VisualLines.Count == 0 || textView.ActualWidth <= 0)
                     return;
 
                 DocumentLine documentLine =
