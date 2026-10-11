@@ -26,6 +26,9 @@
     <Setting Name="HighlightCurrentLine" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="EditorFontSize" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">13</Value>
+    </Setting>
     <Setting Name="EditorZoom" Type="System.Double" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>

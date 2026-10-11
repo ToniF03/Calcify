@@ -1727,7 +1727,6 @@ namespace Calcify
 //  - settings > tab size
 //  - settings > show whitespace characters
 //  - settings > bracket matching
-//  - settings > highlight current line
 //  - settings > currency update interval
 //  - settings > thousands seperator
 //  - settings > Verify rates are current in Settings
@@ -1799,6 +1798,8 @@ namespace Calcify
 //  - editor > ctrl + f find
 //  - editor > ctrl + h replace
 
+//  - settings > highlight current line
+
 //  - put hotkeys into MainWindow.Hotkeys.cs
 //  - put Regex into MainWindow.Regex.cs
 
@@ -1844,6 +1845,7 @@ namespace Calcify
 //    - mode() (most frequent value)
 //    - stdev() (standard deviation)
 //    - var() (variance)
+//
 //  - Added Constants
 //    - tau
 //    - c (speed of light) >> add to docs (math-functions.md)

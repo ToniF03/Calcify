@@ -157,7 +157,7 @@
                                        Grid.Column="0" 
                                        Background="Transparent"
                                        Margin="7, 0, 0, 7"
-                                       FontSize="13"
+                                       FontSize="{Binding Source={x:Static properties:Settings.Default}, Path=EditorFontSize}"
                                        WordWrap="False"
                                        ScrollViewer.VerticalScrollBarVisibility="Visible" 
                                        VerticalScrollBarVisibility="Hidden"
@@ -179,7 +179,7 @@
                                 Foreground="#7EA32B"
                                 IsReadOnly="True"
                                 HorizontalContentAlignment="Right" 
-                                FontSize="13"
+                                FontSize="{Binding Source={x:Static properties:Settings.Default}, Path=EditorFontSize}"
                                 HorizontalScrollBarVisibility="Hidden" 
                                 VerticalScrollBarVisibility="Disabled" >
                 </avalonEdit:TextEditor>

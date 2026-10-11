@@ -118,6 +118,18 @@ namespace Calcify.Properties {
                 this["HighlightCurrentLine"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("13")]
+        public int EditorFontSize {
+            get {
+                return ((int)(this["EditorFontSize"]));
+            }
+            set {
+                this["EditorFontSize"] = value;
+            }
+        }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]

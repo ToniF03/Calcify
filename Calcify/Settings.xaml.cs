@@ -28,6 +28,8 @@ namespace Calcify
             closeButton.Click += CloseButton_Click;
             LessDecimalsButton.Click += DecimalsButton_Click;
             MoreDecimalsButton.Click += DecimalsButton_Click;
+            DecreaseFontSizeButton.Click += FontSizeButton_Click;
+            IncreaseFontSizeButton.Click += FontSizeButton_Click;
 
             DecimalPlacesTextBox.PreviewTextInput += (sender, e) =>
             {
@@ -37,6 +39,13 @@ namespace Calcify
 
             DecimalPlacesTextBox.TextChanged += DecimalPlacesTextBox_TextChanged;
             DecimalPlacesTextBox.LostFocus += DecimalPlacesTextBox_LostFocus;
+            EditorFontSizeTextBox.PreviewTextInput += (sender, e) =>
+            {
+                if (!new Regex(@"\d+").IsMatch(e.Text))
+                    e.Handled = true;
+            };
+            EditorFontSizeTextBox.TextChanged += EditorFontSizeTextBox_TextChanged;
+            EditorFontSizeTextBox.LostFocus += EditorFontSizeTextBox_LostFocus;
             DarkModeRadioButton.Checked += DarkModeRadioButtons_CheckedChanged;
             LightModeRadioButton.Checked += DarkModeRadioButtons_CheckedChanged;
             SystemDefinedDarkModeRadioButton.Checked += DarkModeRadioButtons_CheckedChanged;
@@ -74,6 +83,7 @@ namespace Calcify
             }
             DocumentAutorName.Text = Properties.Settings.Default.UserName;
             DecimalPlacesTextBox.Text = Properties.Settings.Default.Digits.ToString();
+            EditorFontSizeTextBox.Text = Properties.Settings.Default.EditorFontSize.ToString();
             ShowLineNumbersCheckBox.IsChecked = Properties.Settings.Default.ShowLineNumbers;
             HighlightCurrentLineCheckBox.IsChecked = Properties.Settings.Default.HighlightCurrentLine;
         }
@@ -105,6 +115,22 @@ namespace Calcify
                 DecimalPlacesTextBox.Text = Properties.Settings.Default.Digits.ToString();
         }
 
+        private void EditorFontSizeTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (int.TryParse(EditorFontSizeTextBox.Text, out int fontSize) && fontSize >= 8 && fontSize <= 32)
+            {
+                Properties.Settings.Default.EditorFontSize = fontSize;
+                Properties.Settings.Default.Save();
+                _MainWindow.ApplyEditorFontSize(fontSize);
+            }
+        }
+
+        private void EditorFontSizeTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (!int.TryParse(EditorFontSizeTextBox.Text, out int fontSize) || fontSize < 8 || fontSize > 32)
+                EditorFontSizeTextBox.Text = Properties.Settings.Default.EditorFontSize.ToString();
+        }
+
         private void DarkModeRadioButtons_CheckedChanged(object sender, RoutedEventArgs e)
         {
             if (SystemDefinedDarkModeRadioButton.IsChecked.Value)
@@ -115,6 +141,13 @@ namespace Calcify
                 Properties.Settings.Default.DarkMode = DarkModeRadioButton.IsChecked.Value;
             }
             Properties.Settings.Default.Save();
+        }
+
+        private void FontSizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            int adjustment = ((Button)sender).Name == "DecreaseFontSizeButton" ? -1 : 1;
+            int fontSize = System.Math.Max(8, System.Math.Min(32, Properties.Settings.Default.EditorFontSize + adjustment));
+            EditorFontSizeTextBox.Text = fontSize.ToString();
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

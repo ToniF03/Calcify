@@ -11,6 +11,12 @@ namespace Calcify
 {
     public partial class MainWindow
     {
+        internal void ApplyEditorFontSize(int fontSize)
+        {
+            mainEditor.FontSize = fontSize;
+            resultEditor.FontSize = fontSize;
+        }
+
         /// <summary>
         /// Parses a zoom value from the specified text and applies it to the editor controls if valid.
         /// </summary>

@@ -87,8 +87,31 @@
                     <StackPanel>
                         <TextBlock Text="Editor" FontSize="15" FontWeight="SemiBold"
                                    Style="{StaticResource modernTextBlock}" />
-                        <TextBlock Text="Adjust editor guides and line visibility." Margin="0,4,0,12"
+                        <TextBlock Text="Adjust text size, editor guides, and line visibility." Margin="0,4,0,12"
                                    Style="{StaticResource SettingsDescription}" />
+                        <TextBlock Text="Font size" FontWeight="Medium" Margin="0,0,0,7"
+                                   Style="{StaticResource modernTextBlock}" />
+                        <Grid HorizontalAlignment="Left" Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="60" />
+                                <ColumnDefinition Width="90" />
+                                <ColumnDefinition Width="60" />
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="DecreaseFontSizeButton" Grid.Column="0" Height="30" Margin="0,0,5,0"
+                                    Style="{StaticResource SearchReplaceButton}" AutomationProperties.Name="Decrease font size"
+                                    ToolTip="Decrease font size">
+                                <TextBlock Text="&#xE76B;" FontFamily="Segoe MDL2 Assets" FontSize="11" />
+                            </Button>
+                            <TextBox x:Name="EditorFontSizeTextBox" Grid.Column="1" Height="30" Padding="6,3"
+                                     HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                     Style="{StaticResource SearchReplaceTextBox}" Margin="0"
+                                     AutomationProperties.Name="Editor font size" />
+                            <Button x:Name="IncreaseFontSizeButton" Grid.Column="2" Height="30" Margin="5,0,0,0"
+                                    Style="{StaticResource SearchReplaceButton}" AutomationProperties.Name="Increase font size"
+                                    ToolTip="Increase font size">
+                                <TextBlock Text="&#xE76C;" FontFamily="Segoe MDL2 Assets" FontSize="11" />
+                            </Button>
+                        </Grid>
                         <CheckBox x:Name="ShowLineNumbersCheckBox" Content="Show line numbers"
                                   Style="{StaticResource SearchReplaceCheckBox}" Margin="0,4,0,0" />
                         <TextBlock Text="Display a number beside each line in the editor." Margin="22,2,0,8"
