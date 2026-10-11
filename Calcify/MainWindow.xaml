@@ -161,7 +161,7 @@
           </Grid.RowDefinitions>
           <controls:SearchReplaceControl x:Name="SearchReplacePanel" Grid.Row="0" Grid.ColumnSpan="2" />
           <ScrollViewer x:Name="EditorContainer" Grid.Row="1" Grid.Column="0" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel" Margin="0,7,0,0">
-            <Grid Grid.Row="1" >
+            <Grid x:Name="EditorGrid" Grid.Row="1" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="6*" />
                     <!-- Small column for the grid splitter -->
@@ -173,7 +173,7 @@
                 <avalonEdit:TextEditor x:Name="mainEditor" AutomationProperties.Name="Calculation input"
                                        Grid.Column="0" 
                                        Background="Transparent"
-                                       Margin="7, 0, 2.5, 7"
+                                       Margin="7, 0, 0, 7"
                                        FontSize="13"
                                        WordWrap="False"
                                        ScrollViewer.VerticalScrollBarVisibility="Visible" 
@@ -182,11 +182,14 @@
                                        ShowLineNumbers="{Binding Source={x:Static properties:Settings.Default}, Path=ShowLineNumbers}">
                 </avalonEdit:TextEditor>
                 <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                <Border x:Name="splitterLineHighlight" Grid.Column="1"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Top"
+                        Height="0" IsHitTestVisible="False" Panel.ZIndex="1" />
 
                 <!-- The pane where the results are being displayed -->
                 <avalonEdit:TextEditor 
                                 x:Name="resultEditor" AutomationProperties.Name="Calculation results"
-                                Grid.Column="2" Margin="2.5,0,7,7"
+                                Grid.Column="2" Margin="0,0,7,7"
                                 xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
                                 ScrollViewer.VerticalScrollBarVisibility="Visible" 
                                 Background="Transparent" 

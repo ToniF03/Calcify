@@ -58,6 +58,9 @@ namespace Calcify
         public DialogWindow dialogWindow = null;
         public Settings settingsWindow = null;
 
+        private bool isSynchronizingResultEditor;
+        private bool isSynchronizingMainEditor;
+
         private Dictionary<Type, Func<double, Enum, Enum, double>> converterDict = new Dictionary<Type, Func<double, Enum, Enum, double>>();
         #endregion
         #region UI
@@ -177,6 +180,8 @@ namespace Calcify
                 Properties.Settings.Default.DarkMode = int.Parse(watcher.Value) != 1;
             }
 
+
+
             SetUpDictionaries();
             UpdateSyntaxHighlighting();
 
@@ -189,9 +194,10 @@ namespace Calcify
             this.Drop += Window_DragEvent;
 
             mainEditor.TextChanged += MainEditor_TextChanged;
-            mainEditor.TextArea.Caret.PositionChanged += Caret_PositionChanged;
+            mainEditor.TextArea.Caret.PositionChanged += mainEditor_Caret_PositionChanged;
             InitializeFunctionCompletion();
             mainEditor.PreviewKeyDown += MainEditor_PreviewKeyDown;
+            mainEditor.GotFocus += mainEditor_GotFocus;
 
             MinimizeButton.Click += MinimizeButton_Click;
             MaximizeButton.Click += MaximizeButton_Click;
@@ -254,11 +260,19 @@ namespace Calcify
             this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
             this.MaxWidth = SystemParameters.MaximizedPrimaryScreenWidth;
             DropPanel.Visibility = Visibility.Visible;
+
+            resultEditor.TextArea.Caret.PositionChanged += resultEditor_Caret_PositionChanged;
             resultEditor.TextArea.Caret.CaretBrush = Brushes.Transparent;
+            InitializeCurrentLineHighlighting();
 
             ZoomComboBox.Text = (Properties.Settings.Default.EditorZoom * 100).ToString(CultureInfo.InvariantCulture) + " %";
             mainEditor.LayoutTransform = new ScaleTransform(Properties.Settings.Default.EditorZoom, Properties.Settings.Default.EditorZoom);
             resultEditor.LayoutTransform = new ScaleTransform(Properties.Settings.Default.EditorZoom, Properties.Settings.Default.EditorZoom);
+        }
+
+        private void mainEditor_GotFocus(object sender, RoutedEventArgs e)
+        {
+            resultEditor.SelectionLength = 0;
         }
 
         private void CtrlFind_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -376,7 +390,15 @@ namespace Calcify
                     newDocument.Text += result;
                 newDocument.Text += "\n";
             }
-            resultEditor.Document = newDocument;
+            isSynchronizingResultEditor = true;
+            try
+            {
+                resultEditor.Document = newDocument;
+            }
+            finally
+            {
+                isSynchronizingResultEditor = false;
+            }
         }
 
         private void MainEditor_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -440,7 +462,30 @@ namespace Calcify
             }
         }
 
-        private void Caret_PositionChanged(object sender, EventArgs e)
+        private void resultEditor_Caret_PositionChanged(object sender, EventArgs e)
+        {
+            if (isSynchronizingResultEditor)
+                return;
+
+            int lineNumber = resultEditor.Document.GetLineByOffset(resultEditor.CaretOffset).LineNumber;
+            if (lineNumber > mainEditor.Document.LineCount)
+                lineNumber = mainEditor.Document.LineCount;
+
+            DocumentLine mainLine = mainEditor.Document.GetLineByNumber(lineNumber);
+            isSynchronizingMainEditor = true;
+            try
+            {
+                if (mainEditor.SelectionLength > 0)
+                    mainEditor.SelectionLength = 0;
+                mainEditor.SelectionStart = mainLine.EndOffset;
+            }
+            finally
+            {
+                isSynchronizingMainEditor = false;
+            }
+        }
+
+        private void mainEditor_Caret_PositionChanged(object sender, EventArgs e)
         {
             // Keep the caret line in the viewport
             double actualLineNumber = mainEditor.Document.GetLineByOffset(mainEditor.CaretOffset).LineNumber - 1;
@@ -456,6 +501,20 @@ namespace Calcify
             else if (CalculatedOffset > 0)
                 EditorContainer.ScrollToVerticalOffset(VerticalOffset + CalculatedOffset);
             CalculateTotal();
+
+            if (!isSynchronizingMainEditor)
+            {
+                isSynchronizingResultEditor = true;
+                try
+                {
+                    resultEditor.SelectionStart =
+                        resultEditor.Document.GetLineByNumber((int)actualLineNumber + 1).Offset;
+                }
+                finally
+                {
+                    isSynchronizingResultEditor = false;
+                }
+            }
 
             positionLabel.Content = "Ln: " + (mainEditor.Document.GetLineByOffset(mainEditor.CaretOffset).LineNumber) + ", Col: " + (mainEditor.CaretOffset - mainEditor.Document.GetLineByOffset(mainEditor.CaretOffset).Offset + 1);
         }
