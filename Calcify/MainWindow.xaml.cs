@@ -1633,7 +1633,6 @@ namespace Calcify
 //  - Rename settings scheme to theme
 
 
-//  - settings > disable auto updates
 //  - settings > autosave > interval
 //  - settings > Word Wrap (?)
 //  - settings > Line Spacing
@@ -1716,6 +1715,8 @@ namespace Calcify
 //  - settings > Verify rates are current in Settings
 //  - settings > show whitespace characters
 //  - settings > bracket matching
+//  - settings > currency update interval
+//  - settings > disable auto updates
 
 //  - put hotkeys into MainWindow.Hotkeys.cs
 //  - put Regex into MainWindow.Regex.cs

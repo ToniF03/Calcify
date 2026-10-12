@@ -6,6 +6,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Globalization;
+using Microsoft.Win32;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -16,6 +18,10 @@ namespace Update
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const string AppUpdateSettingsRegistryPath = @"Software\ToniF03\Calcify\UpdateSettings";
+        private const string AutoUpdateEnabledValueName = "Enabled";
+        private const string AutoUpdateIntervalDaysValueName = "IntervalDays";
+
         WebClient wc = new WebClient();
         bool UpdateSelf = false;
         public MainWindow()
@@ -46,7 +52,15 @@ namespace Update
 
         public async Task GetCurrentRelease()
         {
-            if (Properties.Settings.Default.LastChecked != DateTime.Today)
+            if (!ReadAutoUpdateEnabled())
+            {
+                Close();
+                return;
+            }
+
+            int intervalDays = ReadAutoUpdateIntervalDays();
+            DateTime nextCheckDate = DateTime.Today.AddDays(-intervalDays);
+            if (Properties.Settings.Default.LastChecked.Date <= nextCheckDate)
             {
                 HttpClient client = new HttpClient();
                 client.BaseAddress = new Uri("https://api.github.com");
@@ -86,6 +100,52 @@ namespace Update
                 Properties.Settings.Default.Save();
             }
             else Close();
+        }
+
+        private static bool ReadAutoUpdateEnabled()
+        {
+            return ReadAppUpdatePreference(AutoUpdateEnabledValueName, 1) != 0;
+        }
+
+        private static int ReadAutoUpdateIntervalDays()
+        {
+            int intervalDays = ReadAppUpdatePreference(AutoUpdateIntervalDaysValueName, 1);
+            switch (intervalDays)
+            {
+                case 1:
+                case 3:
+                case 7:
+                case 14:
+                case 30:
+                    return intervalDays;
+                default:
+                    return 1;
+            }
+        }
+
+        private static int ReadAppUpdatePreference(string valueName, int defaultValue)
+        {
+            try
+            {
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(AppUpdateSettingsRegistryPath))
+                {
+                    object value = key == null ? null : key.GetValue(valueName);
+                    if (value != null && int.TryParse(
+                        Convert.ToString(value, CultureInfo.InvariantCulture),
+                        NumberStyles.Integer,
+                        CultureInfo.InvariantCulture,
+                        out int parsedValue))
+                        return parsedValue;
+                }
+            }
+            catch (System.Security.SecurityException)
+            {
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
+
+            return defaultValue;
         }
 
         private void Wc_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)

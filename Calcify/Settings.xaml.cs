@@ -12,6 +12,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Microsoft.Win32;
+using System.Globalization;
 using Calcify.Classes;
 
 namespace Calcify
@@ -21,6 +23,11 @@ namespace Calcify
     /// </summary>
     public partial class Settings : Window
     {
+        private const string AppUpdateSettingsRegistryPath = @"Software\ToniF03\Calcify\UpdateSettings";
+        private const string AutoUpdateEnabledValueName = "Enabled";
+        private const string AutoUpdateIntervalDaysValueName = "IntervalDays";
+        private bool loadingAppUpdatePreferences;
+
         public MainWindow _MainWindow;
 
         public Settings()
@@ -62,9 +69,67 @@ namespace Calcify
             ShowMatchingBracketsCheckBox.Unchecked += ShowMatchingBracketsCheckBox_Checked;
             ShowWhitespacesCheckBox.Checked += ShowWhitespacesCheckBox_Checked;
             ShowWhitespacesCheckBox.Unchecked += ShowWhitespacesCheckBox_Checked;
-            ExchangeRateUpdateIntervalComboBox.SelectionChanged += ExchangeRateUpdateIntervalComboBox_SelectionChanged;
+            AutoUpdateApplicationCheckBox.Checked += AppUpdatePreferences_Changed;
+            AutoUpdateApplicationCheckBox.Unchecked += AppUpdatePreferences_Changed;
+            ApplicationUpdateIntervalComboBox.SelectionChanged += AppUpdatePreferences_Changed;
             ((Button)FindName("UpdateExchangeRatesButton")).Click += UpdateExchangeRatesButton_Click;
             this.Loaded += Settings_Loaded;
+        }
+
+        private static bool ReadAutoUpdateEnabled()
+        {
+            return ReadAppUpdateSetting(AutoUpdateEnabledValueName, 1) != 0;
+        }
+
+        private static int ReadAutoUpdateIntervalDays()
+        {
+            int intervalDays = ReadAppUpdateSetting(AutoUpdateIntervalDaysValueName, 1);
+            return IsSupportedAutoUpdateInterval(intervalDays) ? intervalDays : 1;
+        }
+
+        private static int ReadAppUpdateSetting(string valueName, int defaultValue)
+        {
+            try
+            {
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(AppUpdateSettingsRegistryPath))
+                {
+                    object value = key == null ? null : key.GetValue(valueName);
+                    if (value != null && int.TryParse(
+                        Convert.ToString(value, CultureInfo.InvariantCulture),
+                        NumberStyles.Integer,
+                        CultureInfo.InvariantCulture,
+                        out int parsedValue))
+                        return parsedValue;
+                }
+            }
+            catch (System.Security.SecurityException)
+            {
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
+
+            return defaultValue;
+        }
+
+        private static bool IsSupportedAutoUpdateInterval(int intervalDays)
+        {
+            return intervalDays == 1 || intervalDays == 3 || intervalDays == 7 ||
+                intervalDays == 14 || intervalDays == 30;
+        }
+
+        private static void SaveAppUpdatePreferences(bool enabled, int intervalDays)
+        {
+            using (RegistryKey key = Registry.CurrentUser.CreateSubKey(AppUpdateSettingsRegistryPath))
+            {
+                if (key == null)
+                    throw new InvalidOperationException("Application update preferences could not be saved.");
+
+                key.SetValue(AutoUpdateEnabledValueName, enabled ? 1 : 0, RegistryValueKind.DWord);
+                key.SetValue(AutoUpdateIntervalDaysValueName,
+                    IsSupportedAutoUpdateInterval(intervalDays) ? intervalDays : 1,
+                    RegistryValueKind.DWord);
+            }
         }
 
         private void ShowWhitespacesCheckBox_Checked(object sender, RoutedEventArgs e)
@@ -114,28 +179,39 @@ namespace Calcify
             ShowWhitespacesCheckBox.IsChecked = Properties.Settings.Default.ShowWhitespaces;
             HighlightCurrentLineCheckBox.IsChecked = Properties.Settings.Default.HighlightCurrentLine;
             ShowMatchingBracketsCheckBox.IsChecked = Properties.Settings.Default.ShowMatchingBrackets;
-            foreach (ComboBoxItem intervalItem in ExchangeRateUpdateIntervalComboBox.Items)
+            loadingAppUpdatePreferences = true;
+            bool autoUpdateEnabled = ReadAutoUpdateEnabled();
+            AutoUpdateApplicationCheckBox.IsChecked = autoUpdateEnabled;
+            ApplicationUpdateIntervalComboBox.IsEnabled = autoUpdateEnabled;
+            int savedIntervalDays = ReadAutoUpdateIntervalDays();
+            foreach (ComboBoxItem intervalItem in ApplicationUpdateIntervalComboBox.Items)
             {
                 if (int.TryParse(intervalItem.Tag.ToString(), out int intervalDays) &&
-                    intervalDays == Properties.Settings.Default.ExchangeRateUpdateIntervalDays)
+                    intervalDays == savedIntervalDays)
                 {
-                    ExchangeRateUpdateIntervalComboBox.SelectedItem = intervalItem;
+                    ApplicationUpdateIntervalComboBox.SelectedItem = intervalItem;
                     break;
                 }
             }
-            if (ExchangeRateUpdateIntervalComboBox.SelectedItem == null)
-                ExchangeRateUpdateIntervalComboBox.SelectedIndex = 0;
+            if (ApplicationUpdateIntervalComboBox.SelectedItem == null)
+                ApplicationUpdateIntervalComboBox.SelectedIndex = 0;
+            loadingAppUpdatePreferences = false;
             UpdateLastExchangeRateDate();
         }
 
-        private void ExchangeRateUpdateIntervalComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void AppUpdatePreferences_Changed(object sender, RoutedEventArgs e)
         {
-            if (ExchangeRateUpdateIntervalComboBox.SelectedItem is ComboBoxItem selectedItem &&
-                int.TryParse(selectedItem.Tag.ToString(), out int intervalDays))
-            {
-                Properties.Settings.Default.ExchangeRateUpdateIntervalDays = intervalDays;
-                Properties.Settings.Default.Save();
-            }
+            if (loadingAppUpdatePreferences)
+                return;
+
+            bool autoUpdateEnabled = AutoUpdateApplicationCheckBox.IsChecked == true;
+            ApplicationUpdateIntervalComboBox.IsEnabled = autoUpdateEnabled;
+            int intervalDays = ReadAutoUpdateIntervalDays();
+            if (ApplicationUpdateIntervalComboBox.SelectedItem is ComboBoxItem selectedItem &&
+                int.TryParse(selectedItem.Tag.ToString(), out int selectedIntervalDays))
+                intervalDays = selectedIntervalDays;
+
+            SaveAppUpdatePreferences(autoUpdateEnabled, intervalDays);
         }
 
         internal void UpdateLastExchangeRateDate()

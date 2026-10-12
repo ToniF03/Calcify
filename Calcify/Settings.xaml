@@ -191,19 +191,6 @@
                                    Style="{StaticResource modernTextBlock}" />
                         <TextBlock Text="Check the date of the available currency rates or fetch the latest data."
                                    Margin="0,4,0,12" Style="{StaticResource SettingsDescription}" />
-                        <TextBlock Text="Automatic update interval" FontWeight="Medium" Margin="0,0,0,7"
-                                   Style="{StaticResource modernTextBlock}" />
-                        <ComboBox x:Name="ExchangeRateUpdateIntervalComboBox" Width="150" Height="28"
-                                  HorizontalAlignment="Left" Style="{StaticResource VsComboBox}"
-                                  AutomationProperties.Name="Exchange rate update interval">
-                            <ComboBoxItem Content="Every day" Tag="1" />
-                            <ComboBoxItem Content="Every 3 days" Tag="3" />
-                            <ComboBoxItem Content="Every 7 days" Tag="7" />
-                            <ComboBoxItem Content="Every 14 days" Tag="14" />
-                            <ComboBoxItem Content="Every 30 days" Tag="30" />
-                        </ComboBox>
-                        <TextBlock Text="Rates are checked automatically when Calcify starts."
-                                   Margin="0,4,0,12" Style="{StaticResource SettingsDescription}" />
                         <TextBlock x:Name="LastExchangeRateUpdateTextBlock" Margin="0,0,0,12"
                                    Style="{StaticResource modernTextBlock}" />
                         <Button x:Name="UpdateExchangeRatesButton" Content="Update rates"
@@ -211,6 +198,30 @@
                                 Style="{StaticResource SearchReplaceButton}" />
                         <TextBlock x:Name="ExchangeRateStatusTextBlock" Margin="0,8,0,0"
                                    Style="{StaticResource SettingsDescription}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource SettingsCard}">
+                    <StackPanel>
+                        <TextBlock Text="Application updates" FontSize="15" FontWeight="SemiBold"
+                                   Style="{StaticResource modernTextBlock}" />
+                        <TextBlock Text="Choose how often Calcify checks for application updates."
+                                   Margin="0,4,0,12" Style="{StaticResource SettingsDescription}" />
+                        <CheckBox x:Name="AutoUpdateApplicationCheckBox" Content="Automatically check for updates"
+                                  Style="{StaticResource SearchReplaceCheckBox}" />
+                        <TextBlock Text="Checks run when Windows starts."
+                                   Margin="22,2,0,12" Style="{StaticResource SettingsDescription}" />
+                        <TextBlock Text="Check interval" FontWeight="Medium" Margin="0,0,0,7"
+                                   Style="{StaticResource modernTextBlock}" />
+                        <ComboBox x:Name="ApplicationUpdateIntervalComboBox" Width="150" Height="28"
+                                  HorizontalAlignment="Left" Style="{StaticResource VsComboBox}"
+                                  AutomationProperties.Name="Application update check interval">
+                            <ComboBoxItem Content="Every day" Tag="1" />
+                            <ComboBoxItem Content="Every 3 days" Tag="3" />
+                            <ComboBoxItem Content="Every 7 days" Tag="7" />
+                            <ComboBoxItem Content="Every 14 days" Tag="14" />
+                            <ComboBoxItem Content="Every 30 days" Tag="30" />
+                        </ComboBox>
                     </StackPanel>
                 </Border>
 
