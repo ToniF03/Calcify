@@ -124,6 +124,7 @@ namespace Calcify
             int dModified = (int)Calculator.DateTimeToUnixTimeStamp(DateTime.UtcNow);
             string header = "[AUTHOR=" + dAuthor + ",MODIFIED_BY=" + Properties.Settings.Default.UserName + ",CREATED=" + dCreated + ",MODIFIED=" + dModified + "]";
             string fileContent = header + "\n" + mainEditor.Text;
+            File.WriteAllText(path, fileContent);
             documentAuthor = dAuthor;
             documentEditedBy = Properties.Settings.Default.UserName;
             documentCreated = dCreated;
@@ -131,7 +132,6 @@ namespace Calcify
             documentPath = path;
             documentText = String.Join("\n", fileContent.Split('\n').Skip(1).ToArray());
             unsavedChanges = false;
-            File.WriteAllText(path, fileContent);
             DocumentChanged();
             AddRecentFile(path);
         }

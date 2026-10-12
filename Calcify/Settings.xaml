@@ -151,6 +151,19 @@
                                   Style="{StaticResource SearchReplaceCheckBox}" Margin="0,4,0,0" />
                         <TextBlock Text="Display whitespace characters in the editor." Margin="22,2,0,0"
                                    Style="{StaticResource SettingsDescription}" />
+                        <TextBlock Text="Autosave interval" FontWeight="Medium" Margin="0,12,0,7"
+                                   Style="{StaticResource modernTextBlock}" />
+                        <ComboBox x:Name="AutoSaveIntervalComboBox" Width="170" Height="28"
+                                  HorizontalAlignment="Left" Style="{StaticResource VsComboBox}"
+                                  AutomationProperties.Name="Autosave interval">
+                            <ComboBoxItem Content="Never" Tag="0" />
+                            <ComboBoxItem Content="Every 1 minute" Tag="1" />
+                            <ComboBoxItem Content="Every 5 minutes" Tag="5" />
+                            <ComboBoxItem Content="Every 10 minutes" Tag="10" />
+                            <ComboBoxItem Content="Every 30 minutes" Tag="30" />
+                        </ComboBox>
+                        <TextBlock Text="Autosaves changes to files that have already been saved once."
+                                   Margin="0,4,0,0" Style="{StaticResource SettingsDescription}" />
                     </StackPanel>
                 </Border>
 

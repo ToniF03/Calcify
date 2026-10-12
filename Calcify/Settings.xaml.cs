@@ -27,6 +27,7 @@ namespace Calcify
         private const string AutoUpdateEnabledValueName = "Enabled";
         private const string AutoUpdateIntervalDaysValueName = "IntervalDays";
         private bool loadingAppUpdatePreferences;
+        private bool loadingAutoSavePreferences;
 
         public MainWindow _MainWindow;
 
@@ -69,6 +70,7 @@ namespace Calcify
             ShowMatchingBracketsCheckBox.Unchecked += ShowMatchingBracketsCheckBox_Checked;
             ShowWhitespacesCheckBox.Checked += ShowWhitespacesCheckBox_Checked;
             ShowWhitespacesCheckBox.Unchecked += ShowWhitespacesCheckBox_Checked;
+            AutoSaveIntervalComboBox.SelectionChanged += AutoSaveIntervalComboBox_SelectionChanged;
             AutoUpdateApplicationCheckBox.Checked += AppUpdatePreferences_Changed;
             AutoUpdateApplicationCheckBox.Unchecked += AppUpdatePreferences_Changed;
             ApplicationUpdateIntervalComboBox.SelectionChanged += AppUpdatePreferences_Changed;
@@ -179,6 +181,18 @@ namespace Calcify
             ShowWhitespacesCheckBox.IsChecked = Properties.Settings.Default.ShowWhitespaces;
             HighlightCurrentLineCheckBox.IsChecked = Properties.Settings.Default.HighlightCurrentLine;
             ShowMatchingBracketsCheckBox.IsChecked = Properties.Settings.Default.ShowMatchingBrackets;
+            int autoSaveInterval = Properties.Settings.Default.AutoSaveIntervalMinutes;
+            foreach (ComboBoxItem intervalItem in AutoSaveIntervalComboBox.Items)
+            {
+                if (int.TryParse(intervalItem.Tag.ToString(), out int intervalMinutes) &&
+                    intervalMinutes == autoSaveInterval)
+                {
+                    AutoSaveIntervalComboBox.SelectedItem = intervalItem;
+                    break;
+                }
+            }
+            if (AutoSaveIntervalComboBox.SelectedItem == null)
+                AutoSaveIntervalComboBox.SelectedIndex = 0;
             loadingAppUpdatePreferences = true;
             bool autoUpdateEnabled = ReadAutoUpdateEnabled();
             AutoUpdateApplicationCheckBox.IsChecked = autoUpdateEnabled;
@@ -212,6 +226,17 @@ namespace Calcify
                 intervalDays = selectedIntervalDays;
 
             SaveAppUpdatePreferences(autoUpdateEnabled, intervalDays);
+        }
+
+        private void AutoSaveIntervalComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (AutoSaveIntervalComboBox.SelectedItem is ComboBoxItem selectedItem &&
+                int.TryParse(selectedItem.Tag.ToString(), out int intervalMinutes))
+            {
+                Properties.Settings.Default.AutoSaveIntervalMinutes = intervalMinutes;
+                Properties.Settings.Default.Save();
+                _MainWindow.UpdateAutoSaveInterval();
+            }
         }
 
         internal void UpdateLastExchangeRateDate()

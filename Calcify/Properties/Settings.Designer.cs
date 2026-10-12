@@ -191,5 +191,17 @@ namespace Calcify.Properties {
             }
         }
 
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int AutoSaveIntervalMinutes {
+            get {
+                return ((int)(this["AutoSaveIntervalMinutes"]));
+            }
+            set {
+                this["AutoSaveIntervalMinutes"] = value;
+            }
+        }
+
     }
 }

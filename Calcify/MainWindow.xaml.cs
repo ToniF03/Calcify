@@ -20,6 +20,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
+using System.Windows.Threading;
 using System.Xml;
 
 namespace Calcify
@@ -51,6 +52,7 @@ namespace Calcify
         private string windowTitle = "";
         private bool unsavedChanges = false;
         private readonly RegistryWatcher watcher = null;
+        private readonly DispatcherTimer autoSaveTimer;
 
         public int returnState = -1;
         public About aboutWindow = null;
@@ -159,6 +161,9 @@ namespace Calcify
         public MainWindow()
         {
             InitializeComponent();
+            autoSaveTimer = new DispatcherTimer();
+            autoSaveTimer.Tick += AutoSaveTimer_Tick;
+            UpdateAutoSaveInterval();
             SearchReplacePanel.Editor = mainEditor;
             SearchReplacePanel.Overview = SearchOverview;
             LoadRecentFiles();
@@ -245,6 +250,39 @@ namespace Calcify
             ZoomComboBox.Text = (Properties.Settings.Default.EditorZoom * 100).ToString(CultureInfo.InvariantCulture) + " %";
             mainEditor.LayoutTransform = new ScaleTransform(Properties.Settings.Default.EditorZoom, Properties.Settings.Default.EditorZoom);
             resultEditor.LayoutTransform = new ScaleTransform(Properties.Settings.Default.EditorZoom, Properties.Settings.Default.EditorZoom);
+        }
+
+        internal void UpdateAutoSaveInterval()
+        {
+            autoSaveTimer.Stop();
+
+            int intervalMinutes = Properties.Settings.Default.AutoSaveIntervalMinutes;
+            if (intervalMinutes != 1 && intervalMinutes != 5 &&
+                intervalMinutes != 10 && intervalMinutes != 30)
+                return;
+
+            autoSaveTimer.Interval = TimeSpan.FromMinutes(intervalMinutes);
+            autoSaveTimer.Start();
+        }
+
+        private void AutoSaveTimer_Tick(object sender, EventArgs e)
+        {
+            if (!unsavedChanges || string.IsNullOrWhiteSpace(documentPath) || !File.Exists(documentPath))
+                return;
+
+            try
+            {
+                SaveFile(documentPath);
+            }
+            catch (IOException)
+            {
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
+            catch (System.Security.SecurityException)
+            {
+            }
         }
 
         private void mainEditor_GotFocus(object sender, RoutedEventArgs e)
@@ -1633,7 +1671,6 @@ namespace Calcify
 //  - Rename settings scheme to theme
 
 
-//  - settings > autosave > interval
 //  - settings > Word Wrap (?)
 //  - settings > Line Spacing
 //  - settings > thousands seperator
@@ -1717,6 +1754,7 @@ namespace Calcify
 //  - settings > bracket matching
 //  - settings > currency update interval
 //  - settings > disable auto updates
+//  - settings > autosave > interval
 
 //  - put hotkeys into MainWindow.Hotkeys.cs
 //  - put Regex into MainWindow.Regex.cs
