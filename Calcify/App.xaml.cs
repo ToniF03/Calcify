@@ -96,7 +96,11 @@ namespace Calcify
             try
             {
                 DateTime? rateDate = ExchangeRateLoader.GetLastUpdatedDate();
-                bool shouldDownload = forceDownload || !rateDate.HasValue || rateDate.Value.Date < DateTime.Today;
+                int updateIntervalDays = System.Math.Max(
+                    1,
+                    System.Math.Min(30, Calcify.Properties.Settings.Default.ExchangeRateUpdateIntervalDays));
+                DateTime refreshAfterDate = DateTime.Today.AddDays(1 - updateIntervalDays);
+                bool shouldDownload = forceDownload || !rateDate.HasValue || rateDate.Value.Date < refreshAfterDate;
 
                 if (shouldDownload && !await Task.Run(() => ExchangeRateLoader.DownloadExchangeRate()))
                     throw new InvalidOperationException("Exchange rates could not be downloaded.");

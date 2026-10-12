@@ -1637,7 +1637,6 @@ namespace Calcify
 //  - settings > autosave > interval
 //  - settings > Word Wrap (?)
 //  - settings > Line Spacing
-//  - settings > currency update interval
 //  - settings > thousands seperator
 
 

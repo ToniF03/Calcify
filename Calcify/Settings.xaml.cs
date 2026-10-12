@@ -62,6 +62,7 @@ namespace Calcify
             ShowMatchingBracketsCheckBox.Unchecked += ShowMatchingBracketsCheckBox_Checked;
             ShowWhitespacesCheckBox.Checked += ShowWhitespacesCheckBox_Checked;
             ShowWhitespacesCheckBox.Unchecked += ShowWhitespacesCheckBox_Checked;
+            ExchangeRateUpdateIntervalComboBox.SelectionChanged += ExchangeRateUpdateIntervalComboBox_SelectionChanged;
             ((Button)FindName("UpdateExchangeRatesButton")).Click += UpdateExchangeRatesButton_Click;
             this.Loaded += Settings_Loaded;
         }
@@ -113,7 +114,28 @@ namespace Calcify
             ShowWhitespacesCheckBox.IsChecked = Properties.Settings.Default.ShowWhitespaces;
             HighlightCurrentLineCheckBox.IsChecked = Properties.Settings.Default.HighlightCurrentLine;
             ShowMatchingBracketsCheckBox.IsChecked = Properties.Settings.Default.ShowMatchingBrackets;
+            foreach (ComboBoxItem intervalItem in ExchangeRateUpdateIntervalComboBox.Items)
+            {
+                if (int.TryParse(intervalItem.Tag.ToString(), out int intervalDays) &&
+                    intervalDays == Properties.Settings.Default.ExchangeRateUpdateIntervalDays)
+                {
+                    ExchangeRateUpdateIntervalComboBox.SelectedItem = intervalItem;
+                    break;
+                }
+            }
+            if (ExchangeRateUpdateIntervalComboBox.SelectedItem == null)
+                ExchangeRateUpdateIntervalComboBox.SelectedIndex = 0;
             UpdateLastExchangeRateDate();
+        }
+
+        private void ExchangeRateUpdateIntervalComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ExchangeRateUpdateIntervalComboBox.SelectedItem is ComboBoxItem selectedItem &&
+                int.TryParse(selectedItem.Tag.ToString(), out int intervalDays))
+            {
+                Properties.Settings.Default.ExchangeRateUpdateIntervalDays = intervalDays;
+                Properties.Settings.Default.Save();
+            }
         }
 
         internal void UpdateLastExchangeRateDate()

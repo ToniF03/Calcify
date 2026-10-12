@@ -190,5 +190,17 @@ namespace Calcify.Properties {
                 this["ShowMatchingBrackets"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int ExchangeRateUpdateIntervalDays {
+            get {
+                return ((int)(this["ExchangeRateUpdateIntervalDays"]));
+            }
+            set {
+                this["ExchangeRateUpdateIntervalDays"] = value;
+            }
+        }
     }
 }

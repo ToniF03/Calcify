@@ -237,22 +237,26 @@
                                               BorderBrush="{x:Null}"
                                               BorderThickness="0"
                                               ClickMode="Press"
-                                              Grid.Column="1"
                                               IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
                                     <ToggleButton.Template>
                                         <ControlTemplate TargetType="ToggleButton">
                                             <Border Background="{TemplateBinding Background}"
                                                     BorderBrush="{TemplateBinding BorderBrush}"
                                                     BorderThickness="{TemplateBinding BorderThickness}">
-                                                <ContentPresenter HorizontalAlignment="Center"
+                                                <ContentPresenter HorizontalAlignment="Stretch"
                                                                   VerticalAlignment="Center"/>
                                             </Border>
                                         </ControlTemplate>
                                     </ToggleButton.Template>
                                     <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="24" />
+                                        </Grid.ColumnDefinitions>
 
                                         <!-- Content (non-editable) -->
                                         <ContentPresenter x:Name="ContentSite"
+                                                          Grid.Column="0"
                                                           Margin="{TemplateBinding Padding}"
                                                           VerticalAlignment="Center"
                                                           HorizontalAlignment="Left"
@@ -265,6 +269,7 @@
 
                                         <!-- Arrow -->
                                             <Path x:Name="Arrow"
+                                                Grid.Column="1"
                                                 Width="10" Height="6"
                                                 Stretch="Uniform"
                                                 Fill="Transparent"
