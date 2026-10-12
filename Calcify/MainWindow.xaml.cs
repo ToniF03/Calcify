@@ -1624,10 +1624,6 @@ namespace Calcify
 //
 //  - 'About' change date
 
-// Bugs:
-//  - Calculation is not working if line starts with brackets
-//  - -2^2 = -2?
-
 //  - chained operations
 //  - implement variables
 //  - calculations within functions
@@ -1641,8 +1637,6 @@ namespace Calcify
 //  - settings > autosave > interval
 //  - settings > Word Wrap (?)
 //  - settings > Line Spacing
-//  - settings > show whitespace characters
-//  - settings > bracket matching
 //  - settings > currency update interval
 //  - settings > thousands seperator
 
@@ -1667,6 +1661,10 @@ namespace Calcify
 //  - time difference (today - tomorrow, now - 09:00)
 //  - maybe update architecture.md
 //  - Time Formats (now.format("HH:mm:ss"), today.format("yyyy-MM-dd"))
+
+// Bugs:
+//  - Calculation is not working if line starts with brackets
+//  - -2^2 = -2?
 
 
 // Refactor:
@@ -1717,6 +1715,8 @@ namespace Calcify
 //  - settings > font size
 //  - settings > tab size
 //  - settings > Verify rates are current in Settings
+//  - settings > show whitespace characters
+//  - settings > bracket matching
 
 //  - put hotkeys into MainWindow.Hotkeys.cs
 //  - put Regex into MainWindow.Regex.cs

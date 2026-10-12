@@ -58,6 +58,8 @@ namespace Calcify
             ShowLineNumbersCheckBox.Unchecked += ShowLineNumbersCheckBox_Checked;
             HighlightCurrentLineCheckBox.Checked += HighlightCurrentLineCheckBox_Checked;
             HighlightCurrentLineCheckBox.Unchecked += HighlightCurrentLineCheckBox_Checked;
+            ShowMatchingBracketsCheckBox.Checked += ShowMatchingBracketsCheckBox_Checked;
+            ShowMatchingBracketsCheckBox.Unchecked += ShowMatchingBracketsCheckBox_Checked;
             ShowWhitespacesCheckBox.Checked += ShowWhitespacesCheckBox_Checked;
             ShowWhitespacesCheckBox.Unchecked += ShowWhitespacesCheckBox_Checked;
             ((Button)FindName("UpdateExchangeRatesButton")).Click += UpdateExchangeRatesButton_Click;
@@ -85,6 +87,13 @@ namespace Calcify
             _MainWindow.UpdateCurrentLineHighlighting();
         }
 
+        private void ShowMatchingBracketsCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.ShowMatchingBrackets = ShowMatchingBracketsCheckBox.IsChecked == true;
+            Properties.Settings.Default.Save();
+            _MainWindow.UpdateBracketHighlighting();
+        }
+
         private void Settings_Loaded(object sender, RoutedEventArgs e)
         {
             if (Properties.Settings.Default.SystemDefinedDarkMode)
@@ -103,6 +112,7 @@ namespace Calcify
             ShowLineNumbersCheckBox.IsChecked = Properties.Settings.Default.ShowLineNumbers;
             ShowWhitespacesCheckBox.IsChecked = Properties.Settings.Default.ShowWhitespaces;
             HighlightCurrentLineCheckBox.IsChecked = Properties.Settings.Default.HighlightCurrentLine;
+            ShowMatchingBracketsCheckBox.IsChecked = Properties.Settings.Default.ShowMatchingBrackets;
             UpdateLastExchangeRateDate();
         }
 

@@ -178,5 +178,17 @@ namespace Calcify.Properties {
                 this["ShowWhitespaces"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowMatchingBrackets {
+            get {
+                return ((bool)(this["ShowMatchingBrackets"]));
+            }
+            set {
+                this["ShowMatchingBrackets"] = value;
+            }
+        }
     }
 }

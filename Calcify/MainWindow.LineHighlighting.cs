@@ -21,7 +21,14 @@ namespace Calcify
             Border splitterHighlight = FindName("splitterLineHighlight") as Border;
 
             AddCurrentLineHighlighting(mainEditor, editorGrid, splitterHighlight);
+            mainEditor.TextArea.TextView.BackgroundRenderers.Add(
+                new MatchingBracketBackgroundRenderer(mainEditor));
             AddCurrentLineHighlighting(resultEditor, null, null);
+        }
+
+        internal void UpdateBracketHighlighting()
+        {
+            mainEditor.TextArea.TextView.InvalidateLayer(KnownLayer.Background);
         }
 
         internal void UpdateCurrentLineHighlighting()
@@ -228,6 +235,156 @@ namespace Calcify
                     new SolidColorBrush(Color.FromArgb(20, 0, 0, 0));
                 brush.Freeze();
                 return brush;
+            }
+        }
+
+        private sealed class MatchingBracketBackgroundRenderer : IBackgroundRenderer
+        {
+            private static readonly Brush HighlightBrush = CreateHighlightBrush();
+            private static readonly Pen HighlightPen = CreateHighlightPen();
+            private readonly TextEditor editor;
+
+            public MatchingBracketBackgroundRenderer(TextEditor editor)
+            {
+                this.editor = editor;
+            }
+
+            public KnownLayer Layer
+            {
+                get { return KnownLayer.Background; }
+            }
+
+            public void Draw(TextView textView, DrawingContext drawingContext)
+            {
+                if (!Properties.Settings.Default.ShowMatchingBrackets ||
+                    textView.VisualLines.Count == 0)
+                    return;
+
+                int bracketOffset = editor.CaretOffset;
+                if (!IsBracketAt(bracketOffset) && !IsBracketAt(bracketOffset - 1))
+                    return;
+                if (!IsBracketAt(bracketOffset))
+                    bracketOffset--;
+
+                int matchingOffset = FindMatchingBracket(bracketOffset);
+                if (matchingOffset < 0)
+                    return;
+
+                DrawBracket(textView, drawingContext, bracketOffset);
+                DrawBracket(textView, drawingContext, matchingOffset);
+            }
+
+            private bool IsBracketAt(int offset)
+            {
+                return offset >= 0 && offset < editor.Document.TextLength &&
+                    IsOpeningBracket(editor.Document.GetCharAt(offset), out _) ||
+                    offset >= 0 && offset < editor.Document.TextLength &&
+                    IsClosingBracket(editor.Document.GetCharAt(offset), out _);
+            }
+
+            private int FindMatchingBracket(int offset)
+            {
+                char bracket = editor.Document.GetCharAt(offset);
+                List<char> expectedBrackets = new List<char>();
+
+                if (IsOpeningBracket(bracket, out char closingBracket))
+                {
+                    expectedBrackets.Add(closingBracket);
+                    for (int i = offset + 1; i < editor.Document.TextLength; i++)
+                    {
+                        char current = editor.Document.GetCharAt(i);
+                        if (IsOpeningBracket(current, out char nestedClosingBracket))
+                            expectedBrackets.Add(nestedClosingBracket);
+                        else if (IsClosingBracket(current, out _) )
+                        {
+                            if (current != expectedBrackets[expectedBrackets.Count - 1])
+                                return -1;
+                            expectedBrackets.RemoveAt(expectedBrackets.Count - 1);
+                            if (expectedBrackets.Count == 0)
+                                return i;
+                        }
+                    }
+                }
+                else if (IsClosingBracket(bracket, out char openingBracket))
+                {
+                    expectedBrackets.Add(openingBracket);
+                    for (int i = offset - 1; i >= 0; i--)
+                    {
+                        char current = editor.Document.GetCharAt(i);
+                        if (IsClosingBracket(current, out char nestedOpeningBracket))
+                            expectedBrackets.Add(nestedOpeningBracket);
+                        else if (IsOpeningBracket(current, out _))
+                        {
+                            if (current != expectedBrackets[expectedBrackets.Count - 1])
+                                return -1;
+                            expectedBrackets.RemoveAt(expectedBrackets.Count - 1);
+                            if (expectedBrackets.Count == 0)
+                                return i;
+                        }
+                    }
+                }
+
+                return -1;
+            }
+
+            private static bool IsOpeningBracket(char value, out char closingBracket)
+            {
+                switch (value)
+                {
+                    case '(': closingBracket = ')'; return true;
+                    case '[': closingBracket = ']'; return true;
+                    case '{': closingBracket = '}'; return true;
+                    default: closingBracket = '\0'; return false;
+                }
+            }
+
+            private static bool IsClosingBracket(char value, out char openingBracket)
+            {
+                switch (value)
+                {
+                    case ')': openingBracket = '('; return true;
+                    case ']': openingBracket = '['; return true;
+                    case '}': openingBracket = '{'; return true;
+                    default: openingBracket = '\0'; return false;
+                }
+            }
+
+            private static void DrawBracket(TextView textView, DrawingContext drawingContext, int offset)
+            {
+                foreach (Rect rect in BackgroundGeometryBuilder.GetRectsForSegment(
+                    textView, new BracketSegment(offset, 1)))
+                {
+                    if (!rect.IsEmpty)
+                        drawingContext.DrawRoundedRectangle(HighlightBrush, HighlightPen, rect, 2, 2);
+                }
+            }
+
+            private static Brush CreateHighlightBrush()
+            {
+                SolidColorBrush brush = new SolidColorBrush(Color.FromArgb(75, 0, 120, 215));
+                brush.Freeze();
+                return brush;
+            }
+
+            private static Pen CreateHighlightPen()
+            {
+                Pen pen = new Pen(new SolidColorBrush(Color.FromArgb(210, 0, 95, 180)), 1);
+                pen.Brush.Freeze();
+                pen.Freeze();
+                return pen;
+            }
+
+            private sealed class BracketSegment : ISegment
+            {
+                public BracketSegment(int offset, int length)
+                {
+                    Offset = offset;
+                    Length = length;
+                }
+
+                public int Offset { get; private set; }
+                public int Length { get; private set; }
+                public int EndOffset { get { return Offset + Length; } }
             }
         }
     }
