@@ -10,14 +10,14 @@ namespace Calcify
     public partial class MainWindow
     {
         readonly string AnglePattern = Math.Units.Patterns.AnglePattern;
-        public string CurrencyPattern = @"\b(EUR|AED|AFN|ALL|AMD|ANG|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BGN|BHD|BIF|BMD|BND|BOB|BRL|BSD|BTC|BTN|BWP|BYN|BYR|BZD|CAD|CDF|CHF|CLF|CLP|CNY|COP|CRC|CUC|CUP|CVE|CZK|DJF|DKK|DOP|DZD|EGP|ERN|ETB|EUR|FJD|FKP|GBP|GEL|GGP|GHS|GIP|GMD|GNF|GTQ|GYD|HKD|HNL|HRK|HTG|HUF|IDR|ILS|IMP|INR|IQD|IRR|ISK|JEP|JMD|JOD|JPY|KES|KGS|KHR|KMF|KPW|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LSL|LTL|LVL|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|MRO|MUR|MVR|MWK|MXN|MYR|MZN|NAD|NGN|NIO|NOK|NPR|NZD|OMR|PAB|PEN|PGK|PHP|PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLL|SOS|SRD|STD|SVC|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TWD|TZS|UAH|UGX|USD|UYU|UZS|VEF|VND|VUV|WST|XAF|XAG|XAU|XCD|XDR|XOF|XPF|YER|ZAR|ZMK|ZMW|ZWL)\b";
         readonly string DataSizePattern = Math.Units.Patterns.DataSizePattern;
         readonly string FrequencyPattern = Math.Units.Patterns.FrequencyPattern;
         readonly string LengthPattern = Math.Units.Patterns.LengthPattern;
         readonly string MassPattern = Math.Units.Patterns.MassPattern;
         readonly string TemperaturePattern = Math.Units.Patterns.TemperaturePattern;
         readonly string TimePattern = Math.Units.Patterns.TimePattern;
-        readonly string ConstantsPattern = @"(π|\b(p(h)?i|e|tau|c|R|Na|g)\b)";
+        readonly static string ConstantsPattern = @"(π|\b(p(h)?i|e|tau|c|R|Na|g)\b)";
+        public static string CurrencyPattern = @"\b(EUR|AED|AFN|ALL|AMD|ANG|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BGN|BHD|BIF|BMD|BND|BOB|BRL|BSD|BTC|BTN|BWP|BYN|BYR|BZD|CAD|CDF|CHF|CLF|CLP|CNY|COP|CRC|CUC|CUP|CVE|CZK|DJF|DKK|DOP|DZD|EGP|ERN|ETB|EUR|FJD|FKP|GBP|GEL|GGP|GHS|GIP|GMD|GNF|GTQ|GYD|HKD|HNL|HRK|HTG|HUF|IDR|ILS|IMP|INR|IQD|IRR|ISK|JEP|JMD|JOD|JPY|KES|KGS|KHR|KMF|KPW|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LSL|LTL|LVL|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|MRO|MUR|MVR|MWK|MXN|MYR|MZN|NAD|NGN|NIO|NOK|NPR|NZD|OMR|PAB|PEN|PGK|PHP|PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLL|SOS|SRD|STD|SVC|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TWD|TZS|UAH|UGX|USD|UYU|UZS|VEF|VND|VUV|WST|XAF|XAG|XAU|XCD|XDR|XOF|XPF|YER|ZAR|ZMK|ZMW|ZWL)\b";
         readonly Regex prevRegex = new Regex(@"\b" + lastKeywords + "\b");
         readonly Regex oneValueFunctionRegex = new Regex(@"\b(?<func>" + oneValueFunctionKeywords + @")\((?<variable1>(-)?\d+(\.\d+)?)\)(( )?|$)");
         readonly Regex twoValueFunctionRegex = new Regex(@"\b(?<func>" + twoValueFunctionKeywords + @")\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
@@ -27,12 +27,12 @@ namespace Calcify
         readonly Regex PermutationRegex = new Regex(@"(?<n>\d+)C(?<r>\d+)");
         readonly Regex middleFunctionRegex = new Regex(@"(?<num1>-?\d+(\.\d+)?)(?<func>(\%))(?<num2>-?\d+(\.\d+)?)");
         readonly Regex calculatorRegex = new Regex(@"^((\d+(\.\d+)?)|\||(\+|\-|\*|\/|\^)(?!\+|\*|\/|\^|\!)|(|\(|\)|\!))*$");
-        readonly Regex directRegex;
-        readonly Regex constantsRegex;
-        readonly Regex sumAvgRegex;
+        readonly Regex directRegex = new Regex(@"^(-?((\d{1,3},)*\d{3}|\d+)(\.\d+)?( (" + Math.Units.Patterns.allUnitPatterns + "|" + CurrencyPattern + "))?|\\d{4}\\/\\d{2}\\/\\d{2}( \\d{2}:\\d{2}:\\d{2})?|\\d{2}:\\d{2}(:\\d{2})?)$");
+        readonly Regex constantsRegex = new Regex(ConstantsPattern);
+        readonly Regex sumAvgRegex  = new Regex(@"\b(avg|sum)\b");
         readonly Regex inlineCalculationRegex = new Regex(@"(?<=\{)(?<subtask>[^{}]*)(?=\})", RegexOptions.RightToLeft);
         public Regex currencyRegex;
-        readonly Regex allUnitRegex;
+        readonly Regex allUnitRegex = new Regex(@"(?<result>(?<value>-?((\d{1,3},)*\d{3}|\d+)(\.\d+)?) (?<srcUnit>(" + Math.Units.Patterns.allUnitPatterns + "))) (in(to)?|to) (?<targetUnit>(" + Math.Units.Patterns.allUnitPatterns + "))");
 
         /// <summary>
         /// Defines a regular expression pattern to match keywords related to "last" or "previous" values, as well as "answer" references, for use in syntax highlighting and parsing.

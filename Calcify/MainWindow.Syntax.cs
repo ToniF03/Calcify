@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Calcify.Math.Conversion;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -151,6 +152,99 @@ namespace Calcify
             // Add support for numbers, including integers and decimals, with optional commas for thousands separators
             darkSyntax.AddComment("Numbers");
             darkSyntax.AddNumbers("(-?((\\d{1,3},)*\\d{3}|\\d+)(\\.\\d+)?)");
+        }
+
+        /// <summary>
+        /// Initializes the unit dictionaries and conversion delegates for supported measurement types.
+        /// </summary>
+        /// <remarks>This method sets up internal mappings between unit types, their string
+        /// representations, and conversion functions. It should be called before performing any unit conversions to
+        /// ensure all supported units and their aliases are recognized.</remarks>
+        private void SetUpDictionaries()
+        {
+            // Temperatures
+            AddUnit(TemperatureUnit.Kelvin, "K", "K");
+            AddUnit(TemperatureUnit.Fahrenheit, "°F", "°F");
+            AddUnit(TemperatureUnit.Celsius, "°C", "°C");
+            AddUnit(TemperatureUnit.Reaumur, "°Re", "°RE");
+            AddUnit(TemperatureUnit.Rankine, "°R", "°R", "°RA");
+
+            // Time
+            AddUnit(TimeUnit.Century, "century", "c", "century", "centuries");
+            AddUnit(TimeUnit.Decade, "decade", "decade", "decades");
+            AddUnit(TimeUnit.Year, "year", "year", "years", "yr", "yrs");
+            AddUnit(TimeUnit.Month, "month", "month", "months", "mth");
+            AddUnit(TimeUnit.Week, "week", "week", "weeks", "wk");
+            AddUnit(TimeUnit.Day, "day", "day", "days", "d");
+            AddUnit(TimeUnit.Hour, "h", "h", "hour", "hours");
+            AddUnit(TimeUnit.Minute, "min", "min", "minute", "minutes");
+            AddUnit(TimeUnit.Second, "s", "s", "sec", "second", "seconds");
+            AddUnit(TimeUnit.Millisecond, "ms", "ms", "millisecond", "milliseconds");
+            AddUnit(TimeUnit.Microsecond, "µs", "µs", "μs", "microsecond", "microseconds");
+            AddUnit(TimeUnit.Nanosecond, "ns", "ns", "nanosecond", "nanoseconds");
+
+            // Mass
+            AddUnit(MassUnit.Ton, "t", "tons", "ton", "t");
+            AddUnit(MassUnit.Kilogram, "kg", "kg", "kilogram", "kilograms");
+            AddUnit(MassUnit.Gram, "g", "grams", "gram", "g");
+            AddUnit(MassUnit.Milligram, "mg", "milligrams", "milligram", "mg");
+            AddUnit(MassUnit.Microgram, "μg", "micrograms", "microgram", "µg", "μg");
+            AddUnit(MassUnit.LongTon, "lt", "long tons", "long ton", "lt");
+            AddUnit(MassUnit.ShortTon, "tn", "short ton", "short tons", "tn");
+            AddUnit(MassUnit.Stone, "st", "st", "stone", "stones");
+            AddUnit(MassUnit.Pounds, "lb", "pounds", "pound", "lbs", "lb");
+            AddUnit(MassUnit.Ounce, "oz.", "oz", "oz.", "ounce", "ounces");
+
+            // Length
+            AddUnit(LengthUnit.Nanometer, "nm", "nanometer", "nm");
+            AddUnit(LengthUnit.Micrometer, "μm", "micrometer", "μm", "µm");
+            AddUnit(LengthUnit.Millimeter, "mm", "millimeter", "mm");
+            AddUnit(LengthUnit.Centimeter, "cm", "centimeter", "cm");
+            AddUnit(LengthUnit.Decimeter, "dm", "decimeter", "dm");
+            AddUnit(LengthUnit.Meter, "m", "meter", "m");
+            AddUnit(LengthUnit.Kilometer, "km", "kilometer", "km");
+            AddUnit(LengthUnit.Decameter, "dam", "decameter", "dam");
+            AddUnit(LengthUnit.Hectometer, "hm", "hectometer", "hm");
+            AddUnit(LengthUnit.Mile, "mi", "mile", "miles", "mi");
+            AddUnit(LengthUnit.Yard, "yd", "yard", "yd");
+            AddUnit(LengthUnit.Feet, "ft", "foot", "feet", "ft");
+            AddUnit(LengthUnit.Inch, "in", "inch", "in");
+
+            // Frequency
+            AddUnit(FrequencyUnit.Hertz, "Hz", "hz", "hertz");
+            AddUnit(FrequencyUnit.Kilohertz, "kHz", "khz", "kilohertz");
+            AddUnit(FrequencyUnit.Megahertz, "MHz", "mhz", "megahertz");
+            AddUnit(FrequencyUnit.Gigahertz, "GHz", "ghz", "gigahertz");
+
+            // Data size
+            AddUnit(DataSizeUnit.Bit, "b", "b", "bit", "bits");
+            AddUnit(DataSizeUnit.Byte, "B", "B", "byte", "bytes");
+            AddUnit(DataSizeUnit.Kilobyte, "KB", "kb", "kilobyte", "kilobytes");
+            AddUnit(DataSizeUnit.Megabyte, "MB", "mb", "megabyte", "megabytes");
+            AddUnit(DataSizeUnit.Gigabyte, "GB", "gb", "gigabyte", "gigabytes");
+            AddUnit(DataSizeUnit.Terabyte, "TB", "tb", "terabyte", "terabytes");
+            AddUnit(DataSizeUnit.Petabyte, "PB", "pb", "petabyte", "petabytes");
+            AddUnit(DataSizeUnit.Exabyte, "EB", "eb", "exabyte", "exabytes");
+
+            // Angle
+            AddUnit(AngleUnit.Gradian, "gon", "gradian", "gon", "grad");
+            AddUnit(AngleUnit.Degree, "deg", "degree", "deg", "°");
+            AddUnit(AngleUnit.Milliradian, "mil", "milliradian", "mil");
+            AddUnit(AngleUnit.Radian, "rad", "radian", "rad");
+            AddUnit(AngleUnit.AngularMinute, "arcmin", "angular minutes", "angular minute", "arcmin");
+            AddUnit(AngleUnit.AngularSecond, "arcsec", "arcsec", "angular second", "angular seconds");
+
+            converterDict = new Dictionary<Type, Func<double, Enum, Enum, double>>
+            {
+                { typeof(MassUnit), (val, current, target) => Converter.MassConverter(val, (MassUnit)current, (MassUnit)target) },
+                { typeof(DataSizeUnit), (val, current, target) => Converter.DataSizeConverter(val, (DataSizeUnit)current, (DataSizeUnit)target) },
+                { typeof(FrequencyUnit), (val, current, target) => Converter.FrequencyConverter(val, (FrequencyUnit)current, (FrequencyUnit)target) },
+                { typeof(LengthUnit), (val, current, target) => Converter.LengthConverter(val, (LengthUnit)current, (LengthUnit)target) },
+                { typeof(AngleUnit), (val, current, target) => Converter.AngleConverter(val, (AngleUnit)current, (AngleUnit)target) },
+                { typeof(TimeUnit), (val, current, target) => Converter.TimeConverter(val, (TimeUnit)current, (TimeUnit)target) },
+                { typeof(TemperatureUnit), (val, current, target) => Converter.TemperatureConverter(val, (TemperatureUnit)current, (TemperatureUnit)target) }
+            };
+
         }
     }
 }

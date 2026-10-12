@@ -233,31 +233,7 @@ namespace Calcify
             ZoomComboBox.SelectionChanged += ZoomCombo_SelectionChanged;
             ZoomComboBox.LostFocus += ZoomCombo_LostFocus;
             #endregion
-            #region Input Bindings
-            CtrlS.InputGestures.Add(new KeyGesture(Key.S, ModifierKeys.Control));
-            CtrlShiftS.InputGestures.Add(new KeyGesture(Key.S, ModifierKeys.Control | ModifierKeys.Shift));
-            CtrlO.InputGestures.Add(new KeyGesture(Key.O, ModifierKeys.Control));
-            CtrlN.InputGestures.Add(new KeyGesture(Key.N, ModifierKeys.Control));
-            Ctrl0.InputGestures.Add(new KeyGesture(Key.D0, ModifierKeys.Control));
-            Ctrl0.InputGestures.Add(new KeyGesture(Key.NumPad0, ModifierKeys.Control));
-            CtrlPlus.InputGestures.Add(new KeyGesture(Key.OemPlus, ModifierKeys.Control));
-            CtrlMinus.InputGestures.Add(new KeyGesture(Key.OemMinus, ModifierKeys.Control));
-            CtrlD.InputGestures.Add(new KeyGesture(Key.D, ModifierKeys.Control));
-            CtrlFind.InputGestures.Add(new KeyGesture(Key.F, ModifierKeys.Control));
-            CtrlReplace.InputGestures.Add(new KeyGesture(Key.H, ModifierKeys.Control));
-            CtrlL.InputGestures.Add(new KeyGesture(Key.L, ModifierKeys.Control));
-            CtrlSlash.InputGestures.Add(new KeyGesture(Key.Oem2, ModifierKeys.Control));
-            CtrlComma.InputGestures.Add(new KeyGesture(Key.OemComma, ModifierKeys.Control));
-            Esc.InputGestures.Add(new KeyGesture(Key.Escape));
-            F1.InputGestures.Add(new KeyGesture(Key.F1));
-            #endregion
-            #region RegexSettings 
-            constantsRegex = new Regex(ConstantsPattern);
-            sumAvgRegex = new Regex(@"\b(avg|sum)\b");
-            currencyRegex = new Regex(@"^(?<value>\-?\d+(\.\d+)?) (?<srcUnit>" + CurrencyPattern + ") (in(to)?|to|as) (?<targetUnit>" + CurrencyPattern + ")$");
-            allUnitRegex = new Regex(@"(?<result>(?<value>-?((\d{1,3},)*\d{3}|\d+)(\.\d+)?) (?<srcUnit>(" + Math.Units.Patterns.allUnitPatterns + "))) (in(to)?|to) (?<targetUnit>(" + Math.Units.Patterns.allUnitPatterns + "))");
-            directRegex = new Regex(@"^(-?((\d{1,3},)*\d{3}|\d+)(\.\d+)?( (" + Math.Units.Patterns.allUnitPatterns + "|" + CurrencyPattern + "))?|\\d{4}\\/\\d{2}\\/\\d{2}( \\d{2}:\\d{2}:\\d{2})?|\\d{2}:\\d{2}(:\\d{2})?)$");
-            #endregion
+            RegisterHotkeys();
 
             this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
             this.MaxWidth = SystemParameters.MaximizedPrimaryScreenWidth;
@@ -1452,8 +1428,6 @@ namespace Calcify
             string valString = val.ToString("N10", CultureInfo.InvariantCulture);
             if (valString.Contains(".")) valString = valString.TrimEnd('0');
             if (valString.EndsWith(".")) valString = valString.Substring(0, valString.Length - 1);
-            //while (valString.Contains(".") && (valString.EndsWith("0") || valString.EndsWith(".")))
-            //    valString = valString.Substring(0, valString.Length - 1);
             return valString;
         }
 
@@ -1474,99 +1448,6 @@ namespace Calcify
             foreach (var s in synonyms)
                 allUnitsDict.Add(s, e);
             allUnitsExt.Add(e, display);
-        }
-
-        /// <summary>
-        /// Initializes the unit dictionaries and conversion delegates for supported measurement types.
-        /// </summary>
-        /// <remarks>This method sets up internal mappings between unit types, their string
-        /// representations, and conversion functions. It should be called before performing any unit conversions to
-        /// ensure all supported units and their aliases are recognized.</remarks>
-        private void SetUpDictionaries()
-        {
-            // Temperatures
-            AddUnit(TemperatureUnit.Kelvin, "K", "K");
-            AddUnit(TemperatureUnit.Fahrenheit, "°F", "°F");
-            AddUnit(TemperatureUnit.Celsius, "°C", "°C");
-            AddUnit(TemperatureUnit.Reaumur, "°Re", "°RE");
-            AddUnit(TemperatureUnit.Rankine, "°R", "°R", "°RA");
-
-            // Time
-            AddUnit(TimeUnit.Century, "century", "c", "century", "centuries");
-            AddUnit(TimeUnit.Decade, "decade", "decade", "decades");
-            AddUnit(TimeUnit.Year, "year", "year", "years", "yr", "yrs");
-            AddUnit(TimeUnit.Month, "month", "month", "months", "mth");
-            AddUnit(TimeUnit.Week, "week", "week", "weeks", "wk");
-            AddUnit(TimeUnit.Day, "day", "day", "days", "d");
-            AddUnit(TimeUnit.Hour, "h", "h", "hour", "hours");
-            AddUnit(TimeUnit.Minute, "min", "min", "minute", "minutes");
-            AddUnit(TimeUnit.Second, "s", "s", "sec", "second", "seconds");
-            AddUnit(TimeUnit.Millisecond, "ms", "ms", "millisecond", "milliseconds");
-            AddUnit(TimeUnit.Microsecond, "µs", "µs", "μs", "microsecond", "microseconds");
-            AddUnit(TimeUnit.Nanosecond, "ns", "ns", "nanosecond", "nanoseconds");
-
-            // Mass
-            AddUnit(MassUnit.Ton, "t", "tons", "ton", "t");
-            AddUnit(MassUnit.Kilogram, "kg", "kg", "kilogram", "kilograms");
-            AddUnit(MassUnit.Gram, "g", "grams", "gram", "g");
-            AddUnit(MassUnit.Milligram, "mg", "milligrams", "milligram", "mg");
-            AddUnit(MassUnit.Microgram, "μg", "micrograms", "microgram", "µg", "μg");
-            AddUnit(MassUnit.LongTon, "lt", "long tons", "long ton", "lt");
-            AddUnit(MassUnit.ShortTon, "tn", "short ton", "short tons", "tn");
-            AddUnit(MassUnit.Stone, "st", "st", "stone", "stones");
-            AddUnit(MassUnit.Pounds, "lb", "pounds", "pound", "lbs", "lb");
-            AddUnit(MassUnit.Ounce, "oz.", "oz", "oz.", "ounce", "ounces");
-
-            // Length
-            AddUnit(LengthUnit.Nanometer, "nm", "nanometer", "nm");
-            AddUnit(LengthUnit.Micrometer, "μm", "micrometer", "μm", "µm");
-            AddUnit(LengthUnit.Millimeter, "mm", "millimeter", "mm");
-            AddUnit(LengthUnit.Centimeter, "cm", "centimeter", "cm");
-            AddUnit(LengthUnit.Decimeter, "dm", "decimeter", "dm");
-            AddUnit(LengthUnit.Meter, "m", "meter", "m");
-            AddUnit(LengthUnit.Kilometer, "km", "kilometer", "km");
-            AddUnit(LengthUnit.Decameter, "dam", "decameter", "dam");
-            AddUnit(LengthUnit.Hectometer, "hm", "hectometer", "hm");
-            AddUnit(LengthUnit.Mile, "mi", "mile", "miles", "mi");
-            AddUnit(LengthUnit.Yard, "yd", "yard", "yd");
-            AddUnit(LengthUnit.Feet, "ft", "foot", "feet", "ft");
-            AddUnit(LengthUnit.Inch, "in", "inch", "in");
-
-            // Frequency
-            AddUnit(FrequencyUnit.Hertz, "Hz", "hz", "hertz");
-            AddUnit(FrequencyUnit.Kilohertz, "kHz", "khz", "kilohertz");
-            AddUnit(FrequencyUnit.Megahertz, "MHz", "mhz", "megahertz");
-            AddUnit(FrequencyUnit.Gigahertz, "GHz", "ghz", "gigahertz");
-
-            // Data size
-            AddUnit(DataSizeUnit.Bit, "b", "b", "bit", "bits");
-            AddUnit(DataSizeUnit.Byte, "B", "B", "byte", "bytes");
-            AddUnit(DataSizeUnit.Kilobyte, "KB", "kb", "kilobyte", "kilobytes");
-            AddUnit(DataSizeUnit.Megabyte, "MB", "mb", "megabyte", "megabytes");
-            AddUnit(DataSizeUnit.Gigabyte, "GB", "gb", "gigabyte", "gigabytes");
-            AddUnit(DataSizeUnit.Terabyte, "TB", "tb", "terabyte", "terabytes");
-            AddUnit(DataSizeUnit.Petabyte, "PB", "pb", "petabyte", "petabytes");
-            AddUnit(DataSizeUnit.Exabyte, "EB", "eb", "exabyte", "exabytes");
-
-            // Angle
-            AddUnit(AngleUnit.Gradian, "gon", "gradian", "gon", "grad");
-            AddUnit(AngleUnit.Degree, "deg", "degree", "deg", "°");
-            AddUnit(AngleUnit.Milliradian, "mil", "milliradian", "mil");
-            AddUnit(AngleUnit.Radian, "rad", "radian", "rad");
-            AddUnit(AngleUnit.AngularMinute, "arcmin", "angular minutes", "angular minute", "arcmin");
-            AddUnit(AngleUnit.AngularSecond, "arcsec", "arcsec", "angular second", "angular seconds");
-
-            converterDict = new Dictionary<Type, Func<double, Enum, Enum, double>>
-            {
-                { typeof(MassUnit), (val, current, target) => Converter.MassConverter(val, (MassUnit)current, (MassUnit)target) },
-                { typeof(DataSizeUnit), (val, current, target) => Converter.DataSizeConverter(val, (DataSizeUnit)current, (DataSizeUnit)target) },
-                { typeof(FrequencyUnit), (val, current, target) => Converter.FrequencyConverter(val, (FrequencyUnit)current, (FrequencyUnit)target) },
-                { typeof(LengthUnit), (val, current, target) => Converter.LengthConverter(val, (LengthUnit)current, (LengthUnit)target) },
-                { typeof(AngleUnit), (val, current, target) => Converter.AngleConverter(val, (AngleUnit)current, (AngleUnit)target) },
-                { typeof(TimeUnit), (val, current, target) => Converter.TimeConverter(val, (TimeUnit)current, (TimeUnit)target) },
-                { typeof(TemperatureUnit), (val, current, target) => Converter.TemperatureConverter(val, (TemperatureUnit)current, (TemperatureUnit)target) }
-            };
-
         }
 
         #region Events
