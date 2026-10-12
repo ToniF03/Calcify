@@ -163,6 +163,19 @@
                                        VerticalScrollBarVisibility="Hidden"
                                        HorizontalScrollBarVisibility="Hidden"
                                        ShowLineNumbers="{Binding Source={x:Static properties:Settings.Default}, Path=ShowLineNumbers}">
+                    <avalonEdit:TextEditor.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Undo" Command="{x:Static ApplicationCommands.Undo}" />
+                            <MenuItem Header="Redo" Command="{x:Static ApplicationCommands.Redo}" />
+                            <Separator />
+                            <MenuItem Header="Cut" Command="{x:Static ApplicationCommands.Cut}" />
+                            <MenuItem Header="Copy" Command="{x:Static ApplicationCommands.Copy}" />
+                            <MenuItem Header="Paste" Command="{x:Static ApplicationCommands.Paste}" />
+                            <MenuItem Header="Delete" Command="{x:Static ApplicationCommands.Delete}" />
+                            <Separator />
+                            <MenuItem Header="Select All" Command="{x:Static ApplicationCommands.SelectAll}" />
+                        </ContextMenu>
+                    </avalonEdit:TextEditor.ContextMenu>
                 </avalonEdit:TextEditor>
                 <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                 <Border x:Name="splitterLineHighlight" Grid.Column="1"
@@ -182,6 +195,19 @@
                                 FontSize="{Binding Source={x:Static properties:Settings.Default}, Path=EditorFontSize}"
                                 HorizontalScrollBarVisibility="Hidden" 
                                 VerticalScrollBarVisibility="Disabled" >
+                    <avalonEdit:TextEditor.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Undo" Command="{x:Static ApplicationCommands.Undo}" />
+                            <MenuItem Header="Redo" Command="{x:Static ApplicationCommands.Redo}" />
+                            <Separator />
+                            <MenuItem Header="Cut" Command="{x:Static ApplicationCommands.Cut}" />
+                            <MenuItem Header="Copy" Command="{x:Static ApplicationCommands.Copy}" />
+                            <MenuItem Header="Paste" Command="{x:Static ApplicationCommands.Paste}" />
+                            <MenuItem Header="Delete" Command="{x:Static ApplicationCommands.Delete}" />
+                            <Separator />
+                            <MenuItem Header="Select All" Command="{x:Static ApplicationCommands.SelectAll}" />
+                        </ContextMenu>
+                    </avalonEdit:TextEditor.ContextMenu>
                 </avalonEdit:TextEditor>
             </Grid>
           </ScrollViewer>

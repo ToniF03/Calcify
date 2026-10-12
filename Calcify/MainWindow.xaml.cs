@@ -1877,16 +1877,6 @@ namespace Calcify
 
 //  - Rename settings scheme to theme
 
-//  - editor > tab complete
-//  - editor > right click context menu
-//    - Undo - Undo last action
-//    - Redo - Redo last undone action
-//    - Cut - Cut selected text
-//    - Copy - Copy selected text
-//    - Paste - Paste from clipboard
-//    - Delete - Delete selected text
-//    - Select All - Select all content
-
 
 //  - accept inches, bytes, gallons, cups, speed (kmh, mh, ...), data speed (mbps, gbps, ...), tmrw, nmi (nautical miles) (1 nmi = 1852 m), carat (1 ct = 0.2 g), turn (turn, revolution) (1 turn = 360 degrees), THz, pressure, energy, Power, area, volumes (look supported-units.md) as keyword
 //  - basic calculation 1024 * x does not work
@@ -1946,6 +1936,14 @@ namespace Calcify
 //  - editor > ctrl + , settings
 //  - editor > ctrl + f find
 //  - editor > ctrl + h replace
+//  - editor > right click context menu
+//    - Undo - Undo last action
+//    - Redo - Redo last undone action
+//    - Cut - Cut selected text
+//    - Copy - Copy selected text
+//    - Paste - Paste from clipboard
+//    - Delete - Delete selected text
+//    - Select All - Select all content
 
 //  - settings > highlight current line
 //  - settings > font size
