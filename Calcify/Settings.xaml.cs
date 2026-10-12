@@ -58,13 +58,23 @@ namespace Calcify
             ShowLineNumbersCheckBox.Unchecked += ShowLineNumbersCheckBox_Checked;
             HighlightCurrentLineCheckBox.Checked += HighlightCurrentLineCheckBox_Checked;
             HighlightCurrentLineCheckBox.Unchecked += HighlightCurrentLineCheckBox_Checked;
+            ShowWhitespacesCheckBox.Checked += ShowWhitespacesCheckBox_Checked;
+            ShowWhitespacesCheckBox.Unchecked += ShowWhitespacesCheckBox_Checked;
             ((Button)FindName("UpdateExchangeRatesButton")).Click += UpdateExchangeRatesButton_Click;
             this.Loaded += Settings_Loaded;
+        }
+
+        private void ShowWhitespacesCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.ShowWhitespaces = (bool)ShowWhitespacesCheckBox.IsChecked;
+            Properties.Settings.Default.Save();
+            _MainWindow.mainEditor.Options.ShowSpaces = Properties.Settings.Default.ShowWhitespaces;
         }
 
         private void ShowLineNumbersCheckBox_Checked(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.ShowLineNumbers = (bool)ShowLineNumbersCheckBox.IsChecked;
+            Properties.Settings.Default.Save();
             _MainWindow.UpdateTextBoxLineNumbers();
         }
 
@@ -91,6 +101,7 @@ namespace Calcify
             EditorFontSizeTextBox.Text = Properties.Settings.Default.EditorFontSize.ToString();
             EditorTabSpaceTextBox.Text = Properties.Settings.Default.TabSize.ToString();
             ShowLineNumbersCheckBox.IsChecked = Properties.Settings.Default.ShowLineNumbers;
+            ShowWhitespacesCheckBox.IsChecked = Properties.Settings.Default.ShowWhitespaces;
             HighlightCurrentLineCheckBox.IsChecked = Properties.Settings.Default.HighlightCurrentLine;
             UpdateLastExchangeRateDate();
         }

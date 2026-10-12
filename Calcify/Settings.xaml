@@ -143,6 +143,10 @@
                                   Style="{StaticResource SearchReplaceCheckBox}" Margin="0,4,0,0" />
                         <TextBlock Text="Emphasize the line where the caret is positioned." Margin="22,2,0,0"
                                    Style="{StaticResource SettingsDescription}" />
+                        <CheckBox x:Name="ShowWhitespacesCheckBox" Content="Show Whitespaces"
+                                  Style="{StaticResource SearchReplaceCheckBox}" Margin="0,4,0,0" />
+                        <TextBlock Text="Display whitespace characters in the editor." Margin="22,2,0,0"
+                                   Style="{StaticResource SettingsDescription}" />
                     </StackPanel>
                 </Border>
 

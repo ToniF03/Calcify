@@ -182,8 +182,6 @@ namespace Calcify
                 Properties.Settings.Default.DarkMode = int.Parse(watcher.Value) != 1;
             }
 
-
-
             SetUpDictionaries();
             UpdateSyntaxHighlighting();
 
@@ -303,6 +301,7 @@ namespace Calcify
             }
 
             UpdateTextBoxLineNumbers();
+            mainEditor.Options.ShowSpaces = Properties.Settings.Default.ShowWhitespaces;
 
             themeButtonLabel.Content = Properties.Settings.Default.DarkMode ? "\uE708" : "\uE706";
         }
@@ -1642,12 +1641,10 @@ namespace Calcify
 //  - settings > autosave > interval
 //  - settings > Word Wrap (?)
 //  - settings > Line Spacing
-//  - settings > tab size
 //  - settings > show whitespace characters
 //  - settings > bracket matching
 //  - settings > currency update interval
 //  - settings > thousands seperator
-//  - settings > Verify rates are current in Settings
 
 
 //  - editor > tab complete
@@ -1718,6 +1715,8 @@ namespace Calcify
 
 //  - settings > highlight current line
 //  - settings > font size
+//  - settings > tab size
+//  - settings > Verify rates are current in Settings
 
 //  - put hotkeys into MainWindow.Hotkeys.cs
 //  - put Regex into MainWindow.Regex.cs

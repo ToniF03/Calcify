@@ -106,7 +106,7 @@ namespace Calcify.Properties {
                 this["ShowLineNumbers"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
@@ -118,7 +118,7 @@ namespace Calcify.Properties {
                 this["HighlightCurrentLine"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("13")]
@@ -154,7 +154,7 @@ namespace Calcify.Properties {
                 this["TabSize"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -164,6 +164,18 @@ namespace Calcify.Properties {
             }
             set {
                 this["RecentFiles"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowWhitespaces {
+            get {
+                return ((bool)(this["ShowWhitespaces"]));
+            }
+            set {
+                this["ShowWhitespaces"] = value;
             }
         }
     }
