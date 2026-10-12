@@ -2,10 +2,12 @@
 using Calcify.Math;
 using Calcify.Math.Conversion;
 using Calcify.Tools;
+using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using ICSharpCode.AvalonEdit.Rendering;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -63,6 +65,15 @@ namespace Calcify
         private bool isSynchronizingResultEditor;
         private bool isSynchronizingMainEditor;
         private bool isNormalizingTabs;
+        private bool isUpdatingAlignedResults;
+        private readonly List<string> calculationResults = new List<string>();
+        private readonly List<int> resultLineToInputLine = new List<int>();
+        private readonly List<int> inputLineToResultLine = new List<int>();
+        private readonly List<int> inputWrappedLineCounts = new List<int>();
+        private readonly List<int> targetWrappedLineCounts = new List<int>();
+        private readonly List<int> resultBlockLastLines = new List<int>();
+        private LineSpacingElementGenerator mainLineSpacingElementGenerator;
+        private LineSpacingElementGenerator resultLineSpacingElementGenerator;
 
         private Dictionary<Type, Func<double, Enum, Enum, double>> converterDict = new Dictionary<Type, Func<double, Enum, Enum, double>>();
         #endregion
@@ -161,6 +172,11 @@ namespace Calcify
         public MainWindow()
         {
             InitializeComponent();
+            mainLineSpacingElementGenerator = new LineSpacingElementGenerator(GetInputLineSpacingHeight);
+            resultLineSpacingElementGenerator = new LineSpacingElementGenerator(GetResultLineSpacingHeight);
+            mainEditor.TextArea.TextView.ElementGenerators.Add(mainLineSpacingElementGenerator);
+            resultEditor.TextArea.TextView.ElementGenerators.Add(resultLineSpacingElementGenerator);
+            ApplyEditorLayoutSettings();
             autoSaveTimer = new DispatcherTimer();
             autoSaveTimer.Tick += AutoSaveTimer_Tick;
             UpdateAutoSaveInterval();
@@ -199,6 +215,7 @@ namespace Calcify
             this.Drop += Window_DragEvent;
 
             mainEditor.TextChanged += MainEditor_TextChanged;
+            mainEditor.SizeChanged += MainEditor_SizeChanged;
             mainEditor.TextArea.Caret.PositionChanged += mainEditor_Caret_PositionChanged;
             InitializeFunctionCompletion();
             mainEditor.PreviewKeyDown += MainEditor_PreviewKeyDown;
@@ -285,6 +302,196 @@ namespace Calcify
             }
         }
 
+        internal void ApplyEditorLayoutSettings()
+        {
+            bool wordWrapEnabled = Properties.Settings.Default.WordWrapEnabled;
+            mainEditor.WordWrap = wordWrapEnabled;
+            resultEditor.WordWrap = wordWrapEnabled;
+            UpdateAlignedResultDocument();
+            mainEditor.TextArea.TextView.InvalidateMeasure();
+            resultEditor.TextArea.TextView.InvalidateMeasure();
+            mainEditor.TextArea.TextView.Redraw();
+            resultEditor.TextArea.TextView.Redraw();
+        }
+
+        private double GetInputLineSpacingHeight(int lineNumber)
+        {
+            int index = lineNumber - 1;
+            int extraRows = index >= 0 && index < targetWrappedLineCounts.Count &&
+                index < inputWrappedLineCounts.Count
+                ? System.Math.Max(0, targetWrappedLineCounts[index] - inputWrappedLineCounts[index])
+                : 0;
+            return mainEditor.TextArea.TextView.DefaultLineHeight *
+                (GetEditorLineSpacing() + extraRows);
+        }
+
+        private double GetResultLineSpacingHeight(int lineNumber)
+        {
+            if (lineNumber < 1 || lineNumber > resultLineToInputLine.Count)
+                return 0;
+
+            int inputLineNumber = resultLineToInputLine[lineNumber - 1];
+            if (inputLineNumber < 1 || inputLineNumber > resultBlockLastLines.Count ||
+                resultBlockLastLines[inputLineNumber - 1] != lineNumber)
+                return 0;
+
+            return resultEditor.TextArea.TextView.DefaultLineHeight * GetEditorLineSpacing();
+        }
+
+        private static double GetEditorLineSpacing()
+        {
+            double spacing = Properties.Settings.Default.EditorLineSpacing;
+            return spacing == 1.25 || spacing == 1.5 || spacing == 2.0 ? spacing : 1.0;
+        }
+
+        private void MainEditor_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(UpdateAlignedResultDocument));
+        }
+
+        private void UpdateAlignedResultDocument()
+        {
+            if (isUpdatingAlignedResults || mainEditor == null || resultEditor == null)
+                return;
+
+            isUpdatingAlignedResults = true;
+            try
+            {
+                bool wordWrapEnabled = Properties.Settings.Default.WordWrapEnabled;
+                mainEditor.WordWrap = wordWrapEnabled;
+                resultEditor.WordWrap = wordWrapEnabled;
+
+                List<string> resultDocumentLines = new List<string>();
+                resultLineToInputLine.Clear();
+                inputLineToResultLine.Clear();
+                inputWrappedLineCounts.Clear();
+                targetWrappedLineCounts.Clear();
+                resultBlockLastLines.Clear();
+
+                for (int i = 1; i <= mainEditor.LineCount; i++)
+                {
+                    DocumentLine inputLine = mainEditor.Document.GetLineByNumber(i);
+                    string inputText = mainEditor.Document.GetText(inputLine.Offset, inputLine.Length);
+                    string resultText = i <= calculationResults.Count ? calculationResults[i - 1] : string.Empty;
+                    int inputRows = EstimateWrappedLineCount(inputText, mainEditor, wordWrapEnabled);
+                    int resultRows = EstimateWrappedLineCount(resultText, resultEditor, wordWrapEnabled);
+                    int targetRows = System.Math.Max(inputRows, resultRows);
+
+                    inputWrappedLineCounts.Add(inputRows);
+                    targetWrappedLineCounts.Add(targetRows);
+                    inputLineToResultLine.Add(resultDocumentLines.Count + 1);
+                    resultDocumentLines.Add(resultText);
+                    resultLineToInputLine.Add(i);
+
+                    for (int row = resultRows; row < targetRows; row++)
+                    {
+                        resultDocumentLines.Add(string.Empty);
+                        resultLineToInputLine.Add(i);
+                    }
+
+                    resultBlockLastLines.Add(resultDocumentLines.Count);
+                }
+
+                TextDocument alignedResults = new TextDocument();
+                alignedResults.Text = string.Join("\n", resultDocumentLines);
+                isSynchronizingResultEditor = true;
+                try
+                {
+                    resultEditor.Document = alignedResults;
+                }
+                finally
+                {
+                    isSynchronizingResultEditor = false;
+                }
+            }
+            finally
+            {
+                isUpdatingAlignedResults = false;
+            }
+        }
+
+        private static int EstimateWrappedLineCount(string text, TextEditor editor, bool wordWrapEnabled)
+        {
+            if (!wordWrapEnabled || string.IsNullOrEmpty(text))
+                return 1;
+
+            double characterWidth = editor.TextArea.TextView.WideSpaceWidth;
+            double availableWidth = editor.TextArea.TextView.ActualWidth;
+            if (characterWidth <= 0 || availableWidth <= 0)
+                return 1;
+
+            int maximumCharacters = System.Math.Max(1, (int)System.Math.Floor(availableWidth / characterWidth));
+            int wrappedLines = 1;
+            int currentLineLength = 0;
+
+            foreach (string word in text.Split((char[])null, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (word.Length > maximumCharacters)
+                {
+                    if (currentLineLength > 0)
+                    {
+                        wrappedLines++;
+                        currentLineLength = 0;
+                    }
+
+                    wrappedLines += (word.Length - 1) / maximumCharacters;
+                    currentLineLength = word.Length % maximumCharacters;
+                }
+                else if (currentLineLength == 0)
+                    currentLineLength = word.Length;
+                else if (currentLineLength + 1 + word.Length <= maximumCharacters)
+                    currentLineLength += 1 + word.Length;
+                else
+                {
+                    wrappedLines++;
+                    currentLineLength = word.Length;
+                }
+            }
+
+            return wrappedLines;
+        }
+
+        private sealed class LineSpacingElementGenerator : VisualLineElementGenerator
+        {
+            private readonly Func<int, double> getElementHeight;
+            private int lastGeneratedLineNumber;
+
+            public LineSpacingElementGenerator(Func<int, double> getElementHeight)
+            {
+                this.getElementHeight = getElementHeight;
+            }
+
+            public override void StartGeneration(ITextRunConstructionContext context)
+            {
+                lastGeneratedLineNumber = 0;
+                base.StartGeneration(context);
+            }
+
+            public override int GetFirstInterestedOffset(int startOffset)
+            {
+                DocumentLine line = CurrentContext.VisualLine.LastDocumentLine;
+                if (line.LineNumber == lastGeneratedLineNumber || line.EndOffset < startOffset ||
+                    getElementHeight(line.LineNumber) <= 0)
+                    return -1;
+
+                return line.EndOffset;
+            }
+
+            public override VisualLineElement ConstructElement(int offset)
+            {
+                DocumentLine line = CurrentContext.VisualLine.LastDocumentLine;
+                lastGeneratedLineNumber = line.LineNumber;
+                Border spacer = new Border
+                {
+                    Width = 0,
+                    Height = getElementHeight(line.LineNumber),
+                    Background = Brushes.Transparent,
+                    IsHitTestVisible = false
+                };
+                return new InlineObjectElement(0, spacer);
+            }
+        }
+
         private void mainEditor_GotFocus(object sender, RoutedEventArgs e)
         {
             resultEditor.SelectionLength = 0;
@@ -340,6 +547,7 @@ namespace Calcify
 
             UpdateTextBoxLineNumbers();
             mainEditor.Options.ShowSpaces = Properties.Settings.Default.ShowWhitespaces;
+            ApplyEditorLayoutSettings();
 
             themeButtonLabel.Content = Properties.Settings.Default.DarkMode ? "\uE708" : "\uE706";
         }
@@ -396,7 +604,6 @@ namespace Calcify
 
         private void MainEditor_TextChanged(object sender, EventArgs e)
         {
-            TextDocument newDocument = new TextDocument();
             if (!isNormalizingTabs && mainEditor.Text.Contains("\t"))
             {
                 Dispatcher.BeginInvoke(new Action(() =>
@@ -418,23 +625,17 @@ namespace Calcify
             unsavedChanges = documentText != mainEditor.Text;
             if (unsavedChanges) DocumentChanged();
 
+            calculationResults.Clear();
             for (int i = 1; i <= mainEditor.LineCount; i++)
             {
                 DocumentLine line = mainEditor.Document.GetLineByNumber(i);
                 string result = Calculate(mainEditor.Document.GetText(line.Offset, line.Length)).Trim();
                 if (directRegex.Match(result).Success || new Regex(@"^[^\d]*$").IsMatch(result))
-                    newDocument.Text += result;
-                newDocument.Text += "\n";
+                    calculationResults.Add(result);
+                else
+                    calculationResults.Add(string.Empty);
             }
-            isSynchronizingResultEditor = true;
-            try
-            {
-                resultEditor.Document = newDocument;
-            }
-            finally
-            {
-                isSynchronizingResultEditor = false;
-            }
+            UpdateAlignedResultDocument();
         }
 
         private void MainEditor_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -503,7 +704,10 @@ namespace Calcify
             if (isSynchronizingResultEditor)
                 return;
 
-            int lineNumber = resultEditor.Document.GetLineByOffset(resultEditor.CaretOffset).LineNumber;
+            int resultLineNumber = resultEditor.Document.GetLineByOffset(resultEditor.CaretOffset).LineNumber;
+            int lineNumber = resultLineNumber <= resultLineToInputLine.Count
+                ? resultLineToInputLine[resultLineNumber - 1]
+                : resultLineNumber;
             if (lineNumber > mainEditor.Document.LineCount)
                 lineNumber = mainEditor.Document.LineCount;
 
@@ -543,8 +747,11 @@ namespace Calcify
                 isSynchronizingResultEditor = true;
                 try
                 {
-                    resultEditor.SelectionStart =
-                        resultEditor.Document.GetLineByNumber((int)actualLineNumber + 1).Offset;
+                    int inputLineNumber = (int)actualLineNumber + 1;
+                    int resultLineNumber = inputLineNumber <= inputLineToResultLine.Count
+                        ? inputLineToResultLine[inputLineNumber - 1]
+                        : inputLineNumber;
+                    resultEditor.SelectionStart = resultEditor.Document.GetLineByNumber(resultLineNumber).Offset;
                 }
                 finally
                 {
@@ -1670,12 +1877,6 @@ namespace Calcify
 
 //  - Rename settings scheme to theme
 
-
-//  - settings > Word Wrap (?)
-//  - settings > Line Spacing
-//  - settings > thousands seperator
-
-
 //  - editor > tab complete
 //  - editor > right click context menu
 //    - Undo - Undo last action
@@ -1755,6 +1956,8 @@ namespace Calcify
 //  - settings > currency update interval
 //  - settings > disable auto updates
 //  - settings > autosave > interval
+//  - settings > Word Wrap
+//  - settings > Line Spacing
 
 //  - put hotkeys into MainWindow.Hotkeys.cs
 //  - put Regex into MainWindow.Regex.cs

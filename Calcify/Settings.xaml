@@ -151,6 +151,20 @@
                                   Style="{StaticResource SearchReplaceCheckBox}" Margin="0,4,0,0" />
                         <TextBlock Text="Display whitespace characters in the editor." Margin="22,2,0,0"
                                    Style="{StaticResource SettingsDescription}" />
+                        <CheckBox x:Name="WordWrapCheckBox" Content="Word wrap"
+                                  Style="{StaticResource SearchReplaceCheckBox}" Margin="0,4,0,0" />
+                        <TextBlock Text="Wrap long tasks and results to fit their editor panes." Margin="22,2,0,8"
+                                   Style="{StaticResource SettingsDescription}" />
+                        <TextBlock Text="Line spacing" FontWeight="Medium" Margin="0,4,0,7"
+                                   Style="{StaticResource modernTextBlock}" />
+                        <ComboBox x:Name="LineSpacingComboBox" Width="170" Height="28"
+                                  HorizontalAlignment="Left" Style="{StaticResource VsComboBox}"
+                                  AutomationProperties.Name="Editor line spacing">
+                            <ComboBoxItem Content="Single (1.0)" Tag="1" />
+                            <ComboBoxItem Content="1.25" Tag="1.25" />
+                            <ComboBoxItem Content="1.5" Tag="1.5" />
+                            <ComboBoxItem Content="Double (2.0)" Tag="2" />
+                        </ComboBox>
                         <TextBlock Text="Autosave interval" FontWeight="Medium" Margin="0,12,0,7"
                                    Style="{StaticResource modernTextBlock}" />
                         <ComboBox x:Name="AutoSaveIntervalComboBox" Width="170" Height="28"

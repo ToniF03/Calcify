@@ -203,5 +203,29 @@ namespace Calcify.Properties {
             }
         }
 
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool WordWrapEnabled {
+            get {
+                return ((bool)(this["WordWrapEnabled"]));
+            }
+            set {
+                this["WordWrapEnabled"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public double EditorLineSpacing {
+            get {
+                return ((double)(this["EditorLineSpacing"]));
+            }
+            set {
+                this["EditorLineSpacing"] = value;
+            }
+        }
+
     }
 }

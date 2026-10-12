@@ -28,6 +28,7 @@ namespace Calcify
         private const string AutoUpdateIntervalDaysValueName = "IntervalDays";
         private bool loadingAppUpdatePreferences;
         private bool loadingAutoSavePreferences;
+        private bool loadingEditorLayoutPreferences;
 
         public MainWindow _MainWindow;
 
@@ -70,6 +71,9 @@ namespace Calcify
             ShowMatchingBracketsCheckBox.Unchecked += ShowMatchingBracketsCheckBox_Checked;
             ShowWhitespacesCheckBox.Checked += ShowWhitespacesCheckBox_Checked;
             ShowWhitespacesCheckBox.Unchecked += ShowWhitespacesCheckBox_Checked;
+            WordWrapCheckBox.Checked += EditorLayoutPreferences_Changed;
+            WordWrapCheckBox.Unchecked += EditorLayoutPreferences_Changed;
+            LineSpacingComboBox.SelectionChanged += EditorLayoutPreferences_Changed;
             AutoSaveIntervalComboBox.SelectionChanged += AutoSaveIntervalComboBox_SelectionChanged;
             AutoUpdateApplicationCheckBox.Checked += AppUpdatePreferences_Changed;
             AutoUpdateApplicationCheckBox.Unchecked += AppUpdatePreferences_Changed;
@@ -193,6 +197,21 @@ namespace Calcify
             }
             if (AutoSaveIntervalComboBox.SelectedItem == null)
                 AutoSaveIntervalComboBox.SelectedIndex = 0;
+            loadingEditorLayoutPreferences = true;
+            WordWrapCheckBox.IsChecked = Properties.Settings.Default.WordWrapEnabled;
+            double lineSpacing = Properties.Settings.Default.EditorLineSpacing;
+            foreach (ComboBoxItem spacingItem in LineSpacingComboBox.Items)
+            {
+                if (double.TryParse(spacingItem.Tag.ToString(), NumberStyles.Float,
+                    CultureInfo.InvariantCulture, out double spacing) && spacing == lineSpacing)
+                {
+                    LineSpacingComboBox.SelectedItem = spacingItem;
+                    break;
+                }
+            }
+            if (LineSpacingComboBox.SelectedItem == null)
+                LineSpacingComboBox.SelectedIndex = 0;
+            loadingEditorLayoutPreferences = false;
             loadingAppUpdatePreferences = true;
             bool autoUpdateEnabled = ReadAutoUpdateEnabled();
             AutoUpdateApplicationCheckBox.IsChecked = autoUpdateEnabled;
@@ -226,6 +245,21 @@ namespace Calcify
                 intervalDays = selectedIntervalDays;
 
             SaveAppUpdatePreferences(autoUpdateEnabled, intervalDays);
+        }
+
+        private void EditorLayoutPreferences_Changed(object sender, RoutedEventArgs e)
+        {
+            if (loadingEditorLayoutPreferences)
+                return;
+
+            Properties.Settings.Default.WordWrapEnabled = WordWrapCheckBox.IsChecked == true;
+            if (LineSpacingComboBox.SelectedItem is ComboBoxItem selectedItem &&
+                double.TryParse(selectedItem.Tag.ToString(), NumberStyles.Float,
+                    CultureInfo.InvariantCulture, out double spacing))
+                Properties.Settings.Default.EditorLineSpacing = spacing;
+
+            Properties.Settings.Default.Save();
+            _MainWindow.ApplyEditorLayoutSettings();
         }
 
         private void AutoSaveIntervalComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -15,6 +15,7 @@ namespace Calcify
         {
             mainEditor.FontSize = fontSize;
             resultEditor.FontSize = fontSize;
+            UpdateAlignedResultDocument();
         }
 
         /// <summary>
@@ -39,6 +40,7 @@ namespace Calcify
                 Properties.Settings.Default.Save();
                 mainEditor.LayoutTransform = new ScaleTransform(scale, scale);
                 resultEditor.LayoutTransform = new ScaleTransform(scale, scale);
+                UpdateAlignedResultDocument();
                 ZoomComboBox.Text = (scale * 100).ToString("F0", CultureInfo.InvariantCulture) + " %";
                 ZoomComboBox.SelectedIndex = Array.FindIndex(items, i => i == ZoomComboBox.Text);
             }
