@@ -23,7 +23,12 @@ namespace Calcify
         readonly Regex twoValueFunctionRegex = new Regex(@"\b(?<func>" + twoValueFunctionKeywords + @")\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
         readonly Regex threeValueRegex = new Regex(@"\b(?<func>" + threeValueFunctionKeywords + @")\((?<variable1>-?\d+(\.\d+)?), ?(?<variable2>-?\d+(\.\d+)?), ?(?<variable3>-?\d+(\.\d+)?)\)", RegexOptions.RightToLeft);
         readonly Regex multipleValueRegex = new Regex(@"\b(?<func>" + multipleValueFunctionKeywords + @")\((?<variable1>-?\d+(\.\d+)?)(, ?(?<variable>-?\d+(\.\d+)?))+\)", RegexOptions.RightToLeft);
-        readonly Regex dateTimeKeyWordsRegex = new Regex(@"\b(?i)(((now|time)(\.(hour|minute|second))?)|(yesterday|date|today|tomorrow|tmrw)(\.(day|month|year|weekday|dayofyear|weekofyear))?)(?-i)\b");
+        readonly Regex dateTimeKeyWordsRegex = new Regex(
+            @"\b(?<keyword>" + dateFunctionKeywords + "|" + timeFunctionKeywords + @")(?<property>" +
+            dateFunctionSubKeywords + "|" + timeFunctionSubKeywords +
+            @")?(?:\.format\((?<quote>['""])(?<format>.*?)\k<quote>\))?(?![\w.])",
+            RegexOptions.IgnoreCase);
+        //readonly Regex dateTimeKeyWordsRegex = new Regex(@"\b(?i)(((now|time)(\.(hour|minute|second))?)|(yesterday|date|today|tomorrow|tmrw)(\.(day|month|year|weekday|dayofyear|weekofyear))?)(?-i)\b");
         readonly Regex PermutationRegex = new Regex(@"(?<n>\d+)C(?<r>\d+)");
         readonly Regex middleFunctionRegex = new Regex(@"(?<num1>-?\d+(\.\d+)?)(?<func>(\%))(?<num2>-?\d+(\.\d+)?)");
         readonly Regex calculatorRegex = new Regex(@"^((\d+(\.\d+)?)|\||(\+|\-|\*|\/|\^)(?!\+|\*|\/|\^|\!)|(|\(|\)|\!))*$");

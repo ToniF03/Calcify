@@ -629,8 +629,12 @@ namespace Calcify
             for (int i = 1; i <= mainEditor.LineCount; i++)
             {
                 DocumentLine line = mainEditor.Document.GetLineByNumber(i);
-                string result = Calculate(mainEditor.Document.GetText(line.Offset, line.Length)).Trim();
-                if (directRegex.Match(result).Success || new Regex(@"^[^\d]*$").IsMatch(result))
+                string lineText = mainEditor.Document.GetText(line.Offset, line.Length);
+                string result = Calculate(lineText).Trim();
+                bool containsFormattedDateTime = dateTimeKeyWordsRegex.Matches(lineText)
+                    .Cast<Match>()
+                    .Any(match => match.Groups["format"].Success);
+                if (containsFormattedDateTime || directRegex.Match(result).Success || new Regex(@"^[^\d]*$").IsMatch(result))
                     calculationResults.Add(result);
                 else
                     calculationResults.Add(string.Empty);
@@ -1383,6 +1387,24 @@ namespace Calcify
         }
 
         /// <summary>
+        /// Determines whether the specified date and time format string is valid for use with DateTime.ToString().
+        /// </summary>
+        /// <param name="format">The date and time format string to validate.</param>
+        /// <returns><see langword="true"/> if the format string can be used to format a date and time; otherwise, <see langword="false"/>.</returns>
+        private static bool IsValidDateTimeFormat(string format)
+        {
+            try
+            {
+                _ = DateTime.Now.ToString(format, CultureInfo.InvariantCulture);
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Replaces recognized date and time keywords in the specified input string with their corresponding formatted
         /// date or time values.
         /// </summary>
@@ -1399,119 +1421,139 @@ namespace Calcify
             DateTime dateTime = DateTime.Now;
             string timeString = "";
             MatchCollection matches = dateTimeKeyWordsRegex.Matches(input);
-            foreach (Match match in matches.Cast<Match>().ToArray())
+            foreach (Match match in matches.Cast<Match>().Reverse())
             {
-                switch (match.Value.ToLower())
+                string expression = (match.Groups["keyword"].Value + match.Groups["property"].Value).ToLowerInvariant();
+                string format = match.Groups["format"].Value;
+
+                if (match.Groups["format"].Success)
                 {
-                    case "now":
-                    case "time":
-                        if (Properties.Settings.Default.showDateTime)
-                            timeString = dateTime.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
-                        else
-                            timeString = dateTime.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
-                        break;
+                    if (!IsValidDateTimeFormat(format))
+                        // Invalid format, skip this match
+                        continue;
+                    DateTime formattedDateTime = dateTime;
+                    if (expression.StartsWith("yesterday", StringComparison.Ordinal))
+                        formattedDateTime = formattedDateTime.AddDays(-1);
+                    else if (expression.StartsWith("tomorrow", StringComparison.Ordinal) ||
+                             expression.StartsWith("tmrw", StringComparison.Ordinal))
+                        formattedDateTime = formattedDateTime.AddDays(1);
 
-                    case "now.hour":
-                    case "time.hour":
-                        timeString = dateTime.ToString("HH", CultureInfo.InvariantCulture);
-                        break;
-                    case "now.minute":
-                    case "time.minute":
-                        timeString = dateTime.ToString("mm", CultureInfo.InvariantCulture);
-                        break;
-                    case "now.second":
-                    case "time.second":
-                        timeString = dateTime.ToString("ss", CultureInfo.InvariantCulture);
-                        break;
+                    timeString = formattedDateTime.ToString(format, CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    switch (expression)
+                    {
+                        case "now":
+                        case "time":
+                            if (Properties.Settings.Default.showDateTime)
+                                timeString = dateTime.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
+                            else
+                                timeString = dateTime.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+                            break;
 
-                    case "today":
-                    case "date":
-                        timeString = dateTime.ToString("yyyy/MM/dd", CultureInfo.InvariantCulture);
-                        break;
+                        case "now.hour":
+                        case "time.hour":
+                            timeString = dateTime.ToString("HH", CultureInfo.InvariantCulture);
+                            break;
+                        case "now.minute":
+                        case "time.minute":
+                            timeString = dateTime.ToString("mm", CultureInfo.InvariantCulture);
+                            break;
+                        case "now.second":
+                        case "time.second":
+                            timeString = dateTime.ToString("ss", CultureInfo.InvariantCulture);
+                            break;
 
-                    case "today.day":
-                    case "date.day":
-                        timeString = dateTime.ToString("dd", CultureInfo.InvariantCulture);
-                        break;
-                    case "today.month":
-                    case "date.month":
-                        timeString = dateTime.ToString("MM", CultureInfo.InvariantCulture);
-                        break;
-                    case "today.year":
-                    case "date.year":
-                        timeString = dateTime.ToString("yyyy", CultureInfo.InvariantCulture);
-                        break;
-                    case "today.weekday":
-                    case "date.weekday":
-                        timeString = dateTime.ToString("dddd", CultureInfo.InvariantCulture);
-                        break;
-                    case "today.dayofyear":
-                    case "date.dayofyear":
-                        timeString = dateTime.DayOfYear.ToString("D3", CultureInfo.InvariantCulture);
-                        break;
-                    case "today.weekofyear":
-                    case "date.weekofyear":
-                        System.Globalization.Calendar Calendar = CultureInfo.InvariantCulture.Calendar;
-                        int weekNumber = Calendar.GetWeekOfYear(DateTime.Now, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
-                        timeString = weekNumber.ToString();
-                        break;
+                        case "today":
+                        case "date":
+                            timeString = dateTime.ToString("yyyy/MM/dd", CultureInfo.InvariantCulture);
+                            break;
 
-                    case "yesterday":
-                    case "tomorrow":
-                    case "tmrw":
-                        timeString = dateTime
-                            .AddDays(match.Value.ToLower() == "yesterday" ? -1 : 1)
-                            .ToString("yyyy/MM/dd", CultureInfo.InvariantCulture);
-                        break;
+                        case "today.day":
+                        case "date.day":
+                            timeString = dateTime.ToString("dd", CultureInfo.InvariantCulture);
+                            break;
+                        case "today.month":
+                        case "date.month":
+                            timeString = dateTime.ToString("MM", CultureInfo.InvariantCulture);
+                            break;
+                        case "today.year":
+                        case "date.year":
+                            timeString = dateTime.ToString("yyyy", CultureInfo.InvariantCulture);
+                            break;
+                        case "today.weekday":
+                        case "date.weekday":
+                            timeString = dateTime.ToString("dddd", CultureInfo.InvariantCulture);
+                            break;
+                        case "today.dayofyear":
+                        case "date.dayofyear":
+                            timeString = dateTime.DayOfYear.ToString("D3", CultureInfo.InvariantCulture);
+                            break;
+                        case "today.weekofyear":
+                        case "date.weekofyear":
+                            System.Globalization.Calendar Calendar = CultureInfo.InvariantCulture.Calendar;
+                            int weekNumber = Calendar.GetWeekOfYear(DateTime.Now, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+                            timeString = weekNumber.ToString();
+                            break;
 
-                    case "yesterday.day":
-                    case "tomorrow.day":
-                    case "tmrw.day":
-                        timeString = dateTime
-                            .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
-                            .ToString("dd", CultureInfo.InvariantCulture);
-                        break;
-                    case "yesterday.month":
-                    case "tomorrow.month":
-                    case "tmrw.month":
-                        timeString = dateTime
-                            .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
-                            .ToString("MM", CultureInfo.InvariantCulture);
-                        break;
-                    case "yesterday.year":
-                    case "tomorrow.year":
-                    case "tmrw.year":
-                        timeString = dateTime
-                            .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
-                            .ToString("yyyy", CultureInfo.InvariantCulture);
-                        break;
-                    case "yesterday.weekday":
-                    case "tomorrow.weekday":
-                    case "tmrw.weekday":
-                        timeString = dateTime
-                            .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
-                            .ToString("dddd", CultureInfo.InvariantCulture);
-                        break;
-                    case "yesterday.dayofyear":
-                    case "tomorrow.dayofyear":
-                    case "tmrw.dayofyear":
-                        timeString = dateTime
-                            .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
-                            .DayOfYear
-                            .ToString("D3", CultureInfo.InvariantCulture);
-                        break;
-                    case "yesterday.weekofyear":
-                    case "tomorrow.weekofyear":
-                    case "tmrw.weekofyear":
-                        timeString = dateTime
-                            .AddDays(match.Value.ToLower()
-                            .StartsWith("yesterday") ? -1 : 1)
-                            .Month
-                            .ToString("00", CultureInfo.InvariantCulture);
-                        break;
+                        case "yesterday":
+                        case "tomorrow":
+                        case "tmrw":
+                            timeString = dateTime
+                                .AddDays(match.Value.ToLower() == "yesterday" ? -1 : 1)
+                                .ToString("yyyy/MM/dd", CultureInfo.InvariantCulture);
+                            break;
+
+                        case "yesterday.day":
+                        case "tomorrow.day":
+                        case "tmrw.day":
+                            timeString = dateTime
+                                .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
+                                .ToString("dd", CultureInfo.InvariantCulture);
+                            break;
+                        case "yesterday.month":
+                        case "tomorrow.month":
+                        case "tmrw.month":
+                            timeString = dateTime
+                                .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
+                                .ToString("MM", CultureInfo.InvariantCulture);
+                            break;
+                        case "yesterday.year":
+                        case "tomorrow.year":
+                        case "tmrw.year":
+                            timeString = dateTime
+                                .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
+                                .ToString("yyyy", CultureInfo.InvariantCulture);
+                            break;
+                        case "yesterday.weekday":
+                        case "tomorrow.weekday":
+                        case "tmrw.weekday":
+                            timeString = dateTime
+                                .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
+                                .ToString("dddd", CultureInfo.InvariantCulture);
+                            break;
+                        case "yesterday.dayofyear":
+                        case "tomorrow.dayofyear":
+                        case "tmrw.dayofyear":
+                            timeString = dateTime
+                                .AddDays(match.Value.ToLower().StartsWith("yesterday") ? -1 : 1)
+                                .DayOfYear
+                                .ToString("D3", CultureInfo.InvariantCulture);
+                            break;
+                        case "yesterday.weekofyear":
+                        case "tomorrow.weekofyear":
+                        case "tmrw.weekofyear":
+                            timeString = dateTime
+                                .AddDays(match.Value.ToLower()
+                                .StartsWith("yesterday") ? -1 : 1)
+                                .Month
+                                .ToString("00", CultureInfo.InvariantCulture);
+                            break;
+                    }
                 }
 
-                input = Regex.Replace(input, @"\b(?i)" + Regex.Escape(match.Value.ToLower()) + @"(?-i)\b", timeString);
+                input = input.Remove(match.Index, match.Length).Insert(match.Index, timeString);
             }
 
             // Support simple time arithmetic:
