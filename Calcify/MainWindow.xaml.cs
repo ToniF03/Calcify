@@ -60,6 +60,7 @@ namespace Calcify
 
         private bool isSynchronizingResultEditor;
         private bool isSynchronizingMainEditor;
+        private bool isNormalizingTabs;
 
         private Dictionary<Type, Func<double, Enum, Enum, double>> converterDict = new Dictionary<Type, Func<double, Enum, Enum, double>>();
         #endregion
@@ -359,6 +360,24 @@ namespace Calcify
         private void MainEditor_TextChanged(object sender, EventArgs e)
         {
             TextDocument newDocument = new TextDocument();
+            if (!isNormalizingTabs && mainEditor.Text.Contains("\t"))
+            {
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    if (mainEditor.Text.Contains("\t"))
+                    {
+                        isNormalizingTabs = true;
+                        try
+                        {
+                            mainEditor.Text = mainEditor.Text.Replace("\t", new string(' ', Properties.Settings.Default.TabSize));
+                        }
+                        finally
+                        {
+                            isNormalizingTabs = false;
+                        }
+                    }
+                }));
+            }
             unsavedChanges = documentText != mainEditor.Text;
             if (unsavedChanges) DocumentChanged();
 
@@ -1448,6 +1467,23 @@ namespace Calcify
             foreach (var s in synonyms)
                 allUnitsDict.Add(s, e);
             allUnitsExt.Add(e, display);
+        }
+
+        public void ApplyEditorTabSpace(int previousTabSize, int tabSize)
+        {
+            if (previousTabSize <= 0 || tabSize <= 0 || previousTabSize == tabSize)
+                return;
+
+            string currentText = mainEditor.Document.Text;
+            string updatedText = Regex.Replace(currentText, @"(?m)^ +", match =>
+            {
+                int indentationLevels = match.Length / previousTabSize;
+                int remainingSpaces = match.Length % previousTabSize;
+                return new string(' ', indentationLevels * tabSize + remainingSpaces);
+            });
+
+            if (updatedText != currentText)
+                mainEditor.Document.Replace(0, mainEditor.Document.TextLength, updatedText);
         }
 
         #region Events

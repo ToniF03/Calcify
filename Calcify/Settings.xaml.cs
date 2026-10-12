@@ -31,6 +31,9 @@ namespace Calcify
             MoreDecimalsButton.Click += DecimalsButton_Click;
             DecreaseFontSizeButton.Click += FontSizeButton_Click;
             IncreaseFontSizeButton.Click += FontSizeButton_Click;
+            DecreaseTabSpaceButton.Click += TabSpaceButton_Click;
+            IncreaseTabSpaceButton.Click += TabSpaceButton_Click;
+            EditorTabSpaceTextBox.TextChanged += EditorTabSpaceTextBox_TextChanged;
 
             DecimalPlacesTextBox.PreviewTextInput += (sender, e) =>
             {
@@ -86,6 +89,7 @@ namespace Calcify
             DocumentAutorName.Text = Properties.Settings.Default.UserName;
             DecimalPlacesTextBox.Text = Properties.Settings.Default.Digits.ToString();
             EditorFontSizeTextBox.Text = Properties.Settings.Default.EditorFontSize.ToString();
+            EditorTabSpaceTextBox.Text = Properties.Settings.Default.TabSize.ToString();
             ShowLineNumbersCheckBox.IsChecked = Properties.Settings.Default.ShowLineNumbers;
             HighlightCurrentLineCheckBox.IsChecked = Properties.Settings.Default.HighlightCurrentLine;
             UpdateLastExchangeRateDate();
@@ -160,6 +164,17 @@ namespace Calcify
             }
         }
 
+        private void EditorTabSpaceTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (int.TryParse(EditorTabSpaceTextBox.Text, out int tabSpace) && tabSpace >= 1 && tabSpace <= 8)
+            {
+                int previousTabSize = Properties.Settings.Default.TabSize;
+                Properties.Settings.Default.TabSize = tabSpace;
+                Properties.Settings.Default.Save();
+                _MainWindow.ApplyEditorTabSpace(previousTabSize, tabSpace);
+            }
+        }
+
         private void EditorFontSizeTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (!int.TryParse(EditorFontSizeTextBox.Text, out int fontSize) || fontSize < 8 || fontSize > 32)
@@ -183,6 +198,13 @@ namespace Calcify
             int adjustment = ((Button)sender).Name == "DecreaseFontSizeButton" ? -1 : 1;
             int fontSize = System.Math.Max(8, System.Math.Min(32, Properties.Settings.Default.EditorFontSize + adjustment));
             EditorFontSizeTextBox.Text = fontSize.ToString();
+        }
+
+        private void TabSpaceButton_Click(object sender, RoutedEventArgs e)
+        {
+            int adjustment = ((Button)sender).Name == "DecreaseTabSpaceButton" ? -1 : 1;
+            int tabSpace = System.Math.Max(1, System.Math.Min(8, Properties.Settings.Default.TabSize + adjustment));
+            EditorTabSpaceTextBox.Text = tabSpace.ToString();
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
