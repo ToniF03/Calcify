@@ -22,6 +22,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
+using System.Windows.Media.TextFormatting;
 using System.Windows.Threading;
 using System.Xml;
 
@@ -66,6 +67,8 @@ namespace Calcify
         private bool isSynchronizingMainEditor;
         private bool isNormalizingTabs;
         private bool isUpdatingAlignedResults;
+        private bool isAlignedResultUpdatePending;
+        private string alignedCalculationResultsText;
         private readonly List<string> calculationResults = new List<string>();
         private readonly List<int> resultLineToInputLine = new List<int>();
         private readonly List<int> inputLineToResultLine = new List<int>();
@@ -216,6 +219,7 @@ namespace Calcify
 
             mainEditor.TextChanged += MainEditor_TextChanged;
             mainEditor.SizeChanged += MainEditor_SizeChanged;
+            resultEditor.SizeChanged += MainEditor_SizeChanged;
             mainEditor.TextArea.Caret.PositionChanged += mainEditor_Caret_PositionChanged;
             InitializeFunctionCompletion();
             mainEditor.PreviewKeyDown += MainEditor_PreviewKeyDown;
@@ -321,8 +325,22 @@ namespace Calcify
                 index < inputWrappedLineCounts.Count
                 ? System.Math.Max(0, targetWrappedLineCounts[index] - inputWrappedLineCounts[index])
                 : 0;
-            return mainEditor.TextArea.TextView.DefaultLineHeight *
-                (GetEditorLineSpacing() - 1.0 + extraRows);
+            double spacing = GetEditorLineSpacing();
+            if (spacing == 1.0 && extraRows == 0)
+                return 0;
+
+            return mainEditor.TextArea.TextView.DefaultLineHeight * (spacing + extraRows);
+        }
+
+        private double GetInputLineHighlightHeight(int lineNumber)
+        {
+            int index = lineNumber - 1;
+            if (index < 0 || index >= targetWrappedLineCounts.Count)
+                return 0;
+
+            double spacing = GetEditorLineSpacing();
+            int targetRows = System.Math.Max(1, targetWrappedLineCounts[index]);
+            return mainEditor.TextArea.TextView.DefaultLineHeight * (targetRows - 1 + spacing);
         }
 
         private double GetResultLineSpacingHeight(int lineNumber)
@@ -335,8 +353,8 @@ namespace Calcify
                 resultBlockLastLines[inputLineNumber - 1] != lineNumber)
                 return 0;
 
-            return resultEditor.TextArea.TextView.DefaultLineHeight *
-                (GetEditorLineSpacing() - 1.0);
+            double spacing = GetEditorLineSpacing();
+            return spacing == 1.0 ? 0 : resultEditor.TextArea.TextView.DefaultLineHeight * spacing;
         }
 
         private static double GetEditorLineSpacing()
@@ -347,7 +365,20 @@ namespace Calcify
 
         private void MainEditor_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            Dispatcher.BeginInvoke(new Action(UpdateAlignedResultDocument));
+            ScheduleAlignedResultUpdate();
+        }
+
+        private void ScheduleAlignedResultUpdate()
+        {
+            if (isAlignedResultUpdatePending)
+                return;
+
+            isAlignedResultUpdatePending = true;
+            Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() =>
+            {
+                isAlignedResultUpdatePending = false;
+                UpdateAlignedResultDocument();
+            }));
         }
 
         private void UpdateAlignedResultDocument()
@@ -355,9 +386,30 @@ namespace Calcify
             if (isUpdatingAlignedResults || mainEditor == null || resultEditor == null)
                 return;
 
+            string currentCalculationResultsText = string.Join("\n", calculationResults);
+            if (currentCalculationResultsText != alignedCalculationResultsText)
+            {
+                alignedCalculationResultsText = currentCalculationResultsText;
+                SetAlignedResultDocument(currentCalculationResultsText);
+                resultLineToInputLine.Clear();
+                inputLineToResultLine.Clear();
+                resultBlockLastLines.Clear();
+                for (int i = 1; i <= mainEditor.LineCount; i++)
+                {
+                    resultLineToInputLine.Add(i);
+                    inputLineToResultLine.Add(i);
+                    resultBlockLastLines.Add(i);
+                }
+                ScheduleAlignedResultUpdate();
+                return;
+            }
+
             isUpdatingAlignedResults = true;
             try
             {
+                List<int> previousInputLineToResultLine = new List<int>(inputLineToResultLine);
+                List<int> previousInputWrappedLineCounts = new List<int>(inputWrappedLineCounts);
+                List<int> previousTargetWrappedLineCounts = new List<int>(targetWrappedLineCounts);
                 bool wordWrapEnabled = Properties.Settings.Default.WordWrapEnabled;
                 mainEditor.WordWrap = wordWrapEnabled;
                 resultEditor.WordWrap = wordWrapEnabled;
@@ -372,10 +424,13 @@ namespace Calcify
                 for (int i = 1; i <= mainEditor.LineCount; i++)
                 {
                     DocumentLine inputLine = mainEditor.Document.GetLineByNumber(i);
-                    string inputText = mainEditor.Document.GetText(inputLine.Offset, inputLine.Length);
                     string resultText = i <= calculationResults.Count ? calculationResults[i - 1] : string.Empty;
-                    int inputRows = EstimateWrappedLineCount(inputText, mainEditor, wordWrapEnabled);
-                    int resultRows = EstimateWrappedLineCount(resultText, resultEditor, wordWrapEnabled);
+                    int inputRows = GetWrappedLineCount(mainEditor, inputLine, wordWrapEnabled);
+                    int resultLineNumber = i <= previousInputLineToResultLine.Count
+                        ? previousInputLineToResultLine[i - 1]
+                        : i;
+                    DocumentLine resultLine = resultEditor.Document.GetLineByNumber(resultLineNumber);
+                    int resultRows = GetWrappedLineCount(resultEditor, resultLine, wordWrapEnabled);
                     int targetRows = System.Math.Max(inputRows, resultRows);
 
                     inputWrappedLineCounts.Add(inputRows);
@@ -393,16 +448,22 @@ namespace Calcify
                     resultBlockLastLines.Add(resultDocumentLines.Count);
                 }
 
+                bool wrappedRowsChanged = !previousInputWrappedLineCounts.SequenceEqual(inputWrappedLineCounts) ||
+                    !previousTargetWrappedLineCounts.SequenceEqual(targetWrappedLineCounts);
                 TextDocument alignedResults = new TextDocument();
                 alignedResults.Text = string.Join("\n", resultDocumentLines);
-                isSynchronizingResultEditor = true;
-                try
+                if (resultEditor.Document.Text != alignedResults.Text)
                 {
-                    resultEditor.Document = alignedResults;
+                    SetAlignedResultDocument(alignedResults.Text);
+                    ScheduleAlignedResultUpdate();
                 }
-                finally
+
+                if (wrappedRowsChanged)
                 {
-                    isSynchronizingResultEditor = false;
+                    mainEditor.TextArea.TextView.InvalidateMeasure();
+                    resultEditor.TextArea.TextView.InvalidateMeasure();
+                    mainEditor.TextArea.TextView.Redraw();
+                    resultEditor.TextArea.TextView.Redraw();
                 }
             }
             finally
@@ -411,45 +472,31 @@ namespace Calcify
             }
         }
 
-        private static int EstimateWrappedLineCount(string text, TextEditor editor, bool wordWrapEnabled)
+        private void SetAlignedResultDocument(string text)
         {
-            if (!wordWrapEnabled || string.IsNullOrEmpty(text))
-                return 1;
-
-            double characterWidth = editor.TextArea.TextView.WideSpaceWidth;
-            double availableWidth = editor.TextArea.TextView.ActualWidth;
-            if (characterWidth <= 0 || availableWidth <= 0)
-                return 1;
-
-            int maximumCharacters = System.Math.Max(1, (int)System.Math.Floor(availableWidth / characterWidth));
-            int wrappedLines = 1;
-            int currentLineLength = 0;
-
-            foreach (string word in text.Split((char[])null, StringSplitOptions.RemoveEmptyEntries))
+            isSynchronizingResultEditor = true;
+            try
             {
-                if (word.Length > maximumCharacters)
-                {
-                    if (currentLineLength > 0)
-                    {
-                        wrappedLines++;
-                        currentLineLength = 0;
-                    }
-
-                    wrappedLines += (word.Length - 1) / maximumCharacters;
-                    currentLineLength = word.Length % maximumCharacters;
-                }
-                else if (currentLineLength == 0)
-                    currentLineLength = word.Length;
-                else if (currentLineLength + 1 + word.Length <= maximumCharacters)
-                    currentLineLength += 1 + word.Length;
-                else
-                {
-                    wrappedLines++;
-                    currentLineLength = word.Length;
-                }
+                TextDocument document = new TextDocument { Text = text };
+                resultEditor.Document = document;
             }
+            finally
+            {
+                isSynchronizingResultEditor = false;
+            }
+        }
 
-            return wrappedLines;
+        private static int GetWrappedLineCount(TextEditor editor, DocumentLine line, bool wordWrapEnabled)
+        {
+            if (!wordWrapEnabled || line.Length == 0)
+                return 1;
+
+            TextView textView = editor.TextArea.TextView;
+            if (!textView.VisualLinesValid)
+                textView.EnsureVisualLines();
+
+            VisualLine visualLine = textView.GetOrConstructVisualLine(line);
+            return visualLine == null ? 1 : visualLine.TextLines.Count;
         }
 
         private sealed class LineSpacingElementGenerator : VisualLineElementGenerator
@@ -487,9 +534,52 @@ namespace Calcify
                     Width = 0,
                     Height = getElementHeight(line.LineNumber),
                     Background = Brushes.Transparent,
+                    VerticalAlignment = VerticalAlignment.Top,
                     IsHitTestVisible = false
                 };
-                return new InlineObjectElement(0, spacer);
+                return new TopAlignedInlineObjectElement(0, spacer);
+            }
+        }
+
+        private sealed class TopAlignedInlineObjectElement : InlineObjectElement
+        {
+            public TopAlignedInlineObjectElement(int documentLength, UIElement element)
+                : base(documentLength, element)
+            {
+            }
+
+            public override TextRun CreateTextRun(int startOffset, ITextRunConstructionContext context)
+            {
+                InlineObjectRun inlineObjectRun = (InlineObjectRun)base.CreateTextRun(startOffset, context);
+                return new TopAlignedInlineObjectRun(
+                    inlineObjectRun.Length,
+                    inlineObjectRun.Properties,
+                    inlineObjectRun.Element,
+                    context.TextView.DefaultBaseline);
+            }
+        }
+
+        private sealed class TopAlignedInlineObjectRun : InlineObjectRun
+        {
+            private readonly double baseline;
+
+            public TopAlignedInlineObjectRun(
+                int documentLength,
+                TextRunProperties properties,
+                UIElement element,
+                double baseline)
+                : base(documentLength, properties, element)
+            {
+                this.baseline = baseline;
+            }
+
+            public override TextEmbeddedObjectMetrics Format(double remainingParagraphWidth)
+            {
+                TextEmbeddedObjectMetrics metrics = base.Format(remainingParagraphWidth);
+                return new TextEmbeddedObjectMetrics(
+                    metrics.Width,
+                    metrics.Height,
+                    System.Math.Min(baseline, metrics.Height));
             }
         }
 
@@ -641,6 +731,7 @@ namespace Calcify
                     calculationResults.Add(string.Empty);
             }
             UpdateAlignedResultDocument();
+            ScheduleAlignedResultUpdate();
         }
 
         private void MainEditor_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -732,19 +823,28 @@ namespace Calcify
 
         private void mainEditor_Caret_PositionChanged(object sender, EventArgs e)
         {
-            // Keep the caret line in the viewport
-            double actualLineNumber = mainEditor.Document.GetLineByOffset(mainEditor.CaretOffset).LineNumber - 1;
-            double defaultLineHeight = mainEditor.TextArea.TextView.DefaultLineHeight;
-            double ScrollViewerHeight = EditorContainer.ViewportHeight;
-            double VerticalOffset = EditorContainer.VerticalOffset;
-            double CalculatedOffset = actualLineNumber * defaultLineHeight;
-            double secOffset = actualLineNumber * defaultLineHeight;
-            secOffset = (VerticalOffset - secOffset) * -1;
-            CalculatedOffset = (VerticalOffset + ScrollViewerHeight - defaultLineHeight - CalculatedOffset) * -1;
-            if (secOffset < 0)
-                EditorContainer.ScrollToVerticalOffset(VerticalOffset + secOffset);
-            else if (CalculatedOffset > 0)
-                EditorContainer.ScrollToVerticalOffset(VerticalOffset + CalculatedOffset);
+            int caretLineNumber = mainEditor.Document.GetLineByOffset(mainEditor.CaretOffset).LineNumber;
+            TextView textView = mainEditor.TextArea.TextView;
+            try
+            {
+                Point caretTop = textView.GetVisualPosition(mainEditor.TextArea.Caret.Position, VisualYPosition.LineTop);
+                Point caretBottom = textView.GetVisualPosition(mainEditor.TextArea.Caret.Position, VisualYPosition.LineBottom);
+                Point lineTop = textView.TranslatePoint(
+                    new Point(caretTop.X, caretTop.Y - textView.ScrollOffset.Y), EditorGrid);
+                Point lineBottom = textView.TranslatePoint(
+                    new Point(caretBottom.X, caretBottom.Y - textView.ScrollOffset.Y), EditorGrid);
+                double viewportTop = EditorContainer.VerticalOffset;
+                double viewportBottom = viewportTop + EditorContainer.ViewportHeight;
+
+                if (lineTop.Y < viewportTop)
+                    EditorContainer.ScrollToVerticalOffset(lineTop.Y);
+                else if (lineBottom.Y > viewportBottom)
+                    EditorContainer.ScrollToVerticalOffset(lineBottom.Y - EditorContainer.ViewportHeight);
+            }
+            catch (VisualLinesInvalidException)
+            {
+            }
+
             CalculateTotal();
 
             if (!isSynchronizingMainEditor)
@@ -752,7 +852,7 @@ namespace Calcify
                 isSynchronizingResultEditor = true;
                 try
                 {
-                    int inputLineNumber = (int)actualLineNumber + 1;
+                    int inputLineNumber = caretLineNumber;
                     int resultLineNumber = inputLineNumber <= inputLineToResultLine.Count
                         ? inputLineToResultLine[inputLineNumber - 1]
                         : inputLineNumber;
@@ -2075,10 +2175,8 @@ namespace Calcify
 //  - accept inches, bytes, gallons, cups, speed (kmh, mh, ...), data speed (mbps, gbps, ...), tmrw, nmi (nautical miles) (1 nmi = 1852 m), carat (1 ct = 0.2 g), turn (turn, revolution) (1 turn = 360 degrees), THz, pressure, energy, Power, area, volumes (look supported-units.md) as keyword
 //  - basic calculation 1024 * x does not work
 //  - fix syntax color (days)
-//  - multiple conversions (100 cm to m to feet)
 //  - ask to save when drag and dropped
 //  - currency calculation
-//  - time difference (today - tomorrow, now - 09:00)
 //  - maybe update architecture.md
 
 // Bugs:
@@ -2087,7 +2185,7 @@ namespace Calcify
 
 
 // Refactor:
-//  - put context menu into MainWindow.ContextMenu.cs
+//  - put context menu logic into MainWindow.ContextMenu.cs
 //  - put drag and drop into MainWindow.DragDrop.cs
 //  - put WindowChrome into seperate Control
 //  - put syntax highlighting into MainWindow.SyntaxHighlighting.cs
@@ -2115,6 +2213,7 @@ namespace Calcify
 //  - added optional line numbers
 //  - Status Bar Line and column
 //  - Time Formats (now.format("HH:mm:ss"), today.format("yyyy-MM-dd"))
+//  - time difference (today - tomorrow, now - 09:00)
 
 //  - Auto Completion
 //  - Recent Files List

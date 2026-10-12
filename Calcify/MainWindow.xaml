@@ -158,9 +158,10 @@
                                        Background="Transparent"
                                        Margin="7, 0, 0, 7"
                                        FontSize="{Binding Source={x:Static properties:Settings.Default}, Path=EditorFontSize}"
+                                        VerticalContentAlignment="Top"
                                        WordWrap="False"
                                        ScrollViewer.VerticalScrollBarVisibility="Visible" 
-                                       VerticalScrollBarVisibility="Hidden"
+                                        VerticalScrollBarVisibility="Disabled"
                                        HorizontalScrollBarVisibility="Hidden"
                                        ShowLineNumbers="{Binding Source={x:Static properties:Settings.Default}, Path=ShowLineNumbers}">
                     <avalonEdit:TextEditor.ContextMenu>
@@ -193,6 +194,7 @@
                                 IsReadOnly="True"
                                 HorizontalContentAlignment="Right" 
                                 FontSize="{Binding Source={x:Static properties:Settings.Default}, Path=EditorFontSize}"
+                                 VerticalContentAlignment="Top"
                                 HorizontalScrollBarVisibility="Hidden" 
                                 VerticalScrollBarVisibility="Disabled" >
                     <avalonEdit:TextEditor.ContextMenu>

@@ -51,10 +51,12 @@ namespace Calcify
                 UpdateSplitterHighlight(mainEditor, FindName("EditorGrid") as Grid, splitterHighlight);
         }
 
-        private static void AddCurrentLineHighlighting(TextEditor editor, Grid editorGrid, Border splitterHighlight)
+        private void AddCurrentLineHighlighting(TextEditor editor, Grid editorGrid, Border splitterHighlight)
         {
+            Func<TextEditor, int, int> getHighlightStartLine = GetCurrentLineHighlightStartLine;
+            Func<TextEditor, int, double, double> getHighlightHeight = GetCurrentLineHighlightHeight;
             editor.TextArea.TextView.BackgroundRenderers.Add(
-                new CurrentLineBackgroundRenderer(editor));
+                new CurrentLineBackgroundRenderer(editor, getHighlightStartLine, getHighlightHeight));
 
             if (splitterHighlight != null)
             {
@@ -72,7 +74,8 @@ namespace Calcify
             {
                 if (editor.TextArea.LeftMargins[i] is LineNumberMargin originalMargin)
                 {
-                    numberMargin = new CurrentLineNumberMargin(editor, originalMargin);
+                    numberMargin = new CurrentLineNumberMargin(
+                        editor, originalMargin, getHighlightStartLine, getHighlightHeight);
                     editor.TextArea.LeftMargins[i] = numberMargin;
                     break;
                 }
@@ -88,7 +91,7 @@ namespace Calcify
             };
         }
 
-        private static void UpdateSplitterHighlight(TextEditor editor, Grid editorGrid, Border splitterHighlight)
+        private void UpdateSplitterHighlight(TextEditor editor, Grid editorGrid, Border splitterHighlight)
         {
             if (!Properties.Settings.Default.HighlightCurrentLine)
             {
@@ -106,7 +109,9 @@ namespace Calcify
                 }
 
                 DocumentLine documentLine = editor.Document.GetLineByOffset(editor.CaretOffset);
-                VisualLine visualLine = textView.GetVisualLine(documentLine.LineNumber);
+                int startLineNumber = GetCurrentLineHighlightStartLine(editor, documentLine.LineNumber);
+                VisualLine visualLine = textView.GetVisualLine(startLineNumber) ??
+                    textView.GetVisualLine(documentLine.LineNumber);
                 if (visualLine == null)
                 {
                     splitterHighlight.Visibility = Visibility.Collapsed;
@@ -114,9 +119,11 @@ namespace Calcify
                 }
 
                 double lineTop = visualLine.VisualTop - textView.ScrollOffset.Y;
+                double lineHeight = GetCurrentLineHighlightHeight(
+                    editor, documentLine.LineNumber, visualLine.Height);
                 Point lineTopInGrid = textView.TranslatePoint(new Point(0, lineTop), editorGrid);
                 Point lineBottomInGrid = textView.TranslatePoint(
-                    new Point(0, lineTop + visualLine.Height), editorGrid);
+                    new Point(0, lineTop + lineHeight), editorGrid);
                 double viewportTop = textView.TranslatePoint(new Point(0, 0), editorGrid).Y;
                 double viewportBottom = textView.TranslatePoint(
                     new Point(0, textView.ActualHeight), editorGrid).Y;
@@ -139,13 +146,50 @@ namespace Calcify
             }
         }
 
+        private int GetCurrentLineHighlightStartLine(TextEditor editor, int lineNumber)
+        {
+            if (editor != resultEditor || lineNumber < 1 || lineNumber > resultLineToInputLine.Count)
+                return lineNumber;
+
+            int inputLineNumber = resultLineToInputLine[lineNumber - 1];
+            return inputLineNumber > 0 && inputLineNumber <= inputLineToResultLine.Count
+                ? inputLineToResultLine[inputLineNumber - 1]
+                : lineNumber;
+        }
+
+        private double GetCurrentLineHighlightHeight(TextEditor editor, int lineNumber, double visualLineHeight)
+        {
+            int inputLineNumber = lineNumber;
+            if (editor == resultEditor)
+            {
+                if (lineNumber < 1 || lineNumber > resultLineToInputLine.Count)
+                    return visualLineHeight;
+
+                inputLineNumber = resultLineToInputLine[lineNumber - 1];
+            }
+            else if (editor != mainEditor)
+            {
+                return visualLineHeight;
+            }
+
+            return System.Math.Max(visualLineHeight, GetInputLineHighlightHeight(inputLineNumber));
+        }
+
         private sealed class CurrentLineNumberMargin : LineNumberMargin
         {
             private readonly TextEditor editor;
+            private readonly Func<TextEditor, int, int> getHighlightStartLine;
+            private readonly Func<TextEditor, int, double, double> getHighlightHeight;
 
-            public CurrentLineNumberMargin(TextEditor editor, LineNumberMargin originalMargin)
+            public CurrentLineNumberMargin(
+                TextEditor editor,
+                LineNumberMargin originalMargin,
+                Func<TextEditor, int, int> getHighlightStartLine,
+                Func<TextEditor, int, double, double> getHighlightHeight)
             {
                 this.editor = editor;
+                this.getHighlightStartLine = getHighlightStartLine;
+                this.getHighlightHeight = getHighlightHeight;
 
                 // Keep AvalonEdit's original line-number color and spacing.
                 Style = originalMargin.Style;
@@ -168,17 +212,20 @@ namespace Calcify
                     {
                         DocumentLine documentLine =
                             editor.Document.GetLineByOffset(editor.CaretOffset);
-                        VisualLine visualLine =
+                        int startLineNumber = getHighlightStartLine(editor, documentLine.LineNumber);
+                        VisualLine visualLine = textView.GetVisualLine(startLineNumber) ??
                             textView.GetVisualLine(documentLine.LineNumber);
 
                         if (visualLine != null)
                         {
                             double top = visualLine.VisualTop - textView.ScrollOffset.Y;
+                            double height = getHighlightHeight(
+                                editor, documentLine.LineNumber, visualLine.Height);
 
                             drawingContext.DrawRectangle(
                                 CurrentLineBackgroundRenderer.HighlightBrush,
                                 null,
-                                new Rect(0, top, ActualWidth, visualLine.Height));
+                                new Rect(0, top, ActualWidth, height));
                         }
                     }
                 }
@@ -195,10 +242,17 @@ namespace Calcify
         {
             public static readonly Brush HighlightBrush = CreateHighlightBrush();
             private readonly TextEditor editor;
+            private readonly Func<TextEditor, int, int> getHighlightStartLine;
+            private readonly Func<TextEditor, int, double, double> getHighlightHeight;
 
-            public CurrentLineBackgroundRenderer(TextEditor editor)
+            public CurrentLineBackgroundRenderer(
+                TextEditor editor,
+                Func<TextEditor, int, int> getHighlightStartLine,
+                Func<TextEditor, int, double, double> getHighlightHeight)
             {
                 this.editor = editor;
+                this.getHighlightStartLine = getHighlightStartLine;
+                this.getHighlightHeight = getHighlightHeight;
             }
 
             public KnownLayer Layer
@@ -214,19 +268,22 @@ namespace Calcify
 
                 DocumentLine documentLine =
                     editor.Document.GetLineByOffset(editor.CaretOffset);
-                VisualLine visualLine = textView.GetVisualLine(documentLine.LineNumber);
+                int startLineNumber = getHighlightStartLine(editor, documentLine.LineNumber);
+                VisualLine visualLine = textView.GetVisualLine(startLineNumber) ??
+                    textView.GetVisualLine(documentLine.LineNumber);
 
                 if (visualLine == null)
                     return;
 
                 double top = visualLine.VisualTop - textView.ScrollOffset.Y;
-                if (top + visualLine.Height < 0 || top > textView.ActualHeight)
+                double height = getHighlightHeight(editor, documentLine.LineNumber, visualLine.Height);
+                if (top + height < 0 || top > textView.ActualHeight)
                     return;
 
                 drawingContext.DrawRectangle(
                     HighlightBrush,
                     null,
-                    new Rect(0, top, textView.ActualWidth, visualLine.Height));
+                    new Rect(0, top, textView.ActualWidth, height));
             }
 
             private static Brush CreateHighlightBrush()
