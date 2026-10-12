@@ -107,7 +107,7 @@ namespace Calcify
             darkSyntax.AddFunction(dateFunctionKeywords);
             darkSyntax.AddFunction("\\b(?&lt;=" + dateFunctionKeywords + ")(" + dateFunctionSubKeywords + "|" + timeFunctionSubKeywords + "|\\.format(?=\\(\".*\"\\))|\\.format(?=\\('.*'\\)))");
             darkSyntax.AddFunction(timeFunctionKeywords);
-            darkSyntax.AddFunction("\\b(?&lt;=" + timeFunctionKeywords + ")(" + timeFunctionSubKeywords + "|\\.format(?=\\(\".*\"\\))|\\.format(?=\\(\'.*\'\\)))");
+            darkSyntax.AddFunction("\\b(?&lt;=" + timeFunctionKeywords + ")(" + timeFunctionSubKeywords + "|" + dateFunctionSubKeywords + "|\\.format(?=\\(\".*\"\\))|\\.format(?=\\(\'.*\'\\)))");
 
             // Add support for constants like "pi", "e", "tau", "c", "R", "Na", and "g"
             darkSyntax.AddComment("Constants");

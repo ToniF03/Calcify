@@ -15,6 +15,8 @@ namespace Calcify
         /// </summary>
         private string UnitArithmeticCalculation(string input)
         {
+            input = Regex.Replace(input, @"\bminus\b", "-", RegexOptions.IgnoreCase);
+
             Regex dataSizeRegex = new Regex("^" + Math.Units.Patterns.DataSizePattern + "$", RegexOptions.IgnoreCase);
             Regex lengthRegex = new Regex("^" + Math.Units.Patterns.LengthPattern + "$", RegexOptions.IgnoreCase);
             Regex massRegex = new Regex("^" + Math.Units.Patterns.MassPattern + "$", RegexOptions.IgnoreCase);

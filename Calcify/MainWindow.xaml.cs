@@ -322,7 +322,7 @@ namespace Calcify
                 ? System.Math.Max(0, targetWrappedLineCounts[index] - inputWrappedLineCounts[index])
                 : 0;
             return mainEditor.TextArea.TextView.DefaultLineHeight *
-                (GetEditorLineSpacing() + extraRows);
+                (GetEditorLineSpacing() - 1.0 + extraRows);
         }
 
         private double GetResultLineSpacingHeight(int lineNumber)
@@ -335,7 +335,8 @@ namespace Calcify
                 resultBlockLastLines[inputLineNumber - 1] != lineNumber)
                 return 0;
 
-            return resultEditor.TextArea.TextView.DefaultLineHeight * GetEditorLineSpacing();
+            return resultEditor.TextArea.TextView.DefaultLineHeight *
+                (GetEditorLineSpacing() - 1.0);
         }
 
         private static double GetEditorLineSpacing()
@@ -864,6 +865,7 @@ namespace Calcify
                 dateCalculation = true;
             }
 
+            input = UnitArithmeticCalculation(input);
 
             if (acceptPrevious)
                 foreach (Match match in sumAvgRegex.Matches(input))
@@ -1452,6 +1454,18 @@ namespace Calcify
                                 timeString = dateTime.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
                             break;
 
+                        case "now.year":
+                        case "time.year":
+                            timeString = dateTime.ToString("yyyy", CultureInfo.InvariantCulture);
+                            break;
+                        case "now.month":
+                        case "time.month":
+                            timeString = dateTime.ToString("MM", CultureInfo.InvariantCulture);
+                            break;
+                        case "now.day":
+                        case "time.day":
+                            timeString = dateTime.ToString("dd", CultureInfo.InvariantCulture);
+                            break;
                         case "now.hour":
                         case "time.hour":
                             timeString = dateTime.ToString("HH", CultureInfo.InvariantCulture);
@@ -1495,6 +1509,18 @@ namespace Calcify
                             System.Globalization.Calendar Calendar = CultureInfo.InvariantCulture.Calendar;
                             int weekNumber = Calendar.GetWeekOfYear(DateTime.Now, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
                             timeString = weekNumber.ToString();
+                            break;
+                        case "today.hour":
+                        case "date.hour":
+                            timeString = dateTime.ToString("HH", CultureInfo.InvariantCulture);
+                            break;
+                        case "today.minute":
+                        case "date.minute":
+                            timeString = dateTime.ToString("mm", CultureInfo.InvariantCulture);
+                            break;
+                        case "today.second":
+                        case "date.second":
+                            timeString = dateTime.ToString("ss", CultureInfo.InvariantCulture);
                             break;
 
                         case "yesterday":
@@ -1550,10 +1576,74 @@ namespace Calcify
                                 .Month
                                 .ToString("00", CultureInfo.InvariantCulture);
                             break;
+                        case "yesterday.hour":
+                        case "tomorrow.hour":
+                        case "tmrw.hour":
+                            timeString = dateTime
+                                .AddDays(match.Value.ToLower()
+                                .StartsWith("yesterday") ? -1 : 1)
+                                .Hour
+                                .ToString("00", CultureInfo.InvariantCulture);
+                            break;
+                        case "yesterday.minute":
+                        case "tomorrow.minute":
+                        case "tmrw.minute":
+                            timeString = dateTime
+                                .AddDays(match.Value.ToLower()
+                                .StartsWith("yesterday") ? -1 : 1)
+                                .Minute
+                                .ToString("00", CultureInfo.InvariantCulture);
+                            break;
+                        case "yesterday.second":
+                        case "tomorrow.second":
+                        case "tmrw.second":
+                            timeString = dateTime
+                                .AddDays(match.Value.ToLower()
+                                .StartsWith("yesterday") ? -1 : 1)
+                                .Second
+                                .ToString("00", CultureInfo.InvariantCulture);
+                            break;
                     }
                 }
 
                 input = input.Remove(match.Index, match.Length).Insert(match.Index, timeString);
+            }
+
+            // Calculate differences between date and time values before applying duration arithmetic.
+            var dateTimeDifferenceRegex = new Regex(@"(?<left>(?:\d{4}/\d{1,2}/\d{1,2}(?: \d{1,2}:\d{2}(?::\d{2})?)?|\d{1,2}:\d{2}(?::\d{2})?))\s*(?:-|\bminus\b)\s*(?<right>(?:\d{4}/\d{1,2}/\d{1,2}(?: \d{1,2}:\d{2}(?::\d{2})?)?|\d{1,2}:\d{2}(?::\d{2})?))", RegexOptions.IgnoreCase);
+            foreach (Match match in dateTimeDifferenceRegex.Matches(input).Cast<Match>().Reverse())
+            {
+                string left = match.Groups["left"].Value;
+                string right = match.Groups["right"].Value;
+                bool leftHasDate = left.Contains("/");
+                bool rightHasDate = right.Contains("/");
+                string difference = null;
+
+                if (leftHasDate && rightHasDate &&
+                    DateTime.TryParse(left, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime leftDateTime) &&
+                    DateTime.TryParse(right, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime rightDateTime))
+                {
+                    if (!left.Contains(":") && !right.Contains(":"))
+                    {
+                        double days = System.Math.Abs((leftDateTime.Date - rightDateTime.Date).TotalDays);
+                        difference = ToNumberString(days) + (days == 1 ? " day" : " days");
+                    }
+                    else
+                    {
+                        difference = FormatTimeDifference(leftDateTime - rightDateTime);
+                    }
+                }
+                else if (left.Contains(":") && right.Contains(":"))
+                {
+                    bool leftParsed = TryParseTimeOfDay(left, out TimeSpan leftTime);
+                    bool rightParsed = TryParseTimeOfDay(right, out TimeSpan rightTime);
+
+                    if (leftParsed && rightParsed)
+                        difference = FormatTimeDifference(leftTime - rightTime);
+                }
+
+                if (difference != null)
+                    input = input.Remove(match.Index, match.Length).Insert(match.Index, difference);
             }
 
             // Support simple time arithmetic:
@@ -1561,7 +1651,7 @@ namespace Calcify
             // - "HH:mm(:ss)? (-|minus) HH:mm(:ss)?" (difference -> duration)
             // - "datetime (+|-) duration" (duration can be "HH:mm", or "N h/min/s")
             // - "(now|today|date|... ) (+|-) duration"
-            var timeOpRegex = new Regex(@"(?<left>(?:\d{1,2}:\d{2}(?::\d{2})?|\d{4}\/\d{1,2}\/\d{1,2}(?: \d{1,2}:\d{2}(?::\d{2})?)?))\s*(?<op>\+|\-|add|plus|minus)\s*(?<right>(?:\d{1,2}:\d{2}(?::\d{2})?|\d+\s*(?:h(r|our(s)?)?|min(ute(s)?)?|s(ec(ond(s)?)?)?)))");
+            var timeOpRegex = new Regex(@"(?<left>(?:\d{1,2}:\d{2}(?::\d{2})?|\d{4}\/\d{1,2}\/\d{1,2}(?: \d{1,2}:\d{2}(?::\d{2})?)?))\s*(?<op>\+|\-|add|plus|minus)\s*(?<right>(?:\d{1,2}:\d{2}(?::\d{2})?|\d+\s*(?:hours?|hrs?|h|minutes?|mins?|min|seconds?|secs?|sec|s|days?|d|weeks?|wks?|wk|months?|mths?|mth|years?|yrs?|yr)))", RegexOptions.IgnoreCase);
 
             while (timeOpRegex.IsMatch(input))
             {
@@ -1577,33 +1667,64 @@ namespace Calcify
                 bool leftIsDateTime = DateTime.TryParse(leftRaw, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime leftDt);
                 // Try parse right as time-of-day (HH:mm[:ss])
                 bool rightIsTimeOfDay = TimeSpan.TryParse(rightRaw, CultureInfo.InvariantCulture, out TimeSpan rightSpan);
+                bool rightIsDuration = false;
+                bool hasCalendarOffset = false;
+                int calendarMonthOffset = 0;
                 if (!rightIsTimeOfDay)
                 {
-                    // Try parse as "N h/min/s"
-                    var unitMatch = Regex.Match(rightRaw.Trim(), @"(?<num>\d+)\s*(?<unit>h|hr|hour|hours|m|min|minute|minutes|s|sec|second|seconds)", RegexOptions.IgnoreCase);
+                    var unitMatch = Regex.Match(rightRaw.Trim(), @"(?<num>\d+)\s*(?<unit>hours?|hrs?|h|minutes?|mins?|min|seconds?|secs?|sec|s|days?|d|weeks?|wks?|wk|months?|mths?|mth|years?|yrs?|yr)\b", RegexOptions.IgnoreCase);
                     if (unitMatch.Success)
                     {
                         int num = int.Parse(unitMatch.Groups["num"].Value);
-                        string unit = unitMatch.Groups["unit"].Value.ToLower();
+                        string unit = unitMatch.Groups["unit"].Value.ToLowerInvariant();
+                        rightIsDuration = true;
+                        rightIsTimeOfDay = true;
                         switch (unit)
                         {
                             case "h":
                             case "hr":
+                            case "hrs":
                             case "hour":
                             case "hours":
                                 rightSpan = TimeSpan.FromHours(num);
-                                rightRaw = rightSpan.ToString(@"hh\:mm\:ss");
                                 break;
-                            case "m":
                             case "min":
+                            case "mins":
                             case "minute":
                             case "minutes":
                                 rightSpan = TimeSpan.FromMinutes(num);
-                                rightRaw = rightSpan.ToString(@"hh\:mm\:ss");
                                 break;
-                            default:
+                            case "s":
+                            case "sec":
+                            case "secs":
+                            case "second":
+                            case "seconds":
                                 rightSpan = TimeSpan.FromSeconds(num);
-                                rightRaw = rightSpan.ToString(@"hh\:mm\:ss");
+                                break;
+                            case "d":
+                            case "day":
+                            case "days":
+                                rightSpan = TimeSpan.FromDays(num);
+                                break;
+                            case "wk":
+                            case "wks":
+                            case "week":
+                            case "weeks":
+                                rightSpan = TimeSpan.FromDays(num * 7);
+                                break;
+                            case "mth":
+                            case "mths":
+                            case "month":
+                            case "months":
+                                hasCalendarOffset = true;
+                                calendarMonthOffset = num;
+                                break;
+                            case "yr":
+                            case "yrs":
+                            case "year":
+                            case "years":
+                                hasCalendarOffset = true;
+                                calendarMonthOffset = num * 12;
                                 break;
                         }
                     }
@@ -1621,7 +1742,9 @@ namespace Calcify
 
                     if (rightIsTimeOfDay)
                     {
-                        DateTime resultDt = opIsAdd ? leftDt.Add(rightSpan) : leftDt.Subtract(rightSpan);
+                        DateTime resultDt = hasCalendarOffset
+                            ? leftDt.AddMonths(opIsAdd ? calendarMonthOffset : -calendarMonthOffset)
+                            : opIsAdd ? leftDt.Add(rightSpan) : leftDt.Subtract(rightSpan);
                         // Preserve format: if left included date and time -> full datetime, if only date -> date, if only time -> time
                         if (leftRaw.Contains("/") && leftRaw.Contains(":"))
                             replacement = resultDt.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
@@ -1639,7 +1762,7 @@ namespace Calcify
                     bool leftIsTimeSpan = TimeSpan.TryParse(leftRaw, CultureInfo.InvariantCulture, out TimeSpan leftSpan);
                     if (leftIsTimeSpan && (rightSpan != TimeSpan.Zero || rightIsTimeOfDay))
                     {
-                        if (opIsSub && rightIsTimeOfDay && !rightRaw.Contains("h") && !rightRaw.Contains("m") && !rightRaw.Contains("s"))
+                        if (opIsSub && rightIsTimeOfDay && !rightIsDuration)
                         {
                             // Interpret both as time-of-day and return difference (duration)
                             TimeSpan diff = leftSpan - rightSpan;
@@ -1663,6 +1786,37 @@ namespace Calcify
             }
 
             return input;
+        }
+
+        private static bool TryParseTimeOfDay(string value, out TimeSpan timeOfDay)
+        {
+            if (value.Contains("/"))
+            {
+                if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateTime))
+                {
+                    timeOfDay = dateTime.TimeOfDay;
+                    return true;
+                }
+
+                timeOfDay = TimeSpan.Zero;
+                return false;
+            }
+
+            return TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out timeOfDay);
+        }
+
+        private string FormatTimeDifference(TimeSpan difference)
+        {
+            double totalHours = System.Math.Abs(difference.TotalHours);
+            if (System.Math.Abs(totalHours) >= 1)
+                return ToNumberString(totalHours) + (totalHours == 1 ? " hour" : " hours");
+
+            double totalMinutes = System.Math.Abs(difference.TotalMinutes);
+            if (System.Math.Abs(totalMinutes) >= 1)
+                return ToNumberString(totalMinutes) + (totalMinutes == 1 ? " minute" : " minutes");
+
+            double totalSeconds = System.Math.Abs(difference.TotalSeconds);
+            return ToNumberString(totalSeconds) + (totalSeconds == 1 ? " second" : " seconds");
         }
 
         /// <summary>
@@ -1916,9 +2070,7 @@ namespace Calcify
 //  - calculations within functions
 //  - toolbar
 
-
 //  - Rename settings scheme to theme
-
 
 //  - accept inches, bytes, gallons, cups, speed (kmh, mh, ...), data speed (mbps, gbps, ...), tmrw, nmi (nautical miles) (1 nmi = 1852 m), carat (1 ct = 0.2 g), turn (turn, revolution) (1 turn = 360 degrees), THz, pressure, energy, Power, area, volumes (look supported-units.md) as keyword
 //  - basic calculation 1024 * x does not work
@@ -1928,7 +2080,6 @@ namespace Calcify
 //  - currency calculation
 //  - time difference (today - tomorrow, now - 09:00)
 //  - maybe update architecture.md
-//  - Time Formats (now.format("HH:mm:ss"), today.format("yyyy-MM-dd"))
 
 // Bugs:
 //  - Calculation is not working if line starts with brackets
@@ -1963,6 +2114,7 @@ namespace Calcify
 //  - refactored all code files to improve readability and maintainability
 //  - added optional line numbers
 //  - Status Bar Line and column
+//  - Time Formats (now.format("HH:mm:ss"), today.format("yyyy-MM-dd"))
 
 //  - Auto Completion
 //  - Recent Files List
