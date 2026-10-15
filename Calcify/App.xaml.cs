@@ -51,6 +51,9 @@ namespace Calcify
                 mainWindow.WindowState = WindowState.Minimized;
             mainWindow.Show();
 
+            if (openFile)
+                mainWindow.OpenFile(filePath);
+
             if (!await LoadExchangeRatesAsync(mainWindow))
             {
                 MessageBox.Show(mainWindow,
@@ -59,9 +62,6 @@ namespace Calcify
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
             }
-
-            if (openFile)
-                mainWindow.OpenFile(filePath);
         }
 
         internal async Task<bool> RefreshExchangeRatesAsync(MainWindow mainWindow)

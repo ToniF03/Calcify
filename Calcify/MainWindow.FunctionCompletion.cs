@@ -77,6 +77,8 @@ namespace Calcify
             new FunctionCompletionData("mode", "mode(value1, value2, ...)"),
             new FunctionCompletionData("stdev", "stdev(value1, value2, ...)"),
             new FunctionCompletionData("var", "var(value1, value2, ...)"),
+            new FunctionCompletionData("root", "root(value)"),
+            new FunctionCompletionData("root", "root(value, digits)")
         };
 
         private void InitializeFunctionCompletion()

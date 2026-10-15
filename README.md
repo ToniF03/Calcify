@@ -2,7 +2,7 @@
 
 # Calcify
 
-**A powerful calculator tool with advanced features for unit conversions, mathematical functions, and real-time currency exchange.**
+**A Windows calculator with text-based calculations, unit conversions, date and time expressions, and exchange-rate conversion.**
 
 [![Homepage](https://img.shields.io/badge/Homepage-Visit-blue)](https://tonif03.github.io/prod/calcify)
 [![Discord](https://img.shields.io/badge/Discord-Join-7289da)](https://discord.gg/MfHHgYtWub)
@@ -11,7 +11,7 @@
 
 ---
 
-[Calcify](https://tonif03.github.io/prod/calcify) is a powerful calculator tool that goes beyond basic arithmetic, offering advanced features such as unit conversions, time and date calculations, mathematical functions, and real-time currency exchange rates. Thanks to the [Frankfurter API](https://frankfurter.app), Calcify provides up-to-date exchange rates for accurate currency conversions. Whether you're a student, professional, or enthusiast, Calcify makes complex calculations simple and accessible.
+[Calcify](https://tonif03.github.io/prod/calcify) is a Windows desktop calculator that evaluates expressions in a text editor and supports unit conversions, date and time calculations, mathematical functions, and currency conversion. Currency conversion uses a locally stored dataset from the [Frankfurter API](https://frankfurter.app); rates are updated when the dataset is refreshed and are not a live market feed.
 
 ![Currency calculation](resources/1.png)
 
@@ -22,13 +22,14 @@
 - 📂 **Drag & Drop** - Drop supported files directly onto the window to open them
 - 🔢 **Smart Calculation** - Automatic calculation of total values based on caret position
 - 🌍 **Unit Conversions** - Work with:
-  - 💱 Currency (real-time exchange rates)
+  - 💱 Currency (Frankfurter exchange-rate dataset)
   - 📅 Dates and time
   - ⚖️ Weight and mass units
   - 📏 Length and distance units
   - 💾 Data size units
   - 🌡️ Temperature units
-  - And more!
+  - 📐 Angles
+  - 📻 Frequency
 - 🧮 **Advanced Math** - Support for complex mathematical operations and functions
 
 **Best of all: Calcify is [Free and Open Source Software (FOSS)](https://en.wikipedia.org/wiki/Free_and_open-source_software)!**
@@ -41,8 +42,8 @@ To install Calcify, download the latest release for your platform:
 
 ### System Requirements
 
-- **Operating System**: Windows 7 or later
-- **.NET Framework**: 4.5 or higher (usually pre-installed on Windows)
+- **Operating System**: Windows version compatible with .NET Framework 4.7.2
+- **.NET Framework**: 4.7.2 or compatible later version
 
 ### Installation Steps
 
@@ -93,13 +94,7 @@ If you know where a bug is in the code or have ideas on how to fix it, feel free
 
 ### 📚 Contributing Documentation
 
-Documentation is crucial for users and developers alike. Help improve our docs:
-
-- **Repository**: [calcify-docs](https://github.com/tonif03/calcify-docs)
-- **How to contribute**:
-  1. Fork the documentation repository
-  2. Fix typos, improve explanations, or add missing content
-  3. Submit a pull request
+Documentation is maintained in this repository under [`docs/`](docs/README.md). Update the relevant page and include it with your code contribution.
 
 **Translation Needed!** Help make Calcify accessible to more users by translating documentation into other languages.
 
@@ -108,7 +103,7 @@ Documentation is crucial for users and developers alike. Help improve our docs:
 ### Prerequisites
 
 - Visual Studio 2019 or later
-- .NET Framework 4.5 SDK or higher
+- .NET Framework 4.7.2 Developer Pack
 - NuGet Package Manager
 
 ### Build Steps
@@ -134,11 +129,12 @@ The compiled executable will be in `Calcify/bin/Release/`.
 - **Libraries**:
   - [AvalonEdit](https://github.com/icsharpcode/AvalonEdit) - Text editor component
   - [Newtonsoft.Json](https://www.newtonsoft.com/json) - JSON parsing
-  - [Microsoft.UI.Xaml](https://github.com/microsoft/microsoft-ui-xaml) - UI components
 - **APIs**:
   - [Frankfurter API](https://frankfurter.app) - Currency exchange rates
 
 ## 📄 License
+
+User and developer documentation is available in [docs/](docs/README.md).
 
 This software is licensed under the [MIT License](LICENSE).
 

@@ -933,7 +933,7 @@ namespace Calcify
 
             // Find and replace 'prev', 'previous', 'ans', 'answer', 'last' with the parser keyword for the last result
             if (acceptPrevious)
-                input = prevRegex.Replace(input, "{/last/}");
+                input = prevRegex.Replace(input, "{/last/}").Trim();
 
             while (inlineCalculationRegex.IsMatch(input))
             {
@@ -947,9 +947,6 @@ namespace Calcify
 
             // Replace all middle functions in the input
             input = ReplaceMiddleFunctions(input);
-
-            // Replace constants
-            input = ReplaceConstants(input);
 
             // Replace Functions
             input = ReplaceMultipleVariableFunctions(input);
@@ -992,11 +989,14 @@ namespace Calcify
                 }
             }
 
+            // Replace constants
+            input = ReplaceConstants(input);
+
             input = CurrencyConversion(input);
 
             // Execute Calculation
-            if (calculatorRegex.IsMatch(input) && !dateCalculation)
-                input = ParseCalculation(input);
+            if (calculatorRegex.IsMatch(input.Replace(" ", "")) && !dateCalculation)
+                input = ParseCalculation(input.Replace(" ", ""));
 
             return input;
         }
@@ -2168,7 +2168,7 @@ namespace Calcify
 //  - chained operations
 //  - implement variables
 //  - calculations within functions
-//  - toolbar
+//  - add closing brackets when opening them
 
 //  - Rename settings scheme to theme
 
@@ -2182,6 +2182,7 @@ namespace Calcify
 // Bugs:
 //  - Calculation is not working if line starts with brackets
 //  - -2^2 = -2?
+//  - Can't write dates
 
 
 // Refactor:
@@ -2202,21 +2203,6 @@ namespace Calcify
 
 
 // Done:
-//  - added theme toggle button 
-//  - optimized data value conversion
-//  - added Permutations and Combinations functions
-//  - added time parts (today.year, today.month, today.day, today.dayOfWeek, now.hour, now.minute, now.second)
-//  - added inline tasks
-//  - fixed now syntax highlighting
-//  - changed the way syntax files are generated to make it less static and more flexible
-//  - refactored all code files to improve readability and maintainability
-//  - added optional line numbers
-//  - Status Bar Line and column
-//  - Time Formats (now.format("HH:mm:ss"), today.format("yyyy-MM-dd"))
-//  - time difference (today - tomorrow, now - 09:00)
-
-//  - Auto Completion
-//  - Recent Files List
 
 //  - editor > F1 help
 //  - editor > ctrl + '0' reset zoom

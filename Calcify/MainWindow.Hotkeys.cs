@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using ICSharpCode.AvalonEdit;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,8 +22,8 @@ namespace Calcify
         public static RoutedCommand CtrlMinus = new RoutedCommand();
         public static RoutedCommand CtrlN = new RoutedCommand();
         public static RoutedCommand CtrlD = new RoutedCommand();
-        public static RoutedCommand CtrlFind = new RoutedCommand();
-        public static RoutedCommand CtrlReplace = new RoutedCommand();
+        public static RoutedCommand CtrlF = new RoutedCommand();
+        public static RoutedCommand CtrlH = new RoutedCommand();
         public static RoutedCommand CtrlL = new RoutedCommand();
         public static RoutedCommand CtrlSlash = new RoutedCommand();
         public static RoutedCommand CtrlComma = new RoutedCommand();
@@ -40,8 +41,8 @@ namespace Calcify
             CtrlPlus.InputGestures.Add(new KeyGesture(Key.OemPlus, ModifierKeys.Control));
             CtrlMinus.InputGestures.Add(new KeyGesture(Key.OemMinus, ModifierKeys.Control));
             CtrlD.InputGestures.Add(new KeyGesture(Key.D, ModifierKeys.Control));
-            CtrlFind.InputGestures.Add(new KeyGesture(Key.F, ModifierKeys.Control));
-            CtrlReplace.InputGestures.Add(new KeyGesture(Key.H, ModifierKeys.Control));
+            CtrlF.InputGestures.Add(new KeyGesture(Key.F, ModifierKeys.Control));
+            CtrlH.InputGestures.Add(new KeyGesture(Key.H, ModifierKeys.Control));
             CtrlL.InputGestures.Add(new KeyGesture(Key.L, ModifierKeys.Control));
             CtrlSlash.InputGestures.Add(new KeyGesture(Key.Oem2, ModifierKeys.Control));
             CtrlComma.InputGestures.Add(new KeyGesture(Key.OemComma, ModifierKeys.Control));
@@ -147,8 +148,11 @@ namespace Calcify
         private void CtrlL_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             int caretLine = mainEditor.TextArea.Caret.Line;
-            mainEditor.Document.Remove(mainEditor.Document.GetLineByNumber(caretLine));
-            mainEditor.Document.Remove(mainEditor.Document.GetLineByNumber(caretLine).Offset, 1);
+            var line = mainEditor.Document.GetLineByNumber(caretLine);
+            if (caretLine == mainEditor.Document.LineCount)
+                mainEditor.Document.Remove(line.Offset - 1, line.TotalLength + 1);
+            else
+                mainEditor.Document.Remove(line.Offset, line.TotalLength);
         }
 
         /// <summary>

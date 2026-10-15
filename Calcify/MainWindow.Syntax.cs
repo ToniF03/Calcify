@@ -120,6 +120,7 @@ namespace Calcify
             // Add support for one-value functions like "exp", "sqrt", "sign", "abs", "floor", "ceil", "cbrt", "fact", trigonometric functions, "ln", and "trunc"
             darkSyntax.AddComment("One Value Functions");
             darkSyntax.AddFunction("\\b" + oneValueFunctionKeywords + "(?=\\(-?\\d+(\\.\\d+)?\\))");
+            darkSyntax.AddFunction("\\b" + oneValueFunctionKeywords + "(?=\\(" + ConstantsPattern + "\\))");
 
             // Add support for two-value functions like "diff", "rand", "randint", "round", "root", "mod", "log", "pow", "perm", and "comb(a)?"
             darkSyntax.AddComment("Two Value Functions");

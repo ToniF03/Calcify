@@ -38,8 +38,8 @@
         <CommandBinding Command="{x:Static local:MainWindow.F1}" Executed="F1_Executed" />
         <!-- Duplicate Line -->
         <CommandBinding Command="{x:Static local:MainWindow.CtrlD}" Executed="CtrlD_Executed" />
-        <CommandBinding Command="{x:Static local:MainWindow.CtrlFind}" Executed="CtrlFind_Executed" />
-        <CommandBinding Command="{x:Static local:MainWindow.CtrlReplace}" Executed="CtrlReplace_Executed" />
+        <CommandBinding Command="{x:Static local:MainWindow.CtrlF}" Executed="CtrlFind_Executed" />
+        <CommandBinding Command="{x:Static local:MainWindow.CtrlH}" Executed="CtrlReplace_Executed" />
         <!-- Delete Line -->
         <CommandBinding Command="{x:Static local:MainWindow.CtrlL}" Executed="CtrlL_Executed" />
         <!-- Toggle Comment -->

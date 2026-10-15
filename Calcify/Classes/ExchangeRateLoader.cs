@@ -16,7 +16,7 @@ namespace Calcify.Classes
     internal class ExchangeRateLoader
     {
         // By https://www.frankfurter.app/
-        private static string exchangeRateLink = "https://api.frankfurter.app/latest";
+        private static string exchangeRateLink = "https://api.frankfurter.dev/v2/rates";
 
         [DllImport("wininet.dll", CharSet = CharSet.Auto)]
         private extern static bool InternetGetConnectedState(ref InternetConnectionState_e lpdwFlags, int dwReserved);
@@ -44,13 +44,15 @@ namespace Calcify.Classes
 
             // Creates an dictionary that contains the ISO-4217 codes and the exchange rate to USD
             Dictionary<string, double> newCurrencyDict = new Dictionary<string, double>();
-            string filePath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "exchangerate.json");
+            string filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "exchangerate.json");
             if (File.Exists(filePath))
             {
                 JObject exchangerate = JObject.Parse(File.ReadAllText(filePath));
-                foreach (JProperty child in exchangerate["rates"].Children())
+                foreach (JObject child in exchangerate["data"].Children())
                 {
-                    newCurrencyDict.Add(child.Name, double.Parse(child.Value.ToString().Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture));
+                    string quote = child["quote"].ToString();
+                    string rawRate = child["rate"].ToString().Replace(',', '.');
+                    newCurrencyDict.Add(quote, double.Parse(rawRate, NumberStyles.Float, CultureInfo.InvariantCulture));
                 }
                 currencyDict = newCurrencyDict;
                 currencyPattern = "(EUR|" + string.Join("|", currencyDict.Keys) + ")";
@@ -94,16 +96,18 @@ namespace Calcify.Classes
                 using (WebClient webClient = new WebClient())
                 {
                     string downloadedContent = webClient.DownloadString(exchangeRateLink);
-                    JObject exchangeRate = JObject.Parse(downloadedContent);
+                    JObject exchangeRate = JObject.Parse("{\"data\":" + downloadedContent + "}");
                     if (!TryGetRateDate(exchangeRate, out DateTime rateDate))
                         return false;
 
-                    File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "exchangerate.json"), downloadedContent);
+                    File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "exchangerate.json"), "{\"data\":" + downloadedContent + "}");
                 }
                 return true;
             }
-            catch
+            catch (Exception e)
             {
+                throw e;
+                Console.WriteLine($"Error occured: {e}");
                 return false;
             }
         }
@@ -111,14 +115,14 @@ namespace Calcify.Classes
         private static bool TryGetRateDate(JObject exchangeRate, out DateTime rateDate)
         {
             rateDate = default(DateTime);
-            JToken dateToken = exchangeRate["date"];
-            JToken ratesToken = exchangeRate["rates"];
-            if (dateToken == null || !(ratesToken is JObject rates) || !rates.Properties().Any())
+            JToken dateToken = exchangeRate["data"][0]["date"];
+            JToken ratesToken = exchangeRate["data"];
+            if (dateToken == null || !(ratesToken is JArray rates) || !rates.Children().Any())
                 return false;
 
-            foreach (JProperty rate in rates.Properties())
+            foreach (JObject currency in rates)
             {
-                string rateValue = rate.Value.ToString().Replace(',', '.');
+                string rateValue = currency["rate"].ToString().Replace(',', '.');
                 if (!double.TryParse(rateValue, NumberStyles.Float, CultureInfo.InvariantCulture, out double value) ||
                     value <= 0 || double.IsNaN(value) || double.IsInfinity(value))
                     return false;
