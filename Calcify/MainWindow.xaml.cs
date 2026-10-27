@@ -779,6 +779,7 @@ namespace Calcify
                 int currentLineNumber = mainEditor.Document.GetLineByOffset(mainEditor.CaretOffset).LineNumber;
                 DocumentLine currentLine = mainEditor.Document.GetLineByNumber(currentLineNumber);
                 string lineText = mainEditor.Document.GetText(currentLine.Offset, currentLine.Length);
+                int caret = mainEditor.CaretOffset - currentLine.Offset;
 
                 if (lineText.StartsWith(new string(' ', Properties.Settings.Default.TabSize)))
                 {
@@ -790,6 +791,14 @@ namespace Calcify
                     {
                         e.Handled = true;
                         mainEditor.Document.Remove(currentLine.Offset, Properties.Settings.Default.TabSize);
+                    }
+                }
+                else if (lineText.Length != caret)
+                {
+                    if (lineText.Substring(caret - 1, 2) == "()" || lineText.Substring(caret - 1, 2) == "[]" || lineText.Substring(caret - 1, 2) == "{}")
+                    {
+                        e.Handled = true;
+                        mainEditor.Document.Replace(mainEditor.CaretOffset - 1, 2, "");
                     }
                 }
             }
