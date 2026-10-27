@@ -75,8 +75,8 @@ namespace Calcify
         private readonly List<int> inputWrappedLineCounts = new List<int>();
         private readonly List<int> targetWrappedLineCounts = new List<int>();
         private readonly List<int> resultBlockLastLines = new List<int>();
-        private LineSpacingElementGenerator mainLineSpacingElementGenerator;
-        private LineSpacingElementGenerator resultLineSpacingElementGenerator;
+        private readonly LineSpacingElementGenerator mainLineSpacingElementGenerator;
+        private readonly LineSpacingElementGenerator resultLineSpacingElementGenerator;
 
         private Dictionary<Type, Func<double, Enum, Enum, double>> converterDict = new Dictionary<Type, Func<double, Enum, Enum, double>>();
         #endregion
@@ -175,6 +175,7 @@ namespace Calcify
         public MainWindow()
         {
             InitializeComponent();
+            SourceInitialized += (_, __) => NativeWindowStyle.ApplyWindowFrame(this);
             mainLineSpacingElementGenerator = new LineSpacingElementGenerator(GetInputLineSpacingHeight);
             resultLineSpacingElementGenerator = new LineSpacingElementGenerator(GetResultLineSpacingHeight);
             mainEditor.TextArea.TextView.ElementGenerators.Add(mainLineSpacingElementGenerator);
@@ -220,10 +221,10 @@ namespace Calcify
             mainEditor.TextChanged += MainEditor_TextChanged;
             mainEditor.SizeChanged += MainEditor_SizeChanged;
             resultEditor.SizeChanged += MainEditor_SizeChanged;
-            mainEditor.TextArea.Caret.PositionChanged += mainEditor_Caret_PositionChanged;
+            mainEditor.TextArea.Caret.PositionChanged += MainEditor_Caret_PositionChanged;
             InitializeFunctionCompletion();
             mainEditor.PreviewKeyDown += MainEditor_PreviewKeyDown;
-            mainEditor.GotFocus += mainEditor_GotFocus;
+            mainEditor.GotFocus += MainEditor_GotFocus;
 
             MinimizeButton.Click += MinimizeButton_Click;
             MaximizeButton.Click += MaximizeButton_Click;
@@ -264,7 +265,7 @@ namespace Calcify
             this.MaxWidth = SystemParameters.MaximizedPrimaryScreenWidth;
             DropPanel.Visibility = Visibility.Visible;
 
-            resultEditor.TextArea.Caret.PositionChanged += resultEditor_Caret_PositionChanged;
+            resultEditor.TextArea.Caret.PositionChanged += ResultEditor_Caret_PositionChanged;
             resultEditor.TextArea.Caret.CaretBrush = Brushes.Transparent;
             InitializeCurrentLineHighlighting();
 
@@ -450,8 +451,10 @@ namespace Calcify
 
                 bool wrappedRowsChanged = !previousInputWrappedLineCounts.SequenceEqual(inputWrappedLineCounts) ||
                     !previousTargetWrappedLineCounts.SequenceEqual(targetWrappedLineCounts);
-                TextDocument alignedResults = new TextDocument();
-                alignedResults.Text = string.Join("\n", resultDocumentLines);
+                TextDocument alignedResults = new TextDocument
+                {
+                    Text = string.Join("\n", resultDocumentLines)
+                };
                 if (resultEditor.Document.Text != alignedResults.Text)
                 {
                     SetAlignedResultDocument(alignedResults.Text);
@@ -583,7 +586,7 @@ namespace Calcify
             }
         }
 
-        private void mainEditor_GotFocus(object sender, RoutedEventArgs e)
+        private void MainEditor_GotFocus(object sender, RoutedEventArgs e)
         {
             resultEditor.SelectionLength = 0;
         }
@@ -610,8 +613,7 @@ namespace Calcify
             currencyRegex = regex;
             currencyDict = rates;
             MainEditor_TextChanged(mainEditor, EventArgs.Empty);
-            if (settingsWindow != null)
-                settingsWindow.UpdateLastExchangeRateDate();
+            settingsWindow?.UpdateLastExchangeRateDate();
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -804,7 +806,7 @@ namespace Calcify
             }
         }
 
-        private void resultEditor_Caret_PositionChanged(object sender, EventArgs e)
+        private void ResultEditor_Caret_PositionChanged(object sender, EventArgs e)
         {
             if (isSynchronizingResultEditor)
                 return;
@@ -830,7 +832,7 @@ namespace Calcify
             }
         }
 
-        private void mainEditor_Caret_PositionChanged(object sender, EventArgs e)
+        private void MainEditor_Caret_PositionChanged(object sender, EventArgs e)
         {
             int caretLineNumber = mainEditor.Document.GetLineByOffset(mainEditor.CaretOffset).LineNumber;
             TextView textView = mainEditor.TextArea.TextView;

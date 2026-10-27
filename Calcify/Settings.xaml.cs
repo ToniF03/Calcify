@@ -35,6 +35,7 @@ namespace Calcify
         public Settings()
         {
             InitializeComponent();
+            SourceInitialized += (_, __) => NativeWindowStyle.ApplyWindowFrame(this);
             closeButton.Click += CloseButton_Click;
             LessDecimalsButton.Click += DecimalsButton_Click;
             MoreDecimalsButton.Click += DecimalsButton_Click;

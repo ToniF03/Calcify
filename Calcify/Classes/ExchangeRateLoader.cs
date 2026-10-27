@@ -16,7 +16,7 @@ namespace Calcify.Classes
     internal class ExchangeRateLoader
     {
         // By https://www.frankfurter.app/
-        private static string exchangeRateLink = "https://api.frankfurter.dev/v2/rates";
+        private const string exchangeRateLink = "https://api.frankfurter.dev/v2/rates";
 
         [DllImport("wininet.dll", CharSet = CharSet.Auto)]
         private extern static bool InternetGetConnectedState(ref InternetConnectionState_e lpdwFlags, int dwReserved);
@@ -48,7 +48,7 @@ namespace Calcify.Classes
             if (File.Exists(filePath))
             {
                 JObject exchangerate = JObject.Parse(File.ReadAllText(filePath));
-                foreach (JObject child in exchangerate["data"].Children())
+                foreach (JObject child in exchangerate["data"].Children().Cast<JObject>())
                 {
                     string quote = child["quote"].ToString();
                     string rawRate = child["rate"].ToString().Replace(',', '.');
@@ -107,20 +107,18 @@ namespace Calcify.Classes
             catch (Exception e)
             {
                 throw e;
-                Console.WriteLine($"Error occured: {e}");
-                return false;
             }
         }
 
         private static bool TryGetRateDate(JObject exchangeRate, out DateTime rateDate)
         {
-            rateDate = default(DateTime);
+            rateDate = default;
             JToken dateToken = exchangeRate["data"][0]["date"];
             JToken ratesToken = exchangeRate["data"];
             if (dateToken == null || !(ratesToken is JArray rates) || !rates.Children().Any())
                 return false;
 
-            foreach (JObject currency in rates)
+            foreach (JObject currency in rates.Cast<JObject>())
             {
                 string rateValue = currency["rate"].ToString().Replace(',', '.');
                 if (!double.TryParse(rateValue, NumberStyles.Float, CultureInfo.InvariantCulture, out double value) ||
