@@ -35,7 +35,7 @@ namespace Calcify
         public Settings()
         {
             InitializeComponent();
-            SourceInitialized += (_, __) => NativeWindowStyle.ApplyWindowFrame(this);
+            SourceInitialized += (_, __) => NativeWindowStyle.ApplyWindowFrame(this, canMaximize: false);
             closeButton.Click += CloseButton_Click;
             LessDecimalsButton.Click += DecimalsButton_Click;
             MoreDecimalsButton.Click += DecimalsButton_Click;
@@ -44,7 +44,7 @@ namespace Calcify
             DecreaseTabSpaceButton.Click += TabSpaceButton_Click;
             IncreaseTabSpaceButton.Click += TabSpaceButton_Click;
             EditorTabSpaceTextBox.TextChanged += EditorTabSpaceTextBox_TextChanged;
-
+            
             DecimalPlacesTextBox.PreviewTextInput += (sender, e) =>
             {
                 if (!new Regex(@"\d+").IsMatch(e.Text))
@@ -100,7 +100,7 @@ namespace Calcify
             {
                 using (RegistryKey key = Registry.CurrentUser.OpenSubKey(AppUpdateSettingsRegistryPath))
                 {
-                    object value = key == null ? null : key.GetValue(valueName);
+                    object value = key?.GetValue(valueName);
                     if (value != null && int.TryParse(
                         Convert.ToString(value, CultureInfo.InvariantCulture),
                         NumberStyles.Integer,
@@ -277,8 +277,7 @@ namespace Calcify
         internal void UpdateLastExchangeRateDate()
         {
             DateTime? rateDate = ExchangeRateLoader.GetLastUpdatedDate();
-            TextBlock lastUpdatedTextBlock = FindName("LastExchangeRateUpdateTextBlock") as TextBlock;
-            if (lastUpdatedTextBlock == null)
+            if (!(FindName("LastExchangeRateUpdateTextBlock") is TextBlock lastUpdatedTextBlock))
                 return;
 
             lastUpdatedTextBlock.Text = rateDate.HasValue

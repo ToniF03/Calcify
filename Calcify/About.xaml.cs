@@ -28,7 +28,7 @@ namespace Calcify
         public About()
         {
             InitializeComponent();
-            SourceInitialized += (_, __) => NativeWindowStyle.ApplyWindowFrame(this);
+            SourceInitialized += (_, __) => NativeWindowStyle.ApplyWindowFrame(this, canMaximize: false);
 
             // Close button handler
             closeButton.Click += CloseButton_Click;

@@ -31,7 +31,7 @@ namespace Calcify
         public DialogWindow()
         {
             InitializeComponent();
-            SourceInitialized += (_, __) => NativeWindowStyle.ApplyWindowFrame(this);
+            SourceInitialized += (_, __) => NativeWindowStyle.ApplyWindowFrame(this, canMaximize: false);
             Enter.InputGestures.Add(new KeyGesture(Key.Enter));
             Space.InputGestures.Add(new KeyGesture(Key.Space));
             Esc.InputGestures.Add(new KeyGesture(Key.Escape));
