@@ -1000,36 +1000,49 @@
                 </Style.Triggers>
             </Style>
             <!--#region SCROLLBARS-->
-            <!-- Rounded scrollbar thumb with theme-aware hover styling. -->
-            <Style x:Key="ScrollThumbs" TargetType="{x:Type Thumb}" >
-                <Setter Property="Template" >
+            <Style TargetType="{x:Type Thumb}">
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="OverridesDefaultStyle" Value="True" />
+                <Setter Property="Background" Value="#8A8A8A" />
+                <Setter Property="Template">
                     <Setter.Value>
-                        <ControlTemplate>
-                            <Grid x:Name="Grid" >
-                                <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" 
-                                           Height="Auto" Fill="Transparent" />
-                                <Border x:Name="Rectangle1" CornerRadius="3" HorizontalAlignment="Stretch" 
-                                        VerticalAlignment="Stretch" Width="Auto" Height="Auto" 
-                                         >
-                                    <Border.Style>
-                                        <!-- Border surface with a subtle theme-aware background or hover highlight. -->
-                                        <Style TargetType="Border">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True">
-                                                    <Setter Property="Background" Value="#22FFFFFF" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="False">
-                                                    <Setter Property="Background" Value="#22000000" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                </Border>
-                            </Grid>
+                        <ControlTemplate TargetType="{x:Type Thumb}">
+                            <Border x:Name="ScrollThumb"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="5"
+                                    Margin="2,0"
+                                    Opacity="0.72" />
                             <ControlTemplate.Triggers>
-                                <Trigger Property="Tag" Value="Horizontal" >
-                                    <Setter TargetName="Rectangle1" Property="Width" Value="Auto" />
-                                    <Setter TargetName="Rectangle1" Property="Height" Value="7" />
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ScrollThumb" Property="Opacity" Value="1" />
+                                </Trigger>
+                                <Trigger Property="IsDragging" Value="True">
+                                    <Setter TargetName="ScrollThumb" Property="Opacity" Value="1" />
+                                </Trigger>
+                                <DataTrigger Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True">
+                                    <Setter Property="Background" Value="#5A5A5A" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="False">
+                                    <Setter Property="Background" Value="#8A8A8A" />
+                                </DataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="True" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Background" Value="#7B7B7B" />
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Source={x:Static properties:Settings.Default}, Path=DarkMode}" Value="False" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Background" Value="#999999" />
+                                </MultiDataTrigger>
+                                <Trigger Property="Tag" Value="Horizontal">
+                                    <Setter TargetName="ScrollThumb" Property="CornerRadius" Value="4" />
+                                    <Setter TargetName="ScrollThumb" Property="Height" Value="8" />
+                                    <Setter TargetName="ScrollThumb" Property="Margin" Value="0,2" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -1037,58 +1050,38 @@
                 </Setter>
             </Style>
 
-            <!-- Slim theme-aware scrollbar with a minimal track and thumb. -->
-            <Style x:Key="{x:Type ScrollBar}" TargetType="{x:Type ScrollBar}" >
+            <Style TargetType="{x:Type ScrollBar}">
                 <Setter Property="Stylus.IsFlicksEnabled" Value="False" />
-                <Setter Property="Foreground" Value="#11FFFFFF" />
-                <Setter Property="Background" Value="#11FFFFFF" />
-                <Setter Property="Width" Value="5" />
-                <Setter Property="Template" >
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="OverridesDefaultStyle" Value="True" />
+                <Setter Property="Width" Value="10" />
+                <Setter Property="Template">
                     <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type ScrollBar}" >
-                            <Grid x:Name="GridRoot" Width="7" Background="{x:Null}" >
-                                <Track x:Name="PART_Track" Grid.Row="0" IsDirectionReversed="true" Focusable="False" >
-                                    <Track.Thumb>
-                                        <Thumb x:Name="Thumb" Background="{TemplateBinding Foreground}" 
-                                               Style="{DynamicResource ScrollThumbs}" />
-                                    </Track.Thumb>
-                                    <Track.IncreaseRepeatButton>
-                                        <RepeatButton x:Name="PageUp" Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="False" />
-                                    </Track.IncreaseRepeatButton>
+                        <ControlTemplate TargetType="{x:Type ScrollBar}">
+                            <Grid x:Name="GridRoot" Background="Transparent" SnapsToDevicePixels="True">
+                                <Track x:Name="PART_Track" IsDirectionReversed="True" Focusable="False">
                                     <Track.DecreaseRepeatButton>
-                                        <RepeatButton x:Name="PageDown" Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="False" />
+                                        <RepeatButton Command="ScrollBar.PageUpCommand" Style="{x:Null}" Opacity="0" Focusable="False" />
                                     </Track.DecreaseRepeatButton>
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton Command="ScrollBar.PageDownCommand" Style="{x:Null}" Opacity="0" Focusable="False" />
+                                    </Track.IncreaseRepeatButton>
+                                    <Track.Thumb>
+                                        <Thumb Tag="Vertical" />
+                                    </Track.Thumb>
                                 </Track>
                             </Grid>
-
                             <ControlTemplate.Triggers>
-                                <Trigger SourceName="Thumb" Property="IsMouseOver" Value="true" >
-                                    <Setter Value="#22FFFFFF" 
-                                            TargetName="Thumb" Property="Background" />
-                                </Trigger>
-                                <Trigger SourceName="Thumb" Property="IsDragging" Value="true" >
-                                    <Setter Value="#22FFFFFF" TargetName="Thumb" Property="Background" />
-                                </Trigger>
-
-                                <Trigger Property="IsEnabled" Value="false" >
-                                    <Setter TargetName="Thumb" Property="Visibility" Value="Collapsed" />
-                                </Trigger>
-                                <Trigger Property="Orientation" Value="Horizontal" >
-                                    <Setter TargetName="GridRoot" Property="LayoutTransform" >
-                                        <Setter.Value>
-                                            <RotateTransform Angle="-90" />
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Setter TargetName="PART_Track" Property="LayoutTransform" >
+                                <Trigger Property="Orientation" Value="Horizontal">
+                                    <Setter TargetName="GridRoot" Property="LayoutTransform">
                                         <Setter.Value>
                                             <RotateTransform Angle="-90" />
                                         </Setter.Value>
                                     </Setter>
                                     <Setter Property="Width" Value="Auto" />
-                                    <Setter Property="Height" Value="12" />
-                                    <Setter TargetName="Thumb" Property="Tag" Value="Horizontal" />
-                                    <Setter TargetName="PageDown" Property="Command" Value="ScrollBar.PageLeftCommand" />
-                                    <Setter TargetName="PageUp" Property="Command" Value="ScrollBar.PageRightCommand" />
+                                    <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="False" />
+                                    <Setter TargetName="PART_Track" Property="Tag" Value="Horizontal" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
